@@ -1,6 +1,7 @@
 package keyframes;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
@@ -21,6 +22,9 @@ public class Main {
 		window.setTitle("Keyframes");
 		window.setVisible(true);
 		window.setBackground(Color.RED);
+		
+		window.setMinimumSize(new Dimension(1600,900));
+		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		
 		MainMenu menu = new MainMenu(window);
 		menu.buildUI();

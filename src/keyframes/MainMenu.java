@@ -36,8 +36,7 @@ public class MainMenu {
 	
 	public void buildUI() {
 		
-		parent.setMinimumSize(new Dimension(1600,900));
-		//parent.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		
 		
 		
 		leftPanel = new JPanel();

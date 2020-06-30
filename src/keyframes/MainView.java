@@ -6,13 +6,16 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 
 public class MainView {
@@ -21,7 +24,18 @@ public class MainView {
 	private JPanel mainWindow;
 	
 	private JPanel topBar;
-	private JToolBar topToolbar;
+	private JMenuBar topMenuBar;
+	private JToolBar topToolBar;
+	
+	private SplitPaneManager drawableAndTimelinePane;
+	
+	private JMenu fileMenu;
+	private JMenu editMenu;
+	
+	private JMenuItem newProjectMenuItem;
+	private JMenuItem openProjectMenuItem;
+	private JMenuItem saveProjectMenuItem;
+	private JMenuItem saveProjectAsButton;
 	
 	public MainView(JFrame parent) {
 		this.parent = parent;
@@ -33,10 +47,25 @@ public class MainView {
 		mainWindow.setBackground(Color.blue);
 		
 		buildTopBar();
+		buildDrawableAndTimeline();
 		parent.revalidate();
 		parent.repaint();
 	}
 	
+	private void buildDrawableAndTimeline() {
+		
+		Timeline mainTimeline = new Timeline(drawableAndTimelinePane, false);
+		Drawable mainDrawable = new Drawable(drawableAndTimelinePane, false);
+
+		drawableAndTimelinePane = new SplitPaneManager(mainDrawable, mainTimeline, true);
+		drawableAndTimelinePane.setTopOrLeft(mainDrawable);
+		drawableAndTimelinePane.setBottomOrRight(mainTimeline);
+		
+		mainTimeline.build();
+		mainDrawable.build();
+	
+		mainWindow.add(drawableAndTimelinePane.getMainComponent());
+	}
 	
 	private void buildTopBar() {
 		topBar = new JPanel();
@@ -45,32 +74,47 @@ public class MainView {
 		
 		mainWindow.add(topBar, BorderLayout.PAGE_START);
 		buildTopMenuBar();
-		buildTopToolbar();
+		buildtopToolBar();
 	}
 	
 	private void buildTopMenuBar() {
-		JMenuBar menuBar = new JMenuBar();
-		JMenu firstMenu = new JMenu("TEST");
-		menuBar.add(firstMenu);
-		menuBar.setAlignmentX(Component.LEFT_ALIGNMENT);
-		topBar.add(menuBar);
+		topMenuBar = new JMenuBar();
+		
+		fileMenu = new JMenu("File");
+		newProjectMenuItem = new JMenuItem("New Project");
+		openProjectMenuItem = new JMenuItem("Open Project");
+		saveProjectMenuItem = new JMenuItem("Save");
+		saveProjectAsButton = new JMenuItem("Save As..");
+		
+		fileMenu.add(newProjectMenuItem);
+		fileMenu.add(openProjectMenuItem);
+		fileMenu.add(saveProjectMenuItem);
+		fileMenu.add(saveProjectAsButton);
+		
+		topMenuBar.add(fileMenu);
+		
+		editMenu = new JMenu("Edit");
+		topMenuBar.add(editMenu);
+		
+		topMenuBar.setAlignmentX(Component.LEFT_ALIGNMENT);
+		topBar.add(topMenuBar);
 	}
 	
-	private void buildTopToolbar() {
-		topToolbar = new JToolBar(JToolBar.HORIZONTAL);
-		topToolbar.setPreferredSize(new Dimension(0,30));
-		topToolbar.setFloatable(false);
-		topToolbar.setAlignmentX(Component.LEFT_ALIGNMENT);
-		buildTopToolbarButtons();
-		topBar.add(topToolbar);
+	private void buildtopToolBar() {
+		topToolBar = new JToolBar(JToolBar.HORIZONTAL);
+		topToolBar.setPreferredSize(new Dimension(0,30));
+		topToolBar.setFloatable(false);
+		topToolBar.setAlignmentX(Component.LEFT_ALIGNMENT);
+		buildtopToolBarButtons();
+		topBar.add(topToolBar);
 		
 	}
 	
-	private void buildTopToolbarButtons() {
+	private void buildtopToolBarButtons() {
 		JButton first = new JButton("first");
 		JButton second = new JButton("second");
 		first.setEnabled(true);
-		topToolbar.add(first);
-		topToolbar.add(second);
+		topToolBar.add(first);
+		topToolBar.add(second);
 	}
 }
