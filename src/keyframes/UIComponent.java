@@ -4,7 +4,9 @@ import javax.swing.JComponent;
 
 public interface UIComponent {
 	
-	public void addToParent(UIComponent parent);
+	
+	
+	public Session getSession();
 	
 	public void addChild(UIComponent child);
 

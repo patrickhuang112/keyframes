@@ -22,7 +22,7 @@ public class Drawable implements UIComponent {
 	
 	public Drawable(UIComponent parent, boolean addToParent) {
 		this.parent = parent;
-		drawPanel = new DrawablePanel();
+		drawPanel = new DrawablePanel(this);
 		if(addToParent) {
 			parent.getMainComponent().add(drawPanel, BorderLayout.CENTER);
 		}
@@ -32,10 +32,6 @@ public class Drawable implements UIComponent {
 		drawPanel.setBackground(Color.white);
 	}
 	
-	@Override
-	public void addToParent(UIComponent parent) {
-		parent.getMainComponent().add(drawPanel);
-	}
 	
 	@Override
 	public void addChild(UIComponent child) {
@@ -45,6 +41,11 @@ public class Drawable implements UIComponent {
 	@Override
 	public JComponent getMainComponent() {
 		return drawPanel;
+	}
+
+	@Override
+	public Session getSession() {
+		return parent.getSession();
 	}
 	
 }

@@ -7,6 +7,7 @@ import javax.swing.JSplitPane;
 
 public class SplitPaneManager implements UIComponent {
 
+	private SessionObject parent;
 	
 	private JSplitPane splitPane;
 	
@@ -18,13 +19,31 @@ public class SplitPaneManager implements UIComponent {
 	
 	private int orientation;
 	
-	
-	
-	public SplitPaneManager(UIComponent topOrLeft, UIComponent bottomOrRight) {
-		this(topOrLeft, bottomOrRight, false);
+	public void setParent(SessionObject parent) {
+		this.parent = parent;
 	}
 	
-	public SplitPaneManager(UIComponent topOrLeft, UIComponent bottomOrRight, boolean vertSplit) {
+	public SessionObject getParent() {
+		return parent;
+	}
+	
+	public SplitPaneManager(SessionObject parent, boolean vertSplit) {
+		this.parent = parent;
+		if(vertSplit) {
+			this.splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+			this.orientation = JSplitPane.VERTICAL_SPLIT;
+		} else {
+			this.splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+			this.orientation = JSplitPane.HORIZONTAL_SPLIT;
+		}
+	}
+	
+	public SplitPaneManager(SessionObject parent, UIComponent topOrLeft, UIComponent bottomOrRight) {
+		this(parent, topOrLeft, bottomOrRight, false);
+	}
+	
+	public SplitPaneManager(SessionObject parent, UIComponent topOrLeft, UIComponent bottomOrRight, boolean vertSplit) {
+		this.parent = parent;
 		if(vertSplit) {
 			this.splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 			this.orientation = JSplitPane.VERTICAL_SPLIT;
@@ -33,11 +52,8 @@ public class SplitPaneManager implements UIComponent {
 			this.orientation = JSplitPane.HORIZONTAL_SPLIT;
 		}
 		
-		this.topOrLeftComp = topOrLeft.getMainComponent();
-		this.bottomOrRightComp = bottomOrRight.getMainComponent();
-		
-		this.topOrLeftComp.setMinimumSize(new Dimension(0, 200));
-		this.bottomOrRightComp.setMinimumSize(new Dimension(0, 200));
+		setTopOrLeft(topOrLeft);
+		setBottomOrRight(bottomOrRight);
 	}
 
 	public UIComponent getTopOrLeft() {
@@ -50,17 +66,16 @@ public class SplitPaneManager implements UIComponent {
 	
 	public void setTopOrLeft(UIComponent topOrLeft) {
 		this.topOrLeft = topOrLeft;
+		this.topOrLeftComp = topOrLeft.getMainComponent();
+		this.topOrLeftComp.setMinimumSize(new Dimension(0, 200));
 		splitPane.setTopComponent(topOrLeft.getMainComponent());
 	}
 	
 	public void setBottomOrRight(UIComponent bottomOrRight) {
 		this.bottomOrRight = bottomOrRight;
+		this.bottomOrRightComp = bottomOrRight.getMainComponent();
+		this.bottomOrRightComp.setMinimumSize(new Dimension(0, 200));
 		splitPane.setBottomComponent(bottomOrRight.getMainComponent());
-	}
-	
-	@Override
-	public void addToParent(UIComponent parent) {
-		parent.getMainComponent().add(splitPane);
 	}
 	
 	@Override
@@ -72,6 +87,10 @@ public class SplitPaneManager implements UIComponent {
 	public JComponent getMainComponent() {
 		return splitPane;
 	}
-	
-	
+
+	@Override
+	public Session getSession() {
+		return parent.getSession();
+	}
+
 }

@@ -1,15 +1,24 @@
 package keyframes;
 
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.net.URL;
 
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -18,7 +27,9 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 
-public class MainView {
+public class MainView implements SessionObject{
+	
+	private Session session;
 	
 	private JFrame parent;
 	private JPanel mainWindow;
@@ -37,7 +48,8 @@ public class MainView {
 	private JMenuItem saveProjectMenuItem;
 	private JMenuItem saveProjectAsButton;
 	
-	public MainView(JFrame parent) {
+	public MainView(JFrame parent, Session session) {
+		this.session = session;
 		this.parent = parent;
 		mainWindow = new JPanel(new BorderLayout());
 		this.parent.add(mainWindow, BorderLayout.CENTER);
@@ -54,10 +66,12 @@ public class MainView {
 	
 	private void buildDrawableAndTimeline() {
 		
+		drawableAndTimelinePane = new SplitPaneManager(this, true);
+		
 		Timeline mainTimeline = new Timeline(drawableAndTimelinePane, false);
 		Drawable mainDrawable = new Drawable(drawableAndTimelinePane, false);
 
-		drawableAndTimelinePane = new SplitPaneManager(mainDrawable, mainTimeline, true);
+		
 		drawableAndTimelinePane.setTopOrLeft(mainDrawable);
 		drawableAndTimelinePane.setBottomOrRight(mainTimeline);
 		
@@ -111,10 +125,47 @@ public class MainView {
 	}
 	
 	private void buildtopToolBarButtons() {
-		JButton first = new JButton("first");
-		JButton second = new JButton("second");
-		first.setEnabled(true);
-		topToolBar.add(first);
-		topToolBar.add(second);
+		
+		try {
+			Image eraserImage = ImageIO.read(this.getClass().getResource("../resources/eraseIcon.bmp"));
+			Image drawImage = ImageIO.read(this.getClass().getResource("../resources/drawIcon.bmp"));
+			
+			JButton eraseTool = new JButton(new ImageIcon(eraserImage));
+			JButton drawTool = new JButton(new ImageIcon(drawImage));
+			
+			drawTool.setVisible(true);
+			drawTool.setPreferredSize(new Dimension(20,20));
+			drawTool.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					session.setPaintSetting(EnumFactory.PaintSetting.DRAW);
+				}
+			});
+			
+			eraseTool.setVisible(true);
+			eraseTool.setPreferredSize(new Dimension(20,20));
+			eraseTool.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					session.setPaintSetting(EnumFactory.PaintSetting.ERASE);
+				}
+			});
+			
+			
+			topToolBar.add(eraseTool);
+			topToolBar.add(drawTool);
+		} catch (Exception e) {
+			System.out.println("Icon creation failed");
+		}
+		
+		
+		
+		
+		
 	}
+
+	@Override
+	public Session getSession() {
+		return session;
+	}
+
+
 }

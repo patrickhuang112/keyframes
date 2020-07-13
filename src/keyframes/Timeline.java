@@ -13,11 +13,6 @@ public class Timeline implements UIComponent{
 	private JPanel mainTimelinePanel;
 	
 	@Override
-	public void addToParent(UIComponent parent) {
-		parent.getMainComponent().add(mainTimelinePanel);
-	}
-	
-	@Override
 	public void addChild(UIComponent child) {
 		mainTimelinePanel.add(child.getMainComponent());
 	}
@@ -42,5 +37,10 @@ public class Timeline implements UIComponent{
 	public void build() {
 		mainTimelinePanel.setBackground(Color.green);
 		mainTimelinePanel.setPreferredSize(new Dimension(0,200));
+	}
+
+	@Override
+	public Session getSession() {
+		return parent.getSession();
 	}
 }

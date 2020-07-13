@@ -16,7 +16,7 @@ public class Main {
 	}
 	
 	public static void main(String[] args) {
-		
+		Session currentSession = new Session();
 		window = createWindow();
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setTitle("Keyframes");
@@ -26,7 +26,7 @@ public class Main {
 		window.setMinimumSize(new Dimension(1600,900));
 		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		
-		MainMenu menu = new MainMenu(window);
+		MainMenu menu = new MainMenu(window, currentSession);
 		menu.buildUI();
 		
 		System.out.println("LOL");

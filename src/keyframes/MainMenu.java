@@ -16,7 +16,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class MainMenu {
+public class MainMenu implements SessionObject {
+	
+	private Session session;
 	
 	private JPanel leftPanel;
 	private JPanel rightPanel;
@@ -28,7 +30,8 @@ public class MainMenu {
 	private JButton newProjectButton;
 	private JButton loadProjectButton;
 	
-	public MainMenu(JFrame parent) {
+	public MainMenu(JFrame parent, Session session) {
+		this.session = session;
 		this.parent = parent;
 		menuPanel = new JPanel();
 		this.parent.add(menuPanel, BorderLayout.CENTER);
@@ -76,7 +79,7 @@ public class MainMenu {
 		newProjectButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				parent.getContentPane().removeAll();
-				MainView mv = new MainView(parent);
+				MainView mv = new MainView(parent, session);
 				mv.buildUI();
 			}
 		});
@@ -104,5 +107,11 @@ public class MainMenu {
 		gbc.gridy = 2;
 		menuPanel.add(settingsButton, gbc);
 
+	}
+
+	@Override
+	public Session getSession() {
+		// TODO Auto-generated method stub
+		return session;
 	}
 }

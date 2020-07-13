@@ -21,7 +21,10 @@ import javax.swing.SwingUtilities;
 
 public class DrawablePanel extends JPanel implements MouseMotionListener, MouseListener{
 	
+	private UIComponent parent;
+	
 	private Color paintColor = Color.red;
+	boolean cursorInScreen = true;
 	
 	//VERY BROKEN
 	//https://www.rgagnon.com/javadetails/java-0265.html
@@ -35,8 +38,9 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	ArrayList<SimpleEntry<EnumFactory.PaintSetting, ArrayList<Point>>> pointCollection = new ArrayList<>();
 	
 	
-	DrawablePanel() {
+	DrawablePanel(UIComponent parent) {
 		super();
+		this.parent = parent;
 		addMouseListener(this);
 		addMouseMotionListener(this);
 	}
@@ -108,17 +112,19 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 
 	@Override
 	public void mouseDragged(MouseEvent e) { 
-		if(currentDraggedPoints == null) {
-		EnumFactory.PaintSetting mouseNum = EnumFactory.PaintSetting.NONE;
-			if(SwingUtilities.isLeftMouseButton(e)) {
-				mouseNum = EnumFactory.PaintSetting.DRAW;
-			} else if(SwingUtilities.isRightMouseButton(e)) {
-				mouseNum =EnumFactory.PaintSetting.ERASE;
-			}
-			currentDraggedPoints = new SimpleEntry<>(mouseNum, new ArrayList<>());
+		if(cursorInScreen) {
+			if(currentDraggedPoints == null) {
+				EnumFactory.PaintSetting mouseNum = EnumFactory.PaintSetting.NONE;
+				if(SwingUtilities.isLeftMouseButton(e)) {
+					mouseNum = parent.getSession().getPaintSetting();
+				} else if(SwingUtilities.isRightMouseButton(e)) {
+					mouseNum =EnumFactory.PaintSetting.ERASE;
+				}
+				currentDraggedPoints = new SimpleEntry<>(mouseNum, new ArrayList<>());
+				}
+			currentDraggedPoints.getValue().add(e.getPoint());
+			repaint();
 		}
-		currentDraggedPoints.getValue().add(e.getPoint());
-		repaint();
 	}
 
 	@Override
@@ -128,16 +134,18 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		EnumFactory.PaintSetting mouseNum = EnumFactory.PaintSetting.NONE;
-		ArrayList<Point> singlePointCollection = new ArrayList<>();
-		singlePointCollection.add(e.getPoint());
-		if(SwingUtilities.isLeftMouseButton(e)) {
-			mouseNum = EnumFactory.PaintSetting.DRAW;
-		} else if(SwingUtilities.isRightMouseButton(e)) {
-			mouseNum = EnumFactory.PaintSetting.ERASE;
+		if(cursorInScreen) {
+			EnumFactory.PaintSetting mouseNum = EnumFactory.PaintSetting.NONE;
+			ArrayList<Point> singlePointCollection = new ArrayList<>();
+			singlePointCollection.add(e.getPoint());
+			if(SwingUtilities.isLeftMouseButton(e)) {
+				mouseNum = parent.getSession().getPaintSetting();
+			} else if(SwingUtilities.isRightMouseButton(e)) {
+				mouseNum = EnumFactory.PaintSetting.ERASE;
+			}
+			pointCollection.add(new SimpleEntry<>(mouseNum, singlePointCollection));
+			repaint();
 		}
-		pointCollection.add(new SimpleEntry<>(mouseNum, singlePointCollection));
-		repaint();
 	}
 
 	@Override
@@ -156,11 +164,16 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 
 	 @Override
 	 public void mouseEntered(MouseEvent e) {
-
+		 cursorInScreen = true;
 	 }
 
-	 @Override
-	 public void mouseExited(MouseEvent e) {
-
+	@Override
+	public void mouseExited(MouseEvent e) {
+		cursorInScreen = false;
+		if(currentDraggedPoints != null) {
+			pointCollection.add(currentDraggedPoints);
+			currentDraggedPoints = null;
+		}
+		repaint();
 	}
 }
