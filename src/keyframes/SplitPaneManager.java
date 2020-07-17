@@ -68,14 +68,15 @@ public class SplitPaneManager implements UIComponent {
 		this.topOrLeft = topOrLeft;
 		this.topOrLeftComp = topOrLeft.getMainComponent();
 		this.topOrLeftComp.setMinimumSize(new Dimension(0, 200));
-		splitPane.setTopComponent(topOrLeft.getMainComponent());
+		this.topOrLeftComp.setPreferredSize(new Dimension(0, 500));
+		splitPane.setTopComponent(this.topOrLeftComp);
 	}
 	
 	public void setBottomOrRight(UIComponent bottomOrRight) {
 		this.bottomOrRight = bottomOrRight;
 		this.bottomOrRightComp = bottomOrRight.getMainComponent();
 		this.bottomOrRightComp.setMinimumSize(new Dimension(0, 200));
-		splitPane.setBottomComponent(bottomOrRight.getMainComponent());
+		splitPane.setBottomComponent(this.bottomOrRightComp);
 	}
 	
 	@Override

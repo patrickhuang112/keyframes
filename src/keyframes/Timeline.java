@@ -6,6 +6,7 @@ import java.awt.Dimension;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 
 public class Timeline implements UIComponent{
 	
@@ -35,8 +36,17 @@ public class Timeline implements UIComponent{
 	}
 	
 	public void build() {
-		mainTimelinePanel.setBackground(Color.green);
+		mainTimelinePanel.setBackground(Color.gray);
 		mainTimelinePanel.setPreferredSize(new Dimension(0,200));
+		mainTimelinePanel.setLayout(new BorderLayout());
+		JSlider brushSizeSlider = new JSlider(JSlider.HORIZONTAL, 0,30, 0);
+		brushSizeSlider.setMajorTickSpacing(10);
+		brushSizeSlider.setMinorTickSpacing(1);
+		brushSizeSlider.setPaintTicks(true);
+		brushSizeSlider.setPaintLabels(true);
+		brushSizeSlider.setSnapToTicks(true);
+		brushSizeSlider.addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
+		mainTimelinePanel.add(brushSizeSlider, BorderLayout.CENTER);
 	}
 
 	@Override

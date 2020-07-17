@@ -30,12 +30,11 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	//https://www.rgagnon.com/javadetails/java-0265.html
 	//LOOK AT THAT WHEN I WANT TO IMPLEMENT LAYERS
 	private Color eraseColor = Color.white;
-	private float brushSize = 5.0f;
 	private float eraseSize = 1.0f;
 	Point drawPoint;
 	Graphics2D old;
-	SimpleEntry<EnumFactory.PaintSetting, ArrayList<Point>> currentDraggedPoints = null;
-	ArrayList<SimpleEntry<EnumFactory.PaintSetting, ArrayList<Point>>> pointCollection = new ArrayList<>();
+	ArrayList<DrawPoint> currentDraggedPoints = null;
+	ArrayList<ArrayList<DrawPoint>> pointCollection = new ArrayList<>();
 	
 	
 	DrawablePanel(UIComponent parent) {
@@ -48,44 +47,46 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	public void clearAll() {
 		currentDraggedPoints = null;
 		pointCollection = new ArrayList<>();
+		repaint();
 	}
-	private void drawAndErasePoint(Graphics2D g2d, Point p, EnumFactory.PaintSetting setting) {
-		float xPos = (float)p.getX();
-		float yPos = (float)p.getY();
-		float radius = brushSize;
+	private void drawAndErasePoint(Graphics2D g2d, DrawPoint p) {
+		Point point = p.point;
+		EnumFactory.PaintSetting setting = p.setting;
+		float xPos = (float)point.getX();
+		float yPos = (float)point.getY();
+		float radius = p.size;
 		if(setting == EnumFactory.PaintSetting.DRAW) {
 			g2d.setPaint(paintColor);
 		} else if (setting == EnumFactory.PaintSetting.ERASE) {
 			g2d.setPaint(eraseColor);
 		}
-		Ellipse2D.Float point = new Ellipse2D.Float(xPos, yPos, radius, radius);
-		g2d.fill(point);
+		//Center the ellipse, ellipse created from top left coord
+		Ellipse2D.Float newPoint = new Ellipse2D.Float(xPos-(radius/2), yPos-(radius/2), radius, radius);
+		g2d.fill(newPoint);
 	}
 	
-	private void drawAndErasePath(Graphics2D g2d, ArrayList<Point> points, EnumFactory.PaintSetting setting) {
+	private void drawAndErasePath(Graphics2D g2d, ArrayList<DrawPoint> points) {
 		GeneralPath gp =  new GeneralPath();
 		BasicStroke s = null;
-		if(setting == EnumFactory.PaintSetting.DRAW) {
-			g2d.setPaint(paintColor);
-			s = new BasicStroke(brushSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-			
-		} else if (setting == EnumFactory.PaintSetting.ERASE) {
-			g2d.setPaint(eraseColor);
-			s = new BasicStroke(eraseSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-		}
-		g2d.setStroke(s);
+		
 		boolean firstPoint = true;
-		for(Point p : points) {
+		for(DrawPoint dp : points) {
 			if(firstPoint) {
-				gp.moveTo(p.getX(), p.getY());
+				gp.moveTo(dp.point.getX(), dp.point.getY());
 				firstPoint = false;
 			} else {
-				gp.lineTo(p.getX(), p.getY());
+				if(dp.setting == EnumFactory.PaintSetting.DRAW) {
+					g2d.setPaint(paintColor);
+					
+				} else if (dp.setting == EnumFactory.PaintSetting.ERASE) {
+					g2d.setPaint(eraseColor);
+				}
+				s = new BasicStroke(dp.size, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+				g2d.setStroke(s);
+				gp.lineTo(dp.point.getX(), dp.point.getY());
 			}
 		}
-		
 		g2d.draw(gp);
-
 	}
 	
 	@Override
@@ -94,17 +95,17 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	Graphics2D g2d = (Graphics2D) g;
 	
 	
-	for(SimpleEntry<EnumFactory.PaintSetting, ArrayList<Point>> points : pointCollection) {
-		if(points.getValue().size() == 1) {
-			drawAndErasePoint(g2d, points.getValue().get(0), points.getKey());
+	for(ArrayList<DrawPoint> points : pointCollection) {
+		if(points.size() == 1) {
+			drawAndErasePoint(g2d, points.get(0));
 		} else {
-			drawAndErasePath(g2d, points.getValue(), points.getKey());
+			drawAndErasePath(g2d, points);
 		}
 	}
 	
 	// The currently dragged stuff
 	if(currentDraggedPoints != null) {
-		drawAndErasePath(g2d, currentDraggedPoints.getValue(), currentDraggedPoints.getKey());
+		drawAndErasePath(g2d, currentDraggedPoints);
 	}
 	
 	}
@@ -113,16 +114,18 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	@Override
 	public void mouseDragged(MouseEvent e) { 
 		if(cursorInScreen) {
+			EnumFactory.PaintSetting setting = EnumFactory.PaintSetting.NONE;
+			int drawSize = -1;
 			if(currentDraggedPoints == null) {
-				EnumFactory.PaintSetting mouseNum = EnumFactory.PaintSetting.NONE;
-				if(SwingUtilities.isLeftMouseButton(e)) {
-					mouseNum = parent.getSession().getPaintSetting();
-				} else if(SwingUtilities.isRightMouseButton(e)) {
-					mouseNum =EnumFactory.PaintSetting.ERASE;
-				}
-				currentDraggedPoints = new SimpleEntry<>(mouseNum, new ArrayList<>());
-				}
-			currentDraggedPoints.getValue().add(e.getPoint());
+				setting = parent.getSession().getPaintSetting();
+				currentDraggedPoints = new ArrayList<>();
+			} else {
+				setting = currentDraggedPoints.get(0).setting;
+			}
+			drawSize = setting == EnumFactory.PaintSetting.DRAW 
+								? parent.getSession().getBrushSize() 
+								: parent.getSession().getEraserSize();
+			currentDraggedPoints.add(new DrawPoint(e.getPoint(), drawSize, setting));
 			repaint();
 		}
 	}
@@ -135,15 +138,17 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if(cursorInScreen) {
-			EnumFactory.PaintSetting mouseNum = EnumFactory.PaintSetting.NONE;
-			ArrayList<Point> singlePointCollection = new ArrayList<>();
-			singlePointCollection.add(e.getPoint());
-			if(SwingUtilities.isLeftMouseButton(e)) {
-				mouseNum = parent.getSession().getPaintSetting();
-			} else if(SwingUtilities.isRightMouseButton(e)) {
-				mouseNum = EnumFactory.PaintSetting.ERASE;
-			}
-			pointCollection.add(new SimpleEntry<>(mouseNum, singlePointCollection));
+			EnumFactory.PaintSetting setting;
+			int drawSize;
+			Point point = e.getPoint();
+			
+			ArrayList<DrawPoint> singlePointCollection = new ArrayList<>();
+			setting = parent.getSession().getPaintSetting();
+			drawSize = setting == EnumFactory.PaintSetting.DRAW 
+					? parent.getSession().getBrushSize() 
+					: parent.getSession().getEraserSize();
+			singlePointCollection.add(new DrawPoint(point, drawSize, setting));
+			pointCollection.add(singlePointCollection);
 			repaint();
 		}
 	}

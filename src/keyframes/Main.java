@@ -16,7 +16,13 @@ public class Main {
 	}
 	
 	public static void main(String[] args) {
+		
 		Session currentSession = new Session();
+		
+		// FIX LATER WITH SETTINGS OR DEFAULTS
+		currentSession.setBrushSize(5);
+		
+		
 		window = createWindow();
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setTitle("Keyframes");
