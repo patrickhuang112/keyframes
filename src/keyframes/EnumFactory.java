@@ -7,8 +7,6 @@ public class EnumFactory {
 		RIGHTMOUSE
 	}
 	
-	
-	
 	public enum PaintSetting {
 		NONE,
 		DRAW,

@@ -23,25 +23,27 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	
 	private UIComponent parent;
 	
-	private Color paintColor = Color.red;
+	private Color brushColor;
 	boolean cursorInScreen = true;
 	
 	//VERY BROKEN
 	//https://www.rgagnon.com/javadetails/java-0265.html
 	//LOOK AT THAT WHEN I WANT TO IMPLEMENT LAYERS
-	private Color eraseColor = Color.white;
+	private Color eraserColor;
 	private float eraseSize = 1.0f;
 	Point drawPoint;
 	Graphics2D old;
 	ArrayList<DrawPoint> currentDraggedPoints = null;
-	ArrayList<ArrayList<DrawPoint>> pointCollection = new ArrayList<>();
-	
+	ArrayList<ArrayList<DrawPoint>> pointCollection = new ArrayList<>();	
 	
 	DrawablePanel(UIComponent parent) {
 		super();
 		this.parent = parent;
+		this.brushColor = parent.getSession().getBrushColor();
+		this.eraserColor = parent.getSession().getEraserColor();
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		updateSession();
 	}
 	
 	public void clearAll() {
@@ -55,11 +57,7 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 		float xPos = (float)point.getX();
 		float yPos = (float)point.getY();
 		float radius = p.size;
-		if(setting == EnumFactory.PaintSetting.DRAW) {
-			g2d.setPaint(paintColor);
-		} else if (setting == EnumFactory.PaintSetting.ERASE) {
-			g2d.setPaint(eraseColor);
-		}
+		g2d.setPaint(p.color);
 		//Center the ellipse, ellipse created from top left coord
 		Ellipse2D.Float newPoint = new Ellipse2D.Float(xPos-(radius/2), yPos-(radius/2), radius, radius);
 		g2d.fill(newPoint);
@@ -75,12 +73,7 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 				gp.moveTo(dp.point.getX(), dp.point.getY());
 				firstPoint = false;
 			} else {
-				if(dp.setting == EnumFactory.PaintSetting.DRAW) {
-					g2d.setPaint(paintColor);
-					
-				} else if (dp.setting == EnumFactory.PaintSetting.ERASE) {
-					g2d.setPaint(eraseColor);
-				}
+				g2d.setPaint(dp.color);
 				s = new BasicStroke(dp.size, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 				g2d.setStroke(s);
 				gp.lineTo(dp.point.getX(), dp.point.getY());
@@ -91,31 +84,39 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	
 	@Override
 	public void paintComponent(Graphics g){
-	super.paintComponent(g);
-	Graphics2D g2d = (Graphics2D) g;
-	
-	
-	for(ArrayList<DrawPoint> points : pointCollection) {
-		if(points.size() == 1) {
-			drawAndErasePoint(g2d, points.get(0));
-		} else {
-			drawAndErasePath(g2d, points);
+		super.paintComponent(g);
+		Graphics2D g2d = (Graphics2D) g;
+		pointCollection = parent.getSession().getCurrentFrame();
+		
+		for(ArrayList<DrawPoint> points : pointCollection) {
+			if(points.size() == 1) {
+				drawAndErasePoint(g2d, points.get(0));
+			} else {
+				drawAndErasePath(g2d, points);
+			}
 		}
-	}
-	
-	// The currently dragged stuff
-	if(currentDraggedPoints != null) {
-		drawAndErasePath(g2d, currentDraggedPoints);
-	}
-	
+		
+		// The currently dragged stuff
+		if(currentDraggedPoints != null) {
+			drawAndErasePath(g2d, currentDraggedPoints);
+		}
+		updateSession();
 	}
 
+	
+	
+	private void updateSession() {
+		parent.getSession().setDrawPanel(this);
+		parent.getSession().setCurrentFrame(pointCollection);
+	}
+	
 
 	@Override
 	public void mouseDragged(MouseEvent e) { 
 		if(cursorInScreen) {
 			EnumFactory.PaintSetting setting = EnumFactory.PaintSetting.NONE;
 			int drawSize = -1;
+			Color pointColor;
 			if(currentDraggedPoints == null) {
 				setting = parent.getSession().getPaintSetting();
 				currentDraggedPoints = new ArrayList<>();
@@ -125,7 +126,12 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 			drawSize = setting == EnumFactory.PaintSetting.DRAW 
 								? parent.getSession().getBrushSize() 
 								: parent.getSession().getEraserSize();
-			currentDraggedPoints.add(new DrawPoint(e.getPoint(), drawSize, setting));
+								
+			pointColor = setting == EnumFactory.PaintSetting.DRAW 
+					? brushColor
+					: eraserColor;	
+			
+			currentDraggedPoints.add(new DrawPoint(e.getPoint(), drawSize, setting, pointColor));
 			repaint();
 		}
 	}
@@ -141,13 +147,18 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 			EnumFactory.PaintSetting setting;
 			int drawSize;
 			Point point = e.getPoint();
+			Color pointColor;
 			
 			ArrayList<DrawPoint> singlePointCollection = new ArrayList<>();
 			setting = parent.getSession().getPaintSetting();
 			drawSize = setting == EnumFactory.PaintSetting.DRAW 
-					? parent.getSession().getBrushSize() 
+					? parent.getSession().getBrushSize()
 					: parent.getSession().getEraserSize();
-			singlePointCollection.add(new DrawPoint(point, drawSize, setting));
+			pointColor = setting == EnumFactory.PaintSetting.DRAW 
+					? brushColor
+					: eraserColor;		
+			
+			singlePointCollection.add(new DrawPoint(point, drawSize, setting, pointColor));
 			pointCollection.add(singlePointCollection);
 			repaint();
 		}
@@ -155,7 +166,7 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-
+		//Nothing
 	}
 
 	@Override

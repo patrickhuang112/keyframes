@@ -33,6 +33,7 @@ import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 public class MainView implements SessionObject{
@@ -129,21 +130,65 @@ public class MainView implements SessionObject{
 		topToolBar.setPreferredSize(new Dimension(0,30));
 		topToolBar.setFloatable(false);
 		topToolBar.setAlignmentX(Component.LEFT_ALIGNMENT);
-		buildtopToolBarButtons();
+		buildTopToolBarButtons();
 		topBar.add(topToolBar);
 		
 	}
 	
-	private void buildtopToolBarButtons() {
-		
+	private void buildTopToolBarEraserButton() {
 		try {
 			Image eraserImage = ImageIO.read(this.getClass().getResource("../resources/eraseIcon.bmp"));
-			Image drawImage = ImageIO.read(this.getClass().getResource("../resources/drawIcon.bmp"));
-			Image eraseAllImage = ImageIO.read(this.getClass().getResource("../resources/eraseAllIcon.bmp"));
-			
 			JButton eraseTool = new JButton(new ImageIcon(eraserImage));
+			
+			eraseTool.setVisible(true);
+			eraseTool.setPreferredSize(new Dimension(20,20));
+			eraseTool.addMouseListener(new MouseAdapter( ) {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					if(SwingUtilities.isLeftMouseButton(e)) {
+						session.setPaintSetting(EnumFactory.PaintSetting.ERASE);
+					}
+					else if(SwingUtilities.isRightMouseButton(e)) {
+						JOptionPane eraserSizeSelector = new JOptionPane();
+						
+						JSlider eraserSizeSlider = new JSlider(JSlider.HORIZONTAL, 0,30, session.getEraserSize());
+						eraserSizeSlider.setMajorTickSpacing(10);
+						eraserSizeSlider.setMinorTickSpacing(1);
+						eraserSizeSlider.setPaintTicks(true);
+						eraserSizeSlider.setPaintLabels(true);
+						eraserSizeSlider.addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
+						
+						eraserSizeSelector.setMessage(new Object[] { "Select an Eraser Size: ", eraserSizeSlider});
+						eraserSizeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
+						eraserSizeSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+						//Centered on the mainWindow
+						JDialog dialog = eraserSizeSelector.createDialog(mainWindow, "Eraser Size");
+					    dialog.setVisible(true);
+					    
+					    
+					    if(eraserSizeSelector.getValue() != null) {
+					    	int res = (int)(eraserSizeSelector.getValue());
+					    	if(res == JOptionPane.YES_OPTION) {
+					    		session.setEraserSize(eraserSizeSlider.getValue());
+					    	} else {
+					    		System.out.println("no?");
+					    	}	
+					    }
+					}
+				}
+			});
+			
+			topToolBar.add(eraseTool);
+		} catch (Exception e) {
+			System.out.println("Icon creation failed");
+		}
+		
+	}
+	
+	private void buildTopToolBarDrawButton() {
+		try {
+			Image drawImage = ImageIO.read(this.getClass().getResource("../resources/drawIcon.bmp"));
 			JButton brushTool = new JButton(new ImageIcon(drawImage));
-			JButton eraseAllTool = new JButton(new ImageIcon(eraseAllImage));
 			
 			brushTool.setVisible(true);
 			brushTool.setPreferredSize(new Dimension(20,20));
@@ -185,43 +230,80 @@ public class MainView implements SessionObject{
 				}
 			});
 			
-			eraseTool.setVisible(true);
-			eraseTool.setPreferredSize(new Dimension(20,20));
-			eraseTool.addMouseListener(new MouseAdapter( ) {
+			topToolBar.add(brushTool);
+		} catch(Exception e) {
+			System.out.println("Icon creation failed");
+		}
+	}
+	
+	private void playMovie() {
+		SwingWorker sw = new SwingWorker() {
+
+			@Override
+			protected Object doInBackground() throws Exception {
+				while(getSession().isPlaying) {
+					getSession().incrementTimepoint();
+					getSession().refreshDrawPanel();
+					getSession().updateTimelineSliderPosition();
+					
+					long increment = 1000 / getSession().getFramesPerSecond();
+					Thread.sleep(increment);
+					System.out.println("PLAYING MOVIE");
+				}
+				return "DONE";
+			}
+			
+			@Override
+			protected void done() {
+				System.out.println("done");
+			}
+		};
+		sw.execute();
+	}
+	
+	private void buildTopToolBarPlayAndPauseButtons() {
+		try {
+			Image playImage = ImageIO.read(this.getClass().getResource("../resources/playIcon.bmp"));
+			Image pauseImage = ImageIO.read(this.getClass().getResource("../resources/pauseIcon.bmp"));
+			
+			JButton playTool = new JButton(new ImageIcon(playImage));
+			JButton pauseTool = new JButton(new ImageIcon(pauseImage));
+			
+			playTool.setVisible(true);
+			playTool.setPreferredSize(new Dimension(20,20));
+			playTool.addMouseListener(new MouseAdapter( ) {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					if(SwingUtilities.isLeftMouseButton(e)) {
-						session.setPaintSetting(EnumFactory.PaintSetting.ERASE);
-					}
-					else if(SwingUtilities.isRightMouseButton(e)) {
-						JOptionPane eraserSizeSelector = new JOptionPane();
-						
-						JSlider eraserSizeSlider = new JSlider(JSlider.HORIZONTAL, 0,30, session.getEraserSize());
-						eraserSizeSlider.setMajorTickSpacing(10);
-						eraserSizeSlider.setMinorTickSpacing(1);
-						eraserSizeSlider.setPaintTicks(true);
-						eraserSizeSlider.setPaintLabels(true);
-						eraserSizeSlider.addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
-						
-						eraserSizeSelector.setMessage(new Object[] { "Select an Eraser Size: ", eraserSizeSlider});
-						eraserSizeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
-						eraserSizeSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
-						//Centered on the mainWindow
-						JDialog dialog = eraserSizeSelector.createDialog(mainWindow, "Eraser Size");
-					    dialog.setVisible(true);
-					    
-					    
-					    if(eraserSizeSelector.getValue() != null) {
-					    	int res = (int)(eraserSizeSelector.getValue());
-					    	if(res == JOptionPane.YES_OPTION) {
-					    		session.setEraserSize(eraserSizeSlider.getValue());
-					    	} else {
-					    		System.out.println("no?");
-					    	}	
-					    }
-					}
+					getSession().isPlaying = true;
+					playMovie();
 				}
 			});
+			
+			pauseTool.setVisible(true);
+			pauseTool.setPreferredSize(new Dimension(20,20));
+			pauseTool.addMouseListener(new MouseAdapter( ) {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					getSession().isPlaying = false;
+				}
+			});
+			topToolBar.add(playTool);
+			topToolBar.add(pauseTool);
+		} catch(Exception e) {
+			System.out.println("Icon creation failed");
+		}
+	}
+	
+	private void buildTopToolBarButtons() {
+		
+		try {
+			buildTopToolBarEraserButton();
+			buildTopToolBarDrawButton();
+			buildTopToolBarPlayAndPauseButtons();
+			
+			Image eraseAllImage = ImageIO.read(this.getClass().getResource("../resources/eraseAllIcon.bmp"));
+			
+			JButton eraseAllTool = new JButton(new ImageIcon(eraseAllImage));
 			
 			eraseAllTool.setVisible(true);
 			eraseAllTool.setPreferredSize(new Dimension(20,20));
@@ -234,8 +316,6 @@ public class MainView implements SessionObject{
 			});
 			
 			
-			topToolBar.add(eraseTool);
-			topToolBar.add(brushTool);
 			topToolBar.add(eraseAllTool);
 		} catch (Exception e) {
 			System.out.println("Icon creation failed");

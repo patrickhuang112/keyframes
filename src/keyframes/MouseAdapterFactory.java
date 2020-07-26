@@ -14,6 +14,8 @@ public class MouseAdapterFactory {
 		    BasicSliderUI ui = (BasicSliderUI)sourceSlider.getUI();
 		    int value = ui.valueForXPosition(e.getX());
 		    sourceSlider.setValue(value); 
+		    sourceSlider.requestFocus();
 		}
 	};
+	
 }
