@@ -23,14 +23,11 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	
 	private UIComponent parent;
 	
-	private Color brushColor;
 	boolean cursorInScreen = true;
 	
 	//VERY BROKEN
 	//https://www.rgagnon.com/javadetails/java-0265.html
 	//LOOK AT THAT WHEN I WANT TO IMPLEMENT LAYERS
-	private Color eraserColor;
-	private float eraseSize = 1.0f;
 	Point drawPoint;
 	Graphics2D old;
 	ArrayList<DrawPoint> currentDraggedPoints = null;
@@ -39,8 +36,6 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	DrawablePanel(UIComponent parent) {
 		super();
 		this.parent = parent;
-		this.brushColor = parent.getSession().getBrushColor();
-		this.eraserColor = parent.getSession().getEraserColor();
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		updateSession();
@@ -49,11 +44,11 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	public void clearAll() {
 		currentDraggedPoints = null;
 		pointCollection = new ArrayList<>();
+		parent.getSession().setCurrentFrame(pointCollection);
 		repaint();
 	}
 	private void drawAndErasePoint(Graphics2D g2d, DrawPoint p) {
 		Point point = p.point;
-		EnumFactory.PaintSetting setting = p.setting;
 		float xPos = (float)point.getX();
 		float yPos = (float)point.getY();
 		float radius = p.size;
@@ -123,13 +118,14 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 			} else {
 				setting = currentDraggedPoints.get(0).setting;
 			}
+			
 			drawSize = setting == EnumFactory.PaintSetting.DRAW 
 								? parent.getSession().getBrushSize() 
 								: parent.getSession().getEraserSize();
 								
 			pointColor = setting == EnumFactory.PaintSetting.DRAW 
-					? brushColor
-					: eraserColor;	
+					? parent.getSession().getBrushColor()
+					: parent.getSession().getEraserColor();	
 			
 			currentDraggedPoints.add(new DrawPoint(e.getPoint(), drawSize, setting, pointColor));
 			repaint();
@@ -155,8 +151,8 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 					? parent.getSession().getBrushSize()
 					: parent.getSession().getEraserSize();
 			pointColor = setting == EnumFactory.PaintSetting.DRAW 
-					? brushColor
-					: eraserColor;		
+					? parent.getSession().getBrushColor()
+					: parent.getSession().getEraserColor();	
 			
 			singlePointCollection.add(new DrawPoint(point, drawSize, setting, pointColor));
 			pointCollection.add(singlePointCollection);

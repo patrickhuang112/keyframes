@@ -39,9 +39,6 @@ public class MainMenu implements SessionObject {
 	
 	public void buildUI() {
 		
-		
-		
-		
 		leftPanel = new JPanel();
 		leftPanel.setPreferredSize(new Dimension(400,400));
 		rightPanel = new JPanel();
@@ -95,7 +92,7 @@ public class MainMenu implements SessionObject {
 		loadProjectButton.setPreferredSize(new Dimension(200, 80));
 		loadProjectButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("CLICKED BRO");
+				System.out.println("Loading Project...");
 			}
 		});
 		gbc.gridy = 1;

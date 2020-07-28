@@ -21,6 +21,7 @@ import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -180,18 +181,18 @@ public class MainView implements SessionObject{
 			
 			topToolBar.add(eraseTool);
 		} catch (Exception e) {
-			System.out.println("Icon creation failed");
+			System.out.println("Erase Icon creation failed");
 		}
 		
 	}
 	
-	private void buildTopToolBarDrawButton() {
+	private void buildTopToolBarBrushButton() {
 		try {
-			Image drawImage = ImageIO.read(this.getClass().getResource("../resources/drawIcon.bmp"));
+			Image drawImage = ImageIO.read(this.getClass().getResource("../resources/brushIcon.bmp"));
 			JButton brushTool = new JButton(new ImageIcon(drawImage));
 			
 			brushTool.setVisible(true);
-			brushTool.setPreferredSize(new Dimension(20,20));
+			brushTool.setPreferredSize(new Dimension(30,30));
 			brushTool.addMouseListener(new MouseAdapter( ) {
 				@Override
 				public void mouseClicked(MouseEvent e) {
@@ -232,13 +233,13 @@ public class MainView implements SessionObject{
 			
 			topToolBar.add(brushTool);
 		} catch(Exception e) {
-			System.out.println("Icon creation failed");
+			System.out.println("Brush Icon creation failed");
 		}
 	}
 	
 	private void playMovie() {
+		
 		SwingWorker sw = new SwingWorker() {
-
 			@Override
 			protected Object doInBackground() throws Exception {
 				while(getSession().isPlaying) {
@@ -248,14 +249,14 @@ public class MainView implements SessionObject{
 					
 					long increment = 1000 / getSession().getFramesPerSecond();
 					Thread.sleep(increment);
-					System.out.println("PLAYING MOVIE");
+					System.out.println("Playing movie...");
 				}
 				return "DONE";
 			}
 			
 			@Override
 			protected void done() {
-				System.out.println("done");
+				System.out.println("Finished playing movie");
 			}
 		};
 		sw.execute();
@@ -270,7 +271,7 @@ public class MainView implements SessionObject{
 			JButton pauseTool = new JButton(new ImageIcon(pauseImage));
 			
 			playTool.setVisible(true);
-			playTool.setPreferredSize(new Dimension(20,20));
+			playTool.setPreferredSize(new Dimension(30,30));
 			playTool.addMouseListener(new MouseAdapter( ) {
 				@Override
 				public void mouseClicked(MouseEvent e) {
@@ -280,7 +281,7 @@ public class MainView implements SessionObject{
 			});
 			
 			pauseTool.setVisible(true);
-			pauseTool.setPreferredSize(new Dimension(20,20));
+			pauseTool.setPreferredSize(new Dimension(30,30));
 			pauseTool.addMouseListener(new MouseAdapter( ) {
 				@Override
 				public void mouseClicked(MouseEvent e) {
@@ -290,23 +291,18 @@ public class MainView implements SessionObject{
 			topToolBar.add(playTool);
 			topToolBar.add(pauseTool);
 		} catch(Exception e) {
-			System.out.println("Icon creation failed");
+			System.out.println("Play/Pause Icon creation failed");
 		}
 	}
 	
-	private void buildTopToolBarButtons() {
-		
+	private void buildTopToolBarEraseAllButton() {
 		try {
-			buildTopToolBarEraserButton();
-			buildTopToolBarDrawButton();
-			buildTopToolBarPlayAndPauseButtons();
-			
 			Image eraseAllImage = ImageIO.read(this.getClass().getResource("../resources/eraseAllIcon.bmp"));
 			
 			JButton eraseAllTool = new JButton(new ImageIcon(eraseAllImage));
 			
 			eraseAllTool.setVisible(true);
-			eraseAllTool.setPreferredSize(new Dimension(20,20));
+			eraseAllTool.setPreferredSize(new Dimension(30,30));
 			eraseAllTool.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
@@ -317,6 +313,43 @@ public class MainView implements SessionObject{
 			
 			
 			topToolBar.add(eraseAllTool);
+		} catch(Exception e) {
+			System.out.println("EraseAll Icon creation failed");
+		}
+	}
+	
+	private void buildTopToolBarColorPickerButton() {
+		try {
+			Image colorPickerImage = ImageIO.read(this.getClass().getResource("../resources/colorPickerIcon.bmp"));
+			
+			JButton colorPickerTool = new JButton(new ImageIcon(colorPickerImage));
+			
+			colorPickerTool.setVisible(true);
+			colorPickerTool.setPreferredSize(new Dimension(30,30));
+			colorPickerTool.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					Color current = getSession().getBrushColor();
+					Color newColor = JColorChooser.showDialog(null, "Choose a color", current);
+					System.out.println(newColor.toString());
+					getSession().setBrushColor(newColor);
+				}
+			});
+			
+			topToolBar.add(colorPickerTool);
+		} catch(Exception e) {
+			System.out.println("ColorPicker Icon creation failed");
+		}
+	}
+	
+	private void buildTopToolBarButtons() {
+		
+		try {
+			buildTopToolBarBrushButton();
+			buildTopToolBarEraserButton();
+			buildTopToolBarEraseAllButton();
+			buildTopToolBarPlayAndPauseButtons();
+			buildTopToolBarColorPickerButton();
 		} catch (Exception e) {
 			System.out.println("Icon creation failed");
 		}

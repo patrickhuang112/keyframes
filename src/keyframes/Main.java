@@ -35,7 +35,7 @@ public class Main {
 		MainMenu menu = new MainMenu(window, currentSession);
 		menu.buildUI();
 		
-		System.out.println("LOL");
+		System.out.println("App Started...");
 	}
 
 }
