@@ -1,30 +1,31 @@
 package keyframes;
 
 import java.awt.Color;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.JSlider;
 
-public class Session {
+public class Session implements Serializable {
 	
 	
+	private static final long serialVersionUID = 3817282456552806335L;
+
 	public Session() {
 		super();
+		drawFrames.put(0, new ArrayList<>());
 	}
-	
 	
 	
 	public boolean isPlaying = false;
 	private DrawablePanel drawPanel = null;
 	private JSlider timelineSlider = null;
 	
-	
-	
 	private Color brushColor = Color.red;
 	private Color eraserColor = Color.white;
-	private int brushSize;
-	private int eraserSize;
+	private int brushSize = 5;
+	private int eraserSize = 5;
 	private EnumFactory.PaintSetting paintSetting = EnumFactory.PaintSetting.DRAW;
 	private HashMap<Integer, ArrayList<ArrayList<DrawPoint>>> drawFrames = 
 			new HashMap<Integer, ArrayList<ArrayList<DrawPoint>>>();

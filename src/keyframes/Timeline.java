@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Hashtable;
 
@@ -16,8 +17,9 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-public class Timeline implements UIComponent{
+public class Timeline implements UIComponent, Serializable{
 	
+	private static final long serialVersionUID = -4549310200115960539L;
 	private UIComponent parent;
 	private JPanel mainTimelinePanel;
 	

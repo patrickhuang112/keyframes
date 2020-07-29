@@ -6,12 +6,14 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
+import java.io.Serializable;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-public class Drawable implements UIComponent {
+public class Drawable implements UIComponent, Serializable {
 	
+	private static final long serialVersionUID = -7498204826751850301L;
 	private UIComponent parent;
 	private JPanel drawPanel;
 	private float brushSize;

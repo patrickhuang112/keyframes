@@ -15,9 +15,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -37,8 +41,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-public class MainView implements SessionObject{
+public class MainView implements SessionObject, Serializable{
 	
+	private static final long serialVersionUID = -4390147842958702501L;
+
 	private Session session;
 	
 	private JFrame parent;
@@ -109,7 +115,33 @@ public class MainView implements SessionObject{
 		fileMenu = new JMenu("File");
 		newProjectMenuItem = new JMenuItem("New Project");
 		openProjectMenuItem = new JMenuItem("Open Project");
-		saveProjectMenuItem = new JMenuItem("Save");
+		
+		saveProjectMenuItem = new JMenuItem(new AbstractAction("Save") {
+			
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 808255237838132139L;
+
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				try {
+					FileOutputStream fos = new FileOutputStream("Session.ser");
+					ObjectOutputStream oos = new ObjectOutputStream(fos);
+					// write object to file
+					oos.writeObject(session);
+					System.out.println("Saving Successful!");
+					// closing resources
+					oos.close();
+					fos.close();
+				} catch (Exception e) {
+					System.out.println("SAVING FAILED");
+					System.out.println(e.getMessage());
+				}
+			}
+		});
+		
+		
 		saveProjectAsButton = new JMenuItem("Save As..");
 		
 		fileMenu.add(newProjectMenuItem);
@@ -138,7 +170,7 @@ public class MainView implements SessionObject{
 	
 	private void buildTopToolBarEraserButton() {
 		try {
-			Image eraserImage = ImageIO.read(this.getClass().getResource("../resources/eraseIcon.bmp"));
+			Image eraserImage = ImageIO.read(this.getClass().getResource("/eraseIcon.bmp"));
 			JButton eraseTool = new JButton(new ImageIcon(eraserImage));
 			
 			eraseTool.setVisible(true);
@@ -172,7 +204,7 @@ public class MainView implements SessionObject{
 					    	if(res == JOptionPane.YES_OPTION) {
 					    		session.setEraserSize(eraserSizeSlider.getValue());
 					    	} else {
-					    		System.out.println("no?");
+					    		System.out.println("Slider cancelled");
 					    	}	
 					    }
 					}
@@ -188,7 +220,7 @@ public class MainView implements SessionObject{
 	
 	private void buildTopToolBarBrushButton() {
 		try {
-			Image drawImage = ImageIO.read(this.getClass().getResource("../resources/brushIcon.bmp"));
+			Image drawImage = ImageIO.read(this.getClass().getResource("/brushIcon.bmp"));
 			JButton brushTool = new JButton(new ImageIcon(drawImage));
 			
 			brushTool.setVisible(true);
@@ -210,7 +242,6 @@ public class MainView implements SessionObject{
 						brushSizeSlider.addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
 						
 						
-						
 						brushSizeSelector.setMessage(new Object[] { "Select a Brush Size: ", brushSizeSlider});
 						brushSizeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
 						brushSizeSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
@@ -224,7 +255,7 @@ public class MainView implements SessionObject{
 					    	if(res == JOptionPane.YES_OPTION) {
 					    		session.setBrushSize(brushSizeSlider.getValue());
 					    	} else {
-					    		System.out.println("no?");
+					    		System.out.println("Slider cancelled");
 					    	}	
 					    }
 					}
@@ -264,8 +295,8 @@ public class MainView implements SessionObject{
 	
 	private void buildTopToolBarPlayAndPauseButtons() {
 		try {
-			Image playImage = ImageIO.read(this.getClass().getResource("../resources/playIcon.bmp"));
-			Image pauseImage = ImageIO.read(this.getClass().getResource("../resources/pauseIcon.bmp"));
+			Image playImage = ImageIO.read(this.getClass().getResource("/playIcon.bmp"));
+			Image pauseImage = ImageIO.read(this.getClass().getResource("/pauseIcon.bmp"));
 			
 			JButton playTool = new JButton(new ImageIcon(playImage));
 			JButton pauseTool = new JButton(new ImageIcon(pauseImage));
@@ -297,7 +328,7 @@ public class MainView implements SessionObject{
 	
 	private void buildTopToolBarEraseAllButton() {
 		try {
-			Image eraseAllImage = ImageIO.read(this.getClass().getResource("../resources/eraseAllIcon.bmp"));
+			Image eraseAllImage = ImageIO.read(this.getClass().getResource("/eraseAllIcon.bmp"));
 			
 			JButton eraseAllTool = new JButton(new ImageIcon(eraseAllImage));
 			
@@ -320,7 +351,7 @@ public class MainView implements SessionObject{
 	
 	private void buildTopToolBarColorPickerButton() {
 		try {
-			Image colorPickerImage = ImageIO.read(this.getClass().getResource("../resources/colorPickerIcon.bmp"));
+			Image colorPickerImage = ImageIO.read(this.getClass().getResource("/colorPickerIcon.bmp"));
 			
 			JButton colorPickerTool = new JButton(new ImageIcon(colorPickerImage));
 			
@@ -331,7 +362,6 @@ public class MainView implements SessionObject{
 				public void mouseClicked(MouseEvent e) {
 					Color current = getSession().getBrushColor();
 					Color newColor = JColorChooser.showDialog(null, "Choose a color", current);
-					System.out.println(newColor.toString());
 					getSession().setBrushColor(newColor);
 				}
 			});

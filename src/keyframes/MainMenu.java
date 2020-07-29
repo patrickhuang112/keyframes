@@ -9,6 +9,9 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -16,22 +19,20 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class MainMenu implements SessionObject {
+public class MainMenu implements Serializable {
 	
-	private Session session;
-	
+	private static final long serialVersionUID = -3854588841281613072L;
+
 	private JPanel leftPanel;
 	private JPanel rightPanel;
 	private JPanel menuPanel;
 	private JFrame parent;
 	
-	
 	private JButton settingsButton;
 	private JButton newProjectButton;
 	private JButton loadProjectButton;
 	
-	public MainMenu(JFrame parent, Session session) {
-		this.session = session;
+	public MainMenu(JFrame parent) {
 		this.parent = parent;
 		menuPanel = new JPanel();
 		this.parent.add(menuPanel, BorderLayout.CENTER);
@@ -76,7 +77,10 @@ public class MainMenu implements SessionObject {
 		newProjectButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				parent.getContentPane().removeAll();
-				MainView mv = new MainView(parent, session);
+				
+				Session session = new Session();
+				
+				MainView mv = new MainView(parent, new Session());
 				mv.buildUI();
 			}
 		});
@@ -92,7 +96,27 @@ public class MainMenu implements SessionObject {
 		loadProjectButton.setPreferredSize(new Dimension(200, 80));
 		loadProjectButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Loading Project...");
+				parent.getContentPane().removeAll();
+				Session session;
+				try {
+					System.out.println("Loading project...");
+					FileInputStream fileIn = new FileInputStream("Session.ser");
+			        ObjectInputStream in = new ObjectInputStream(fileIn);
+			        session = (Session) in.readObject();
+			        in.close();
+			        fileIn.close();
+				} catch (Exception ex) {
+					System.out.println("No file");
+					session = new Session();
+				}
+				
+				
+				MainView mv = new MainView(parent, session);
+				mv.buildUI();
+				
+				// FIX LATER WITH SETTINGS OR DEFAULTS
+				
+				System.out.println("Loaded project");
 			}
 		});
 		gbc.gridy = 1;
@@ -106,9 +130,4 @@ public class MainMenu implements SessionObject {
 
 	}
 
-	@Override
-	public Session getSession() {
-		// TODO Auto-generated method stub
-		return session;
-	}
 }

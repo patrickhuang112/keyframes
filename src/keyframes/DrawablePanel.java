@@ -21,6 +21,8 @@ import javax.swing.SwingUtilities;
 
 public class DrawablePanel extends JPanel implements MouseMotionListener, MouseListener{
 	
+	private static final long serialVersionUID = -4890309349957259630L;
+
 	private UIComponent parent;
 	
 	boolean cursorInScreen = true;
@@ -38,7 +40,7 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 		this.parent = parent;
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		updateSession();
+		parent.getSession().setDrawPanel(this);
 	}
 	
 	public void clearAll() {
@@ -101,7 +103,6 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	
 	
 	private void updateSession() {
-		parent.getSession().setDrawPanel(this);
 		parent.getSession().setCurrentFrame(pointCollection);
 	}
 	

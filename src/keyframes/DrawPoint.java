@@ -2,9 +2,12 @@ package keyframes;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.io.Serializable;
 
-public class DrawPoint {
+public class DrawPoint implements Serializable {
 
+	private static final long serialVersionUID = -4439471652129107246L;
+	
 	public Color color;
 	public Point point;
 	public int size;
