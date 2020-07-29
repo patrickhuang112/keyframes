@@ -13,7 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
@@ -113,15 +112,19 @@ public class MainView implements SessionObject, Serializable{
 		topMenuBar = new JMenuBar();
 		
 		fileMenu = new JMenu("File");
-		newProjectMenuItem = new JMenuItem("New Project");
+		newProjectMenuItem = new JMenuItem(new AbstractAction("New Project") {
+
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				session = new Session();
+				session.setDrawPanel((DrawablePanel)drawableAndTimelinePane.getTopOrLeft().getMainComponent());
+				session.refreshDrawPanel();
+				System.out.println("New project created");
+			}
+		});
 		openProjectMenuItem = new JMenuItem("Open Project");
 		
 		saveProjectMenuItem = new JMenuItem(new AbstractAction("Save") {
-			
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 808255237838132139L;
 
 			@Override
 			public void actionPerformed(ActionEvent ae) {
