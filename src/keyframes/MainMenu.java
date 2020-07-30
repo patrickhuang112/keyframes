@@ -9,6 +9,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -16,6 +17,7 @@ import java.io.Serializable;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -96,26 +98,35 @@ public class MainMenu implements Serializable {
 		loadProjectButton.setPreferredSize(new Dimension(200, 80));
 		loadProjectButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				parent.getContentPane().removeAll();
 				Session session;
 				try {
 					System.out.println("Loading project...");
-					FileInputStream fileIn = new FileInputStream("Session.ser");
-			        ObjectInputStream in = new ObjectInputStream(fileIn);
-			        session = (Session) in.readObject();
-			        in.close();
-			        fileIn.close();
+					final JFileChooser fc = new JFileChooser();
+					int returnVal = fc.showOpenDialog(loadProjectButton);
+					
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
+						File file = fc.getSelectedFile();
+						String l = Utils.getExtension(file);
+						if(Utils.getExtension(file).equals("ser")) {
+							FileInputStream fileIn = new FileInputStream(file);
+					        ObjectInputStream in = new ObjectInputStream(fileIn);
+					        session = (Session) in.readObject();
+					        in.close();
+					        fileIn.close();
+					        parent.getContentPane().removeAll();
+							MainView mv = new MainView(parent, session);
+							mv.buildUI();
+						} else {
+							System.out.println("Incompatible file");
+						}
+					} else {
+						System.out.println("Loading aborted");
+					}
+					
 				} catch (Exception ex) {
-					System.out.println("No file");
+					System.out.println("Error loading file");
 					session = new Session();
 				}
-				
-				
-				MainView mv = new MainView(parent, session);
-				mv.buildUI();
-				
-				// FIX LATER WITH SETTINGS OR DEFAULTS
-				
 				System.out.println("Loaded project");
 			}
 		});
