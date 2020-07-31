@@ -1,6 +1,12 @@
 package keyframes;
 
+import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 
 public class Utils {
 
@@ -15,4 +21,35 @@ public class Utils {
         return ext;
     }
 	
+	public static void saveFile(ActionEvent e, Session session, JComponent parent) {
+		try {
+			System.out.println("Loading project...");
+			final JFileChooser fc = new JFileChooser();
+			fc.setDialogTitle("Save session");
+			int returnVal = fc.showSaveDialog(parent);
+			
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				String savePath = file.getAbsolutePath() + ".ser";
+				
+				session.setSavePath(savePath);
+				
+				FileOutputStream fos = new FileOutputStream(savePath);
+				ObjectOutputStream oos = new ObjectOutputStream(fos);
+				// write object to file
+				oos.writeObject(session);
+				System.out.println("Saving Successful!");
+				// closing resources
+				oos.close();
+				fos.close();
+				
+			} else {
+				System.out.println("Loading aborted");
+			}
+			
+		} catch (Exception ex) {
+			System.out.println("Error loading file");
+			session = new Session();
+		}
+	}
 }

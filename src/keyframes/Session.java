@@ -17,7 +17,7 @@ public class Session implements Serializable {
 		drawFrames.put(0, new ArrayList<>());
 	}
 	
-	
+	private String savePath = null;
 	public boolean isPlaying = false;
 	private DrawablePanel drawPanel = null;
 	private JSlider timelineSlider = null;
@@ -39,6 +39,14 @@ public class Session implements Serializable {
 	private int longestTimepoint = longestTimeInSeconds * framesPerSecond;
 	private ArrayList<ArrayList<DrawPoint>> clipboardFrames = null;
 	
+	
+	public String getSavePath() {
+		return savePath;
+	}
+	
+	public void setSavePath(String path) {
+		savePath = path;
+	}
 	
 	public Color getBrushColor() {
 		return this.brushColor;
@@ -190,7 +198,6 @@ public class Session implements Serializable {
 	public EnumFactory.PaintSetting getPaintSetting() {
 		return this.paintSetting;
 	}
-	
 	
 	//DRAWABLE BRUSH/ERASER SETTINGS
 	public int getBrushSize() {

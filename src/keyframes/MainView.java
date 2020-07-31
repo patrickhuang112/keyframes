@@ -64,7 +64,7 @@ public class MainView implements SessionObject, Serializable{
 	private JMenuItem newProjectMenuItem;
 	private JMenuItem openProjectMenuItem;
 	private JMenuItem saveProjectMenuItem;
-	private JMenuItem saveProjectAsButton;
+	private JMenuItem saveProjectAsMenuItem;
 	
 	
 	public MainView(JFrame parent, Session session) {
@@ -135,7 +135,6 @@ public class MainView implements SessionObject, Serializable{
 					
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
 						File file = fc.getSelectedFile();
-						String l = Utils.getExtension(file);
 						if(Utils.getExtension(file).equals("ser")) {
 							FileInputStream fileIn = new FileInputStream(file);
 					        ObjectInputStream in = new ObjectInputStream(fileIn);
@@ -165,29 +164,39 @@ public class MainView implements SessionObject, Serializable{
 
 			@Override
 			public void actionPerformed(ActionEvent ae) {
-				try {
-					FileOutputStream fos = new FileOutputStream("Session.ser");
-					ObjectOutputStream oos = new ObjectOutputStream(fos);
-					// write object to file
-					oos.writeObject(session);
-					System.out.println("Saving Successful!");
-					// closing resources
-					oos.close();
-					fos.close();
-				} catch (Exception e) {
-					System.out.println("SAVING FAILED");
-					System.out.println(e.getMessage());
+				if(session.getSavePath() == null) {
+					Utils.saveFile(ae, session, saveProjectMenuItem);
+				} else {
+					try {
+						FileOutputStream fos = new FileOutputStream(session.getSavePath());
+						ObjectOutputStream oos = new ObjectOutputStream(fos);
+						// write object to file
+						oos.writeObject(session);
+						System.out.println("Saving Successful!");
+						// closing resources
+						oos.close();
+						fos.close();
+					} catch (Exception e) {
+						System.out.println("SAVING FAILED");
+						System.out.println(e.getMessage());
+					}
 				}
 			}
 		});
 		
 		
-		saveProjectAsButton = new JMenuItem("Save As..");
+		saveProjectAsMenuItem = new JMenuItem(new AbstractAction("Save As..") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Utils.saveFile(e, session, saveProjectAsMenuItem);
+			}
+		});
+		
 		
 		fileMenu.add(newProjectMenuItem);
 		fileMenu.add(openProjectMenuItem);
 		fileMenu.add(saveProjectMenuItem);
-		fileMenu.add(saveProjectAsButton);
+		fileMenu.add(saveProjectAsMenuItem);
 		
 		topMenuBar.add(fileMenu);
 		

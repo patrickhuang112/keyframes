@@ -79,9 +79,6 @@ public class MainMenu implements Serializable {
 		newProjectButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				parent.getContentPane().removeAll();
-				
-				Session session = new Session();
-				
 				MainView mv = new MainView(parent, new Session());
 				mv.buildUI();
 			}
