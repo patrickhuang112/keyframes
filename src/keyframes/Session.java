@@ -4,8 +4,11 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 
+import javax.swing.JLabel;
 import javax.swing.JSlider;
+import javax.swing.plaf.basic.BasicSliderUI;
 
 public class Session implements Serializable {
 	
@@ -21,6 +24,8 @@ public class Session implements Serializable {
 	public boolean isPlaying = false;
 	private DrawablePanel drawPanel = null;
 	private JSlider timelineSlider = null;
+	private Hashtable<Integer, JLabel> timelineLabelDict = new Hashtable<Integer, JLabel>();
+	
 	
 	private Color brushColor = Color.red;
 	private Color eraserColor = Color.white;
@@ -32,7 +37,6 @@ public class Session implements Serializable {
 	
 	//REPLACE BY SETTINGS
 	private int currentTimepoint = 0;
-	
 	
 	private int longestTimeInSeconds = 10;
 	private int framesPerSecond = 15;
@@ -73,6 +77,11 @@ public class Session implements Serializable {
 	public void updateTimelineSliderPosition() {
 		timelineSlider.setValue(currentTimepoint);
 	}
+	
+	public Hashtable<Integer, JLabel> getTimelineLabelDict() {
+		return timelineLabelDict;
+	}
+	
 	
 	public void setDrawPanel(DrawablePanel dp) {
 		this.drawPanel = dp;
@@ -133,12 +142,62 @@ public class Session implements Serializable {
 	
 	
 	//FPS
+	private void updateTimeline(int oldFps, int newFps) {
+		int newTimepoint = calculateNewTimelinePointerPositionFromOldFps(oldFps, newFps, currentTimepoint);
+		timelineSlider.setMaximum(longestTimeInSeconds * newFps);
+		timelineSlider.setMajorTickSpacing(newFps);
+		timelineSlider.setMinorTickSpacing(1);
+		timelineLabelDict = new Hashtable<Integer, JLabel>();
+		
+		for(Integer i = 0; i < longestTimeInSeconds; i++) {
+			timelineLabelDict.put(i * newFps, new JLabel(i.toString()));
+		}
+		//ADD THE ENDPOINT LABEL
+		timelineLabelDict.put(longestTimeInSeconds * newFps, 
+				new JLabel(((Integer)longestTimeInSeconds).toString()));
+		timelineSlider.setLabelTable(timelineLabelDict);
+		
+		timelineSlider.setValue(newTimepoint);
+		setCurrentTimepoint(newTimepoint);
+	}
+	
 	public void setFramesPerSecond(int fps) {
-		this.framesPerSecond = fps;
+		int oldFps = framesPerSecond;
+		int newFps = fps;
+		
+		updateTimeline(oldFps, newFps);
+		updateFrames(oldFps, newFps);
+		timelineSlider.repaint();
+		timelineSlider.revalidate();
+		
+		framesPerSecond = fps;
+		
+		refreshDrawPanel();
 	}
 	
 	public int getFramesPerSecond() {
 		return this.framesPerSecond;
+	}
+	
+	private int calculateNewTimelinePointerPositionFromOldFps(int oldFps, int newFps, int timePoint) {
+		int sec = timePoint / oldFps;
+		double rem = timePoint % oldFps;
+		double frac = rem / ((double)oldFps);
+		int newTimepoint = (sec * newFps) + (int)(frac * (double)(newFps));
+		return newTimepoint;
+	}
+	
+	private void updateFrames(int oldFps, int newFps) {
+		HashMap<Integer, ArrayList<ArrayList<DrawPoint>>> newFrames = 
+				new HashMap<Integer, ArrayList<ArrayList<DrawPoint>>>();
+		for(Integer i : drawFrames.keySet()) {
+			int newKey = calculateNewTimelinePointerPositionFromOldFps(oldFps, newFps, i);
+			if(!newFrames.containsKey(newKey)) {
+				newFrames.put(newKey, drawFrames.get(i));
+			} 
+		}
+		
+		drawFrames = newFrames;
 	}
 	
 	

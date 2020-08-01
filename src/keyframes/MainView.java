@@ -66,6 +66,8 @@ public class MainView implements SessionObject, Serializable{
 	private JMenuItem saveProjectMenuItem;
 	private JMenuItem saveProjectAsMenuItem;
 	
+	private JMenuItem editFpsMenuItem;
+	
 	
 	public MainView(JFrame parent, Session session) {
 		this.session = session;
@@ -201,6 +203,43 @@ public class MainView implements SessionObject, Serializable{
 		topMenuBar.add(fileMenu);
 		
 		editMenu = new JMenu("Edit");
+		
+		editFpsMenuItem = new JMenuItem(new AbstractAction("Edit Frames Per Second") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane fpsSelector = new JOptionPane();
+				
+				JSlider fpsSlider = new JSlider(JSlider.HORIZONTAL, 0,30, session.getFramesPerSecond());
+				fpsSlider.setMajorTickSpacing(10);
+				fpsSlider.setMinorTickSpacing(1);
+				fpsSlider.setPaintTicks(true);
+				fpsSlider.setPaintLabels(true);
+				fpsSlider.addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
+				
+				
+				fpsSelector.setMessage(new Object[] { "Adjust Composition Frames Per Second ", fpsSlider});
+				fpsSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
+				fpsSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+				//Centered on the mainWindow
+				JDialog dialog = fpsSelector.createDialog(mainWindow, "Frames Per Second");
+			    dialog.setVisible(true);
+			    
+			    
+			    if(fpsSelector.getValue() != null) {
+			    	int res = (int)(fpsSelector.getValue());
+			    	if(res == JOptionPane.YES_OPTION) {
+			    		session.setFramesPerSecond(fpsSlider.getValue());
+			    	} else {
+			    		System.out.println("Slider cancelled");
+			    	}	
+			    }
+			}
+				
+		});
+		
+		editMenu.add(editFpsMenuItem);
+		
 		topMenuBar.add(editMenu);
 		
 		topMenuBar.setAlignmentX(Component.LEFT_ALIGNMENT);

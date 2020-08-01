@@ -64,11 +64,13 @@ public class Timeline implements UIComponent, Serializable{
 
 		getSession().setTimelineSlider(timelineSlider);
 		
+		
 		timelineSlider.setMajorTickSpacing(fps);
 		timelineSlider.setMinorTickSpacing(1);
 		timelineSlider.setPaintTicks(true);
 		timelineSlider.setPaintLabels(true);
 		timelineSlider.setSnapToTicks(true);
+		
 		
 		Hashtable<Integer, JLabel> labelDict = new Hashtable<Integer, JLabel>();
 		for(Integer i = 0; i < endSec; i++) {
@@ -77,6 +79,7 @@ public class Timeline implements UIComponent, Serializable{
 		//ADD THE ENDPOINT LABEL
 		labelDict.put(endPoint, new JLabel(((Integer)endSec).toString()));
 		timelineSlider.setLabelTable(labelDict);
+		
 		timelineSlider.addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
 		timelineSlider.addMouseListener(new MouseAdapter( ) {
 			@Override
