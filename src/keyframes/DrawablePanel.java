@@ -12,10 +12,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
+import java.awt.image.BufferedImage;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -26,7 +28,6 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	private UIComponent parent;
 	
 	boolean cursorInScreen = true;
-	
 	//VERY BROKEN
 	//https://www.rgagnon.com/javadetails/java-0265.html
 	//LOOK AT THAT WHEN I WANT TO IMPLEMENT LAYERS
@@ -84,26 +85,36 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 		pointCollection = parent.getSession().getCurrentFrame();
+		BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), 
+				BufferedImage.TYPE_INT_RGB);
+		Graphics2D imgG = img.createGraphics();
+		imgG.setPaint(parent.getSession().getDrawablePanelBackgroundColor());
+		imgG.fillRect(0,0, this.getWidth(), this.getHeight());
 		
-		for(ArrayList<DrawPoint> points : pointCollection) {
-			if(points.size() == 1) {
-				drawAndErasePoint(g2d, points.get(0));
-			} else {
-				drawAndErasePath(g2d, points);
-			}
-		}
-		
-		// The currently dragged stuff
-		if(currentDraggedPoints != null) {
-			drawAndErasePath(g2d, currentDraggedPoints);
-		}
-		updateSession();
+		Graphics2D[] allGraphics = new Graphics2D[] {g2d, imgG};
+ 		for(Graphics2D gr : allGraphics) {
+ 			for(ArrayList<DrawPoint> points : pointCollection) {
+ 				if(points.size() == 1) {
+ 					drawAndErasePoint(gr, points.get(0));
+ 				} else {
+ 					drawAndErasePath(gr, points);
+ 				}
+ 			}
+ 			
+ 			// The currently dragged stuff
+ 			if(currentDraggedPoints != null) {
+ 				drawAndErasePath(gr, currentDraggedPoints);
+ 			}
+ 		}
+		updateSession(img);
 	}
 
 	
 	
-	private void updateSession() {
+	private void updateSession(BufferedImage img) {
 		parent.getSession().setCurrentFrame(pointCollection);
+		parent.getSession().setCurrentImage(img);
+		
 	}
 	
 

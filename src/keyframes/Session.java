@@ -1,6 +1,8 @@
 package keyframes;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +28,6 @@ public class Session implements Serializable {
 	private JSlider timelineSlider = null;
 	private Hashtable<Integer, JLabel> timelineLabelDict = new Hashtable<Integer, JLabel>();
 	
-	
 	private Color brushColor = Color.red;
 	private Color eraserColor = Color.white;
 	private int brushSize = 5;
@@ -34,6 +35,8 @@ public class Session implements Serializable {
 	private EnumFactory.PaintSetting paintSetting = EnumFactory.PaintSetting.DRAW;
 	private HashMap<Integer, ArrayList<ArrayList<DrawPoint>>> drawFrames = 
 			new HashMap<Integer, ArrayList<ArrayList<DrawPoint>>>();
+	
+	private HashMap<Integer, BufferedImage> drawImages = new HashMap<Integer, BufferedImage>();
 	
 	//REPLACE BY SETTINGS
 	private int currentTimepoint = 0;
@@ -43,6 +46,10 @@ public class Session implements Serializable {
 	private int longestTimepoint = longestTimeInSeconds * framesPerSecond;
 	private ArrayList<ArrayList<DrawPoint>> clipboardFrames = null;
 	
+	
+	public Color getDrawablePanelBackgroundColor () {
+		return drawPanel.getBackground();
+	}
 	
 	public String getSavePath() {
 		return savePath;
@@ -69,6 +76,13 @@ public class Session implements Serializable {
 	}
 	
 	
+	public int getDrawablePaneWidth() {
+		return drawPanel.getWidth();
+	}
+	
+	public int getDrawablePaneHeight() {
+		return drawPanel.getHeight();
+	}
 	
 	public void setTimelineSlider(JSlider ts) {
 		this.timelineSlider = ts;
@@ -171,6 +185,7 @@ public class Session implements Serializable {
 		timelineSlider.revalidate();
 		
 		framesPerSecond = fps;
+		longestTimepoint = fps * longestTimeInSeconds;
 		
 		refreshDrawPanel();
 	}
@@ -241,7 +256,13 @@ public class Session implements Serializable {
 		
 	}
 	
+	public void setCurrentImage(BufferedImage img) {
+		drawImages.put(currentTimepoint, img);
+	}
 	
+	public HashMap<Integer, BufferedImage> getImages() {
+		return drawImages;
+	}
 
 	//BYE BYE ALL FRAMES
 	public void eraseAllFrames() {

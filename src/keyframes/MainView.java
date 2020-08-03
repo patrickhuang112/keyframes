@@ -43,6 +43,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import org.jcodec.api.awt.AWTSequenceEncoder;
+
+
+
+
 public class MainView implements SessionObject, Serializable{
 	
 	private static final long serialVersionUID = -4390147842958702501L;
@@ -65,6 +70,7 @@ public class MainView implements SessionObject, Serializable{
 	private JMenuItem openProjectMenuItem;
 	private JMenuItem saveProjectMenuItem;
 	private JMenuItem saveProjectAsMenuItem;
+	private JMenuItem renderAsMenuItem;
 	
 	private JMenuItem editFpsMenuItem;
 	
@@ -194,11 +200,19 @@ public class MainView implements SessionObject, Serializable{
 			}
 		});
 		
+		renderAsMenuItem = new JMenuItem(new AbstractAction("Render As..") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Utils.renderFile(e, session, saveProjectAsMenuItem, session.getFramesPerSecond());
+			}
+		});
 		
+			
 		fileMenu.add(newProjectMenuItem);
 		fileMenu.add(openProjectMenuItem);
 		fileMenu.add(saveProjectMenuItem);
 		fileMenu.add(saveProjectAsMenuItem);
+		fileMenu.add(renderAsMenuItem);
 		
 		topMenuBar.add(fileMenu);
 		
