@@ -148,6 +148,12 @@ public class Session implements Serializable {
 	//TIMELINE ENDPOINT
 	public void setLongestTimeInSeconds(int time) {
 		this.longestTimeInSeconds = time;
+		longestTimepoint = framesPerSecond * longestTimeInSeconds;
+		updateTimeline(framesPerSecond, framesPerSecond);
+		updateFrames(framesPerSecond, framesPerSecond);
+		
+		refreshDrawPanel();
+		
 	}
 	
 	public int getLongestTimeInSeconds() {
@@ -173,6 +179,8 @@ public class Session implements Serializable {
 		
 		timelineSlider.setValue(newTimepoint);
 		setCurrentTimepoint(newTimepoint);
+		timelineSlider.repaint();
+		timelineSlider.revalidate();
 	}
 	
 	public void setFramesPerSecond(int fps) {
@@ -181,8 +189,7 @@ public class Session implements Serializable {
 		
 		updateTimeline(oldFps, newFps);
 		updateFrames(oldFps, newFps);
-		timelineSlider.repaint();
-		timelineSlider.revalidate();
+		
 		
 		framesPerSecond = fps;
 		longestTimepoint = fps * longestTimeInSeconds;
@@ -207,7 +214,7 @@ public class Session implements Serializable {
 				new HashMap<Integer, ArrayList<ArrayList<DrawPoint>>>();
 		for(Integer i : drawFrames.keySet()) {
 			int newKey = calculateNewTimelinePointerPositionFromOldFps(oldFps, newFps, i);
-			if(!newFrames.containsKey(newKey)) {
+			if(!newFrames.containsKey(newKey) && i <= longestTimepoint) {
 				newFrames.put(newKey, drawFrames.get(i));
 			} 
 		}

@@ -73,6 +73,7 @@ public class MainView implements SessionObject, Serializable{
 	private JMenuItem renderAsMenuItem;
 	
 	private JMenuItem editFpsMenuItem;
+	private JMenuItem editTimeMenuItem;
 	
 	
 	public MainView(JFrame parent, Session session) {
@@ -252,7 +253,43 @@ public class MainView implements SessionObject, Serializable{
 				
 		});
 		
+		
+		editTimeMenuItem = new JMenuItem(new AbstractAction("Edit Composition Endpoint") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane timeSelector = new JOptionPane();
+				
+				JSlider timeSlider = new JSlider(JSlider.HORIZONTAL, 0, 60, session.getLongestTimeInSeconds());
+				timeSlider.setMajorTickSpacing(10);
+				timeSlider.setMinorTickSpacing(1);
+				timeSlider.setPaintTicks(true);
+				timeSlider.setPaintLabels(true);
+				timeSlider.addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
+				
+				
+				timeSelector.setMessage(new Object[] { "Adjust composition length ", timeSlider});
+				timeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
+				timeSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+				//Centered on the mainWindow
+				JDialog dialog = timeSelector.createDialog(mainWindow, "Composition length");
+			    dialog.setVisible(true);
+			    
+			    
+			    if(timeSelector.getValue() != null) {
+			    	int res = (int)(timeSelector.getValue());
+			    	if(res == JOptionPane.YES_OPTION) {
+			    		session.setLongestTimeInSeconds(timeSlider.getValue());
+			    	} else {
+			    		System.out.println("Slider cancelled");
+			    	}	
+			    }
+			}
+				
+		});
+		
 		editMenu.add(editFpsMenuItem);
+		editMenu.add(editTimeMenuItem);
 		
 		topMenuBar.add(editMenu);
 		
