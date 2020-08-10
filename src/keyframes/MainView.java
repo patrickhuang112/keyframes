@@ -223,32 +223,7 @@ public class MainView implements SessionObject, Serializable{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane fpsSelector = new JOptionPane();
-				
-				JSlider fpsSlider = new JSlider(JSlider.HORIZONTAL, 0,30, session.getFramesPerSecond());
-				fpsSlider.setMajorTickSpacing(10);
-				fpsSlider.setMinorTickSpacing(1);
-				fpsSlider.setPaintTicks(true);
-				fpsSlider.setPaintLabels(true);
-				fpsSlider.addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
-				
-				
-				fpsSelector.setMessage(new Object[] { "Adjust Composition Frames Per Second ", fpsSlider});
-				fpsSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
-				fpsSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
-				//Centered on the mainWindow
-				JDialog dialog = fpsSelector.createDialog(mainWindow, "Frames Per Second");
-			    dialog.setVisible(true);
-			    
-			    
-			    if(fpsSelector.getValue() != null) {
-			    	int res = (int)(fpsSelector.getValue());
-			    	if(res == JOptionPane.YES_OPTION) {
-			    		session.setFramesPerSecond(fpsSlider.getValue());
-			    	} else {
-			    		System.out.println("Slider cancelled");
-			    	}	
-			    }
+				SliderFactory.createFPSDialogSlider(mainWindow, session);
 			}
 				
 		});
@@ -258,32 +233,7 @@ public class MainView implements SessionObject, Serializable{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane timeSelector = new JOptionPane();
-				
-				JSlider timeSlider = new JSlider(JSlider.HORIZONTAL, 0, 60, session.getLongestTimeInSeconds());
-				timeSlider.setMajorTickSpacing(10);
-				timeSlider.setMinorTickSpacing(1);
-				timeSlider.setPaintTicks(true);
-				timeSlider.setPaintLabels(true);
-				timeSlider.addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
-				
-				
-				timeSelector.setMessage(new Object[] { "Adjust composition length ", timeSlider});
-				timeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
-				timeSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
-				//Centered on the mainWindow
-				JDialog dialog = timeSelector.createDialog(mainWindow, "Composition length");
-			    dialog.setVisible(true);
-			    
-			    
-			    if(timeSelector.getValue() != null) {
-			    	int res = (int)(timeSelector.getValue());
-			    	if(res == JOptionPane.YES_OPTION) {
-			    		session.setLongestTimeInSeconds(timeSlider.getValue());
-			    	} else {
-			    		System.out.println("Slider cancelled");
-			    	}	
-			    }
+				SliderFactory.createCompositionEndpointDialogSlider(mainWindow, session);
 			}
 				
 		});
@@ -321,31 +271,7 @@ public class MainView implements SessionObject, Serializable{
 						session.setPaintSetting(EnumFactory.PaintSetting.ERASE);
 					}
 					else if(SwingUtilities.isRightMouseButton(e)) {
-						JOptionPane eraserSizeSelector = new JOptionPane();
-						
-						JSlider eraserSizeSlider = new JSlider(JSlider.HORIZONTAL, 0,30, session.getEraserSize());
-						eraserSizeSlider.setMajorTickSpacing(10);
-						eraserSizeSlider.setMinorTickSpacing(1);
-						eraserSizeSlider.setPaintTicks(true);
-						eraserSizeSlider.setPaintLabels(true);
-						eraserSizeSlider.addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
-						
-						eraserSizeSelector.setMessage(new Object[] { "Select an Eraser Size: ", eraserSizeSlider});
-						eraserSizeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
-						eraserSizeSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
-						//Centered on the mainWindow
-						JDialog dialog = eraserSizeSelector.createDialog(mainWindow, "Eraser Size");
-					    dialog.setVisible(true);
-					    
-					    
-					    if(eraserSizeSelector.getValue() != null) {
-					    	int res = (int)(eraserSizeSelector.getValue());
-					    	if(res == JOptionPane.YES_OPTION) {
-					    		session.setEraserSize(eraserSizeSlider.getValue());
-					    	} else {
-					    		System.out.println("Slider cancelled");
-					    	}	
-					    }
+						SliderFactory.createEraserSizeDialogSlider(mainWindow, session);
 					}
 				}
 			});
@@ -371,32 +297,7 @@ public class MainView implements SessionObject, Serializable{
 						session.setPaintSetting(EnumFactory.PaintSetting.DRAW);
 					}
 					else if(SwingUtilities.isRightMouseButton(e)) {
-						JOptionPane brushSizeSelector = new JOptionPane();
-						
-						JSlider brushSizeSlider = new JSlider(JSlider.HORIZONTAL, 0,30, session.getBrushSize());
-						brushSizeSlider.setMajorTickSpacing(10);
-						brushSizeSlider.setMinorTickSpacing(1);
-						brushSizeSlider.setPaintTicks(true);
-						brushSizeSlider.setPaintLabels(true);
-						brushSizeSlider.addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
-						
-						
-						brushSizeSelector.setMessage(new Object[] { "Select a Brush Size: ", brushSizeSlider});
-						brushSizeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
-						brushSizeSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
-						//Centered on the mainWindow
-						JDialog dialog = brushSizeSelector.createDialog(mainWindow, "Brush Size");
-					    dialog.setVisible(true);
-					    
-					    
-					    if(brushSizeSelector.getValue() != null) {
-					    	int res = (int)(brushSizeSelector.getValue());
-					    	if(res == JOptionPane.YES_OPTION) {
-					    		session.setBrushSize(brushSizeSlider.getValue());
-					    	} else {
-					    		System.out.println("Slider cancelled");
-					    	}	
-					    }
+						SliderFactory.createBrushSizeDialogSlider(mainWindow, session);
 					}
 				}
 			});

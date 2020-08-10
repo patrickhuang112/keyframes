@@ -72,7 +72,6 @@ public class MainMenu implements Serializable {
 		//gbc.gridheight = 3;
 		gbc.insets = new Insets(10,10,10,10);
 		
-		
 		newProjectButton = new JButton("New Project");
 		newProjectButton.setEnabled(true);
 		newProjectButton.setPreferredSize(new Dimension(200, 80));
@@ -88,12 +87,12 @@ public class MainMenu implements Serializable {
 		gbc.gridy = 0;
 		menuPanel.add(newProjectButton, gbc);
 
-		
-		
 		loadProjectButton = new JButton("Load Project");
 		loadProjectButton.setEnabled(true);
 		loadProjectButton.setPreferredSize(new Dimension(200, 80));
 		loadProjectButton.addActionListener(new ActionListener() {
+			
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				Session session;
 				try {
@@ -133,6 +132,17 @@ public class MainMenu implements Serializable {
 		settingsButton = new JButton("Settings");
 		settingsButton.setEnabled(true);
 		settingsButton.setPreferredSize(new Dimension(200, 80));
+		settingsButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				parent.getContentPane().removeAll();
+				SettingsView sv = new SettingsView(parent);
+				sv.buildUI();
+			}
+			
+		});
 		gbc.gridy = 2;
 		menuPanel.add(settingsButton, gbc);
 

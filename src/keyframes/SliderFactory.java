@@ -1,0 +1,110 @@
+package keyframes;
+
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JSlider;
+
+public class SliderFactory {
+	
+	private static JSlider createBasicTenTickSlider(int defaultTime, int start, int end) {
+		JSlider timeSlider = new JSlider(JSlider.HORIZONTAL, start, end, defaultTime);
+		timeSlider.setMajorTickSpacing(10);
+		timeSlider.setMinorTickSpacing(1);
+		timeSlider.setPaintTicks(true);
+		timeSlider.setPaintLabels(true);
+		timeSlider.addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
+		
+		return timeSlider;
+	}
+	
+	public static void createCompositionEndpointDialogSlider (JComponent parent, Session session) {
+		JOptionPane timeSelector = new JOptionPane();
+		JSlider timeSlider = createBasicTenTickSlider(session.getLongestTimeInSeconds(), 0, 60);
+		
+		timeSelector.setMessage(new Object[] { "Adjust composition length ", timeSlider});
+		timeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
+		timeSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+		//Centered on the mainWindow
+		JDialog dialog = timeSelector.createDialog(parent, "Composition length");
+	    dialog.setVisible(true);
+	    
+	    
+	    if(timeSelector.getValue() != null) {
+	    	int res = (int)(timeSelector.getValue());
+	    	if(res == JOptionPane.YES_OPTION) {
+	    		session.setLongestTimeInSeconds(timeSlider.getValue());
+	    	} else {
+	    		System.out.println("Slider cancelled");
+	    	}	
+	    }
+	}
+	
+	public static void createFPSDialogSlider (JComponent parent, Session session) {
+		JOptionPane fpsSelector = new JOptionPane();
+		JSlider fpsSlider = createBasicTenTickSlider(session.getFramesPerSecond(), 0, 30);
+		
+		fpsSelector.setMessage(new Object[] { "Adjust Composition Frames Per Second ", fpsSlider});
+		fpsSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
+		fpsSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+		//Centered on the mainWindow
+		JDialog dialog = fpsSelector.createDialog(parent, "Frames Per Second");
+	    dialog.setVisible(true);
+	    
+	    
+	    if(fpsSelector.getValue() != null) {
+	    	int res = (int)(fpsSelector.getValue());
+	    	if(res == JOptionPane.YES_OPTION) {
+	    		session.setFramesPerSecond(fpsSlider.getValue());
+	    	} else {
+	    		System.out.println("Slider cancelled");
+	    	}	
+	    }
+	}
+	
+	public static void createEraserSizeDialogSlider (JComponent parent, Session session) {
+		JOptionPane eraserSizeSelector = new JOptionPane();
+		JSlider eraserSizeSlider = createBasicTenTickSlider(session.getEraserSize(), 0, 30);
+		
+		eraserSizeSelector.setMessage(new Object[] { "Select an Eraser Size: ", eraserSizeSlider});
+		eraserSizeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
+		eraserSizeSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+		//Centered on the mainWindow
+		JDialog dialog = eraserSizeSelector.createDialog(parent, "Eraser Size");
+	    dialog.setVisible(true);
+	    
+	    
+	    if(eraserSizeSelector.getValue() != null) {
+	    	int res = (int)(eraserSizeSelector.getValue());
+	    	if(res == JOptionPane.YES_OPTION) {
+	    		session.setEraserSize(eraserSizeSlider.getValue());
+	    	} else {
+	    		System.out.println("Slider cancelled");
+	    	}	
+	    }
+	}
+	
+	public static void createBrushSizeDialogSlider (JComponent parent, Session session) {
+		JOptionPane brushSizeSelector = new JOptionPane();
+		JSlider brushSizeSlider = createBasicTenTickSlider(session.getBrushSize(), 0, 30);
+		
+		brushSizeSelector.setMessage(new Object[] { "Select a Brush Size: ", brushSizeSlider});
+		brushSizeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
+		brushSizeSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+		//Centered on the mainWindow
+		JDialog dialog = brushSizeSelector.createDialog(parent, "Brush Size");
+	    dialog.setVisible(true);
+	    
+	    
+	    if(brushSizeSelector.getValue() != null) {
+	    	int res = (int)(brushSizeSelector.getValue());
+	    	if(res == JOptionPane.YES_OPTION) {
+	    		session.setBrushSize(brushSizeSlider.getValue());
+	    	} else {
+	    		System.out.println("Slider cancelled");
+	    	}	
+	    }
+	}
+	
+	
+}
