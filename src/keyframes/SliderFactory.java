@@ -7,8 +7,8 @@ import javax.swing.JSlider;
 
 public class SliderFactory {
 	
-	private static JSlider createBasicTenTickSlider(int defaultStart, int start, int end) {
-		JSlider timeSlider = new JSlider(JSlider.HORIZONTAL, start, end, defaultStart);
+	private static JSlider createBasicTenTickSlider(int defaultTime, int start, int end) {
+		JSlider timeSlider = new JSlider(JSlider.HORIZONTAL, start, end, defaultTime);
 		timeSlider.setMajorTickSpacing(10);
 		timeSlider.setMinorTickSpacing(1);
 		timeSlider.setPaintTicks(true);
@@ -16,15 +16,6 @@ public class SliderFactory {
 		timeSlider.addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
 		
 		return timeSlider;
-	}
-	
-	public static JSlider createBasicFiveTickSlider(int defaultStart, int start, int end) {
-		JSlider slide = createBasicTenTickSlider(defaultStart, start, end);
-		slide.setMajorTickSpacing(5);
-		return slide;
-	}
-	public static JSlider createBasicSettingsSlider(int defaultStart, int start, int end) {
-		return createBasicTenTickSlider(defaultStart, start, end);
 	}
 	
 	public static void createCompositionEndpointDialogSlider (JComponent parent, Session session) {
@@ -51,7 +42,7 @@ public class SliderFactory {
 	
 	public static void createFPSDialogSlider (JComponent parent, Session session) {
 		JOptionPane fpsSelector = new JOptionPane();
-		JSlider fpsSlider = createBasicTenTickSlider(session.getFramesPerSecond(), 10, 30);
+		JSlider fpsSlider = createBasicTenTickSlider(session.getFramesPerSecond(), 0, 30);
 		
 		fpsSelector.setMessage(new Object[] { "Adjust Composition Frames Per Second ", fpsSlider});
 		fpsSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);

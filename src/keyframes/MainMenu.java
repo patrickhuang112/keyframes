@@ -66,6 +66,10 @@ public class MainMenu implements Serializable {
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		
+		// 1 column
+		//gbc.gridwidth = 1;
+		// 3 rows
+		//gbc.gridheight = 3;
 		gbc.insets = new Insets(10,10,10,10);
 		
 		newProjectButton = new JButton("New Project");
@@ -134,10 +138,7 @@ public class MainMenu implements Serializable {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				parent.getContentPane().removeAll();
-				//FIXME LATER
-				Settings set = new Settings();
-				
-				SettingsView sv = new SettingsView(parent, set);
+				SettingsView sv = new SettingsView(parent);
 				sv.buildUI();
 			}
 			
