@@ -43,7 +43,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-import org.jcodec.api.awt.AWTSequenceEncoder;
 
 
 

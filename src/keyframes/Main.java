@@ -11,15 +11,9 @@ import javax.swing.JFrame;
 
 public class Main {
 	
-	public static JFrame window;
-	
-	private static JFrame createWindow() {
-		return new JFrame();
-	}
-	
 	public static void main(String[] args) {
 		
-		window = createWindow();
+		JFrame window = new JFrame();
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setTitle("Keyframes");
 		window.setVisible(true);
@@ -28,7 +22,9 @@ public class Main {
 		window.setMinimumSize(new Dimension(1600,900));
 		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		
-		MainMenu menu = new MainMenu(window);
+		Settings settings = Utils.getSettings();
+		
+		MainMenu menu = new MainMenu(window, settings);
 		menu.buildUI();
 		
 		System.out.println("App Started...");

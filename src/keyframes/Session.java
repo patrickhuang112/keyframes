@@ -17,9 +17,23 @@ public class Session implements Serializable {
 	
 	private static final long serialVersionUID = 3817282456552806335L;
 
+	public Session(Settings settings) {
+		this();
+		brushSize = settings.getBrushSize();
+		eraserSize = settings.getEraserSize();
+		longestTimeInSeconds = settings.getCompLength();
+		framesPerSecond = settings.getFps();
+	}
+	
 	public Session() {
 		super();
 		drawFrames.put(0, new ArrayList<>());
+		brushSize = 5;
+		eraserSize = 5;
+		
+		longestTimeInSeconds = 10;
+		framesPerSecond = 15;
+		longestTimepoint = longestTimeInSeconds * framesPerSecond;
 	}
 	
 	private String savePath = null;
@@ -30,8 +44,8 @@ public class Session implements Serializable {
 	
 	private Color brushColor = Color.red;
 	private Color eraserColor = Color.white;
-	private int brushSize = 5;
-	private int eraserSize = 5;
+	private int brushSize;
+	private int eraserSize;
 	private EnumFactory.PaintSetting paintSetting = EnumFactory.PaintSetting.DRAW;
 	private HashMap<Integer, ArrayList<ArrayList<DrawPoint>>> drawFrames = 
 			new HashMap<Integer, ArrayList<ArrayList<DrawPoint>>>();
@@ -41,8 +55,8 @@ public class Session implements Serializable {
 	//REPLACE BY SETTINGS
 	private int currentTimepoint = 0;
 	
-	private int longestTimeInSeconds = 10;
-	private int framesPerSecond = 15;
+	private int longestTimeInSeconds;
+	private int framesPerSecond;
 	private int longestTimepoint = longestTimeInSeconds * framesPerSecond;
 	private ArrayList<ArrayList<DrawPoint>> clipboardFrames = null;
 	

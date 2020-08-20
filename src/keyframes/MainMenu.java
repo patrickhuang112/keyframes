@@ -11,7 +11,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import javax.swing.BorderFactory;
@@ -25,26 +27,22 @@ public class MainMenu implements Serializable {
 	
 	private static final long serialVersionUID = -3854588841281613072L;
 
-	private JPanel leftPanel;
-	private JPanel rightPanel;
 	private JPanel menuPanel;
 	private JFrame parent;
+	private Settings settings;
 	
-	private JButton settingsButton;
-	private JButton newProjectButton;
-	private JButton loadProjectButton;
-	
-	public MainMenu(JFrame parent) {
+	public MainMenu(JFrame parent, Settings settings) {
 		this.parent = parent;
+		this.settings = settings;
 		menuPanel = new JPanel();
 		this.parent.add(menuPanel, BorderLayout.CENTER);
 	}
 	
 	public void buildUI() {
 		
-		leftPanel = new JPanel();
+		JPanel leftPanel = new JPanel();
 		leftPanel.setPreferredSize(new Dimension(400,400));
-		rightPanel = new JPanel();
+		JPanel rightPanel = new JPanel();
 		rightPanel.setPreferredSize(new Dimension(400,400));
 		parent.add(leftPanel, BorderLayout.LINE_START);
 		parent.add(rightPanel, BorderLayout.LINE_END);
@@ -66,19 +64,15 @@ public class MainMenu implements Serializable {
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		
-		// 1 column
-		//gbc.gridwidth = 1;
-		// 3 rows
-		//gbc.gridheight = 3;
 		gbc.insets = new Insets(10,10,10,10);
 		
-		newProjectButton = new JButton("New Project");
+		JButton newProjectButton = new JButton("New Project");
 		newProjectButton.setEnabled(true);
 		newProjectButton.setPreferredSize(new Dimension(200, 80));
 		newProjectButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				parent.getContentPane().removeAll();
-				MainView mv = new MainView(parent, new Session());
+				MainView mv = new MainView(parent, new Session(settings));
 				mv.buildUI();
 			}
 		});
@@ -87,7 +81,7 @@ public class MainMenu implements Serializable {
 		gbc.gridy = 0;
 		menuPanel.add(newProjectButton, gbc);
 
-		loadProjectButton = new JButton("Load Project");
+		JButton loadProjectButton = new JButton("Load Project");
 		loadProjectButton.setEnabled(true);
 		loadProjectButton.setPreferredSize(new Dimension(200, 80));
 		loadProjectButton.addActionListener(new ActionListener() {
@@ -129,16 +123,18 @@ public class MainMenu implements Serializable {
 		gbc.gridy = 1;
 		menuPanel.add(loadProjectButton, gbc);
 		
-		settingsButton = new JButton("Settings");
+		JButton settingsButton = new JButton("Settings");
 		settingsButton.setEnabled(true);
 		settingsButton.setPreferredSize(new Dimension(200, 80));
 		settingsButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+
 				parent.getContentPane().removeAll();
-				SettingsView sv = new SettingsView(parent);
+				
+				settings = Utils.getSettings();
+				SettingsView sv = new SettingsView(parent, settings);
 				sv.buildUI();
 			}
 			

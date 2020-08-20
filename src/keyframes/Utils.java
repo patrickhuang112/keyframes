@@ -5,7 +5,9 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
@@ -17,6 +19,24 @@ import org.jcodec.api.awt.AWTSequenceEncoder;
 
 public class Utils {
 
+	public static Settings getSettings() {
+		Settings settings;
+		try {
+			String file = Settings.settingsPath;
+			FileInputStream fileIn = new FileInputStream(file);
+	        ObjectInputStream in = new ObjectInputStream(fileIn);
+	        settings = (Settings)in.readObject();
+	        System.out.println("Successfully loaded settings");
+	        in.close();
+	        fileIn.close();
+		} catch (Exception e) {
+			System.out.println("Settings don't preexist");
+			settings = new Settings();
+		}
+		return settings;
+		
+	}
+	
 	public static String getExtension(File f) {
         String ext = null;
         String s = f.getName();
