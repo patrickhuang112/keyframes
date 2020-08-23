@@ -1,0 +1,37 @@
+group 'war'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'java-library-distribution'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+// Task "distZip" added by plugin "java-library-distribution":
+distZip.shouldRunAfter(build)
+
+jar {
+
+    // Keep jar clean:
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
+
+    manifest {
+        //attributes 'Main-Class': 'com.doughuang.WarGame',
+        //attributes 'Main-Class': 'com.keyframes',
+        attributes 'Main-Class': 'keyframes.Main',
+                'Class-Path': configurations.runtime.files.collect { "lib/$it.name" }.join(' ')
+    }
+
+}
+
+dependencies {
+    // compile 'org.jcodec:jcodec:0.2.5'
+    implementation group: 'org.jcodec', name: 'jcodec-javase', version: '0.2.0'
+    
+    //use following if gradle version > 3.0 
+    //implementation group: 'org.jcodec', name: 'jcodec-javase', version: '0.2.0'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
