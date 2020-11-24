@@ -33,8 +33,11 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	//LOOK AT THAT WHEN I WANT TO IMPLEMENT LAYERS
 	Point drawPoint;
 	Graphics2D old;
+	
 	ArrayList<DrawPoint> currentDraggedPoints = null;
 	ArrayList<ArrayList<DrawPoint>> pointCollection = new ArrayList<>();	
+	
+	Integer currentLayer;
 	
 	DrawablePanel(UIComponent parent) {
 		super();

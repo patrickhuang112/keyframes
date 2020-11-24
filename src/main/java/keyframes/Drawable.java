@@ -34,7 +34,6 @@ public class Drawable implements UIComponent, Serializable {
 		drawPanel.setBackground(Color.white);
 	}
 	
-	
 	@Override
 	public void addChild(UIComponent child) {
 		drawPanel.add(child.getMainComponent());

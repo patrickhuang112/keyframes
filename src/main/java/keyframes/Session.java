@@ -16,6 +16,16 @@ public class Session implements Serializable {
 	
 	
 	private static final long serialVersionUID = 3817282456552806335L;
+	
+	public final int brushMin = 1;
+	public final int brushMax = 30;
+	public final int eraserMin = 1;
+	public final int eraserMax = 30;
+	public final int fpsMin = 10;
+	public final int fpsMax = 30;
+	public final int lengthMin = 5;
+	public final int lengthMax = 60;
+	
 
 	public Session(Settings settings) {
 		this();
@@ -23,11 +33,13 @@ public class Session implements Serializable {
 		eraserSize = settings.getEraserSize();
 		longestTimeInSeconds = settings.getCompLength();
 		framesPerSecond = settings.getFps();
+		longestTimepoint = longestTimeInSeconds * framesPerSecond;
 	}
 	
 	public Session() {
 		super();
 		drawFrames.put(0, new ArrayList<>());
+		drawLayers.add(new Layer(0, drawFrames));
 		brushSize = 5;
 		eraserSize = 5;
 		
@@ -36,6 +48,7 @@ public class Session implements Serializable {
 		longestTimepoint = longestTimeInSeconds * framesPerSecond;
 	}
 	
+	private Integer currentLayerNum = 0;
 	private String savePath = null;
 	public boolean isPlaying = false;
 	private DrawablePanel drawPanel = null;
@@ -47,6 +60,9 @@ public class Session implements Serializable {
 	private int brushSize;
 	private int eraserSize;
 	private EnumFactory.PaintSetting paintSetting = EnumFactory.PaintSetting.DRAW;
+	// This contains layer info, and time info
+	private ArrayList<Layer> drawLayers = new ArrayList<Layer>();
+	// This just contains time info
 	private HashMap<Integer, ArrayList<ArrayList<DrawPoint>>> drawFrames = 
 			new HashMap<Integer, ArrayList<ArrayList<DrawPoint>>>();
 	
@@ -57,6 +73,7 @@ public class Session implements Serializable {
 	
 	private int longestTimeInSeconds;
 	private int framesPerSecond;
+	private int minTimepoint = 0;
 	private int longestTimepoint = longestTimeInSeconds * framesPerSecond;
 	private ArrayList<ArrayList<DrawPoint>> clipboardFrames = null;
 	
@@ -159,15 +176,16 @@ public class Session implements Serializable {
 	}
 	
 	
-	//TIMELINE ENDPOINT
+	// Set the longest timepoint for the composition (from the slider)
 	public void setLongestTimeInSeconds(int time) {
-		this.longestTimeInSeconds = time;
-		longestTimepoint = framesPerSecond * longestTimeInSeconds;
-		updateTimeline(framesPerSecond, framesPerSecond);
-		updateFrames(framesPerSecond, framesPerSecond);
-		
-		refreshDrawPanel();
-		
+		if(time >= lengthMin && time <= lengthMax) {
+			this.longestTimeInSeconds = time;
+			longestTimepoint = framesPerSecond * longestTimeInSeconds;
+			updateTimeline(framesPerSecond, framesPerSecond);
+			updateFrames(framesPerSecond, framesPerSecond);
+			
+			refreshDrawPanel();
+		}
 	}
 	
 	public int getLongestTimeInSeconds() {
@@ -198,17 +216,20 @@ public class Session implements Serializable {
 	}
 	
 	public void setFramesPerSecond(int fps) {
-		int oldFps = framesPerSecond;
-		int newFps = fps;
+		if(fps >= fpsMin && fps <= fpsMax) {
+			int oldFps = framesPerSecond;
+			int newFps = fps;
+			
+			updateTimeline(oldFps, newFps);
+			updateFrames(oldFps, newFps);
+			
+			
+			framesPerSecond = fps;
+			longestTimepoint = fps * longestTimeInSeconds;
+			
+			refreshDrawPanel();
+		}
 		
-		updateTimeline(oldFps, newFps);
-		updateFrames(oldFps, newFps);
-		
-		
-		framesPerSecond = fps;
-		longestTimepoint = fps * longestTimeInSeconds;
-		
-		refreshDrawPanel();
 	}
 	
 	public int getFramesPerSecond() {
@@ -239,13 +260,31 @@ public class Session implements Serializable {
 	
 	//TIMELINE CURRENT TIME
 	public void setCurrentTimepoint(int time) {
-		this.currentTimepoint = time;
+		if(time >= minTimepoint && time <= longestTimepoint) {
+			this.currentTimepoint = time;
+		}
 	}
 	
 	public int getCurrentTimepoint() {
 		return this.currentTimepoint;
 	}
 	
+	// CURRENT LAYER
+	public Integer getCurrentLayerNum () {
+		return this.currentLayerNum;
+	}
+	
+	public void setCurrentLayerNum (Integer num) {
+		this.currentLayerNum = num;
+	}
+	
+	public void setCurrentLayer (Layer layer) {
+		this.drawLayers.set(this.currentLayerNum, layer);
+	}
+	
+	public Layer getCurrentLayer () {
+		return this.drawLayers.get(this.currentLayerNum);
+	}
 	
 	//DRAWABLE GET/SET FRAMEs
 	public void setFrame(Integer timePoint, ArrayList<ArrayList<DrawPoint>> drawing) {
@@ -306,7 +345,9 @@ public class Session implements Serializable {
 	}
 	
 	public void setBrushSize(int brushSize) {
-		this.brushSize = brushSize;
+		if(brushSize >= brushMin && brushSize <= brushMax) {
+			this.brushSize = brushSize;
+		}
 	}
 	
 	public int getEraserSize() {
@@ -314,7 +355,9 @@ public class Session implements Serializable {
 	}
 	
 	public void setEraserSize(int eraserSize) {
-		this.eraserSize = eraserSize;
+		if(eraserSize >= eraserMin && eraserSize <= eraserMax) {
+			this.eraserSize = eraserSize;
+		}
 	}
 	
 }

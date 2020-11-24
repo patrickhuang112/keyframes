@@ -23,10 +23,12 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -111,17 +113,17 @@ public class MainView implements SessionObject, Serializable{
 	
 	private void buildTopBar() {
 		topBar = new JPanel();
-		topBar.setLayout(new BoxLayout(topBar, BoxLayout.Y_AXIS));
+		topBar.setLayout(new BorderLayout());
 		topBar.setPreferredSize(new Dimension(0,60));
-		
+		topBar.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mainWindow.add(topBar, BorderLayout.PAGE_START);
 		buildTopMenuBar();
-		buildtopToolBar();
+		buildTopToolBar();
 	}
 	
 	private void buildTopMenuBar() {
 		topMenuBar = new JMenuBar();
-		
+		topMenuBar.setPreferredSize(new Dimension(0,30));
 		fileMenu = new JMenu("File");
 		newProjectMenuItem = new JMenuItem(new AbstractAction("New Project") {
 
@@ -241,18 +243,33 @@ public class MainView implements SessionObject, Serializable{
 		editMenu.add(editTimeMenuItem);
 		
 		topMenuBar.add(editMenu);
-		
-		topMenuBar.setAlignmentX(Component.LEFT_ALIGNMENT);
-		topBar.add(topMenuBar);
+		topBar.add(topMenuBar, BorderLayout.PAGE_START);
 	}
 	
-	private void buildtopToolBar() {
+	private void buildTopToolBar() {
 		topToolBar = new JToolBar(JToolBar.HORIZONTAL);
+		topToolBar.setLayout(new BoxLayout(topToolBar, BoxLayout.X_AXIS));
 		topToolBar.setPreferredSize(new Dimension(0,30));
 		topToolBar.setFloatable(false);
-		topToolBar.setAlignmentX(Component.LEFT_ALIGNMENT);
+		
 		buildTopToolBarButtons();
-		topBar.add(topToolBar);
+		topToolBar.add(Box.createHorizontalGlue());
+		buildLayersDropdownButton();
+		
+		topBar.add(topToolBar, BorderLayout.PAGE_END);
+		
+	}
+	
+	private void buildLayersDropdownButton() {
+		try {
+			JComboBox<Integer> layersDropdown = new JComboBox<Integer>();
+			layersDropdown.setVisible(true);
+			layersDropdown.setPreferredSize(new Dimension(40, 20));
+			
+			topToolBar.add(layersDropdown);
+		} catch (Exception e) {
+			System.out.println("Layers Icon failed");
+		}
 		
 	}
 	
