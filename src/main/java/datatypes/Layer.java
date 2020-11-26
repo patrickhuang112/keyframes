@@ -1,4 +1,4 @@
-package keyframes;
+package datatypes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,12 +8,12 @@ public class Layer {
 	// Layer num is the priority of the list being drawn
 	private Integer layerNum;
 	// All the timestamped points for a layer
-	private HashMap<Integer,ArrayList<ArrayList<DrawPoint>>> points;
+	private KeyFrames frames;
 	private String layerName;
 	
-	Layer(Integer layerNum, HashMap<Integer,ArrayList<ArrayList<DrawPoint>>> points) {
+	public Layer(Integer layerNum, KeyFrames frames) {
 		this.layerNum = layerNum;
-		this.points = points;
+		this.frames = frames;
 	}
 	
 	public Integer getLayerNum() {
@@ -24,8 +24,12 @@ public class Layer {
 		this.layerNum = num;
 	}
 	
-	public HashMap<Integer,ArrayList<ArrayList<DrawPoint>>> getPoints() {
-		return points;
+	public KeyFrames getFrames() {
+		return frames;
+	}
+	
+	public void setFrames(KeyFrames frames) {
+		this.frames = frames;
 	}
 	
 	public void setName(String name) {

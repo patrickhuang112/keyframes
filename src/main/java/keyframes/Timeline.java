@@ -1,27 +1,43 @@
 package keyframes;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.GeneralPath;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-public class Timeline implements UIComponent, Serializable{
+import datatypes.DrawPoint;
+import datatypes.Interval;
+import datatypes.KeyFrames;
+import datatypes.Layer;
+import datatypes.TimelineSlider;
+
+public class Timeline extends JComponent implements UIComponent, Serializable{
 	
 	private static final long serialVersionUID = -4549310200115960539L;
 	private UIComponent parent;
-	private JPanel mainTimelinePanel;
+	private JLayeredPane mainTimelinePanel;
+	private TimelineSlider slider;
+	private JScrollPane layersPane;
+	private Double sliderBarx;
 	
 	@Override
 	public void addChild(UIComponent child) {
@@ -39,7 +55,7 @@ public class Timeline implements UIComponent, Serializable{
 	
 	public Timeline(UIComponent parent, boolean addToParent) {
 		this.parent = parent;
-		mainTimelinePanel = new JPanel();
+		mainTimelinePanel = new JLayeredPane();
 		if(addToParent) { 
 			this.parent.getMainComponent().add(mainTimelinePanel, BorderLayout.PAGE_END);
 		}
@@ -54,16 +70,15 @@ public class Timeline implements UIComponent, Serializable{
 		int fps = getSession().getFramesPerSecond();
 		
 		
-		JSlider timelineSlider = new JSlider(JSlider.HORIZONTAL, 
+		TimelineSlider timelineSlider = new TimelineSlider(JSlider.HORIZONTAL, 
 				//STARTPOINT
 				0, 
 				//ENDPOINT
 				endPoint,
 				//INTIALPOINT
-				cur);
-
-		getSession().setTimelineSlider(timelineSlider);
-		
+				cur, 
+				//SESSION OBJ
+				getSession());
 		
 		timelineSlider.setMajorTickSpacing(fps);
 		timelineSlider.setMinorTickSpacing(1);
@@ -71,63 +86,86 @@ public class Timeline implements UIComponent, Serializable{
 		timelineSlider.setPaintLabels(true);
 		timelineSlider.setSnapToTicks(true);
 		
+		getSession().setTimelineSlider(timelineSlider);
 		
 		Hashtable<Integer, JLabel> labelDict = new Hashtable<Integer, JLabel>();
 		for(Integer i = 0; i < endSec; i++) {
 			labelDict.put(i * fps, new JLabel(i.toString()));
 		}
+		
 		//ADD THE ENDPOINT LABEL
 		labelDict.put(endPoint, new JLabel(((Integer)endSec).toString()));
 		timelineSlider.setLabelTable(labelDict);
+		timelineSlider.setPreferredSize(new Dimension (0, 100));
 		
-		timelineSlider.addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
-		timelineSlider.addMouseListener(new MouseAdapter( ) {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				updateFromMouse(e);
-			}
-		});
-		timelineSlider.addMouseMotionListener(new MouseAdapter() {
-			@Override 
-			public void mouseDragged(MouseEvent e) {
-				updateFromMouse(e);
-			}
-		});
-		
-		timelineSlider.addKeyListener(new KeyListener() {
-
-			@Override
-			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_C && e.isControlDown()) {
-					getSession().copyFrames();
-				} else if(e.getKeyCode() == KeyEvent.VK_V && e.isControlDown()) {
-					getSession().pasteFrames();
-				}
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
-		
-		mainTimelinePanel.add(timelineSlider, BorderLayout.CENTER);
+		this.slider = timelineSlider;
+		mainTimelinePanel.add(timelineSlider, BorderLayout.NORTH, 1);
 	}
 	
+	private void buildLayers() {
+		JScrollPane timelineLayers = new JScrollPane();
+		ArrayList<Layer> layers = getSession().getLayers();
+		for (Layer layer : layers) {
+			buildIndividualLayerTimeline(layer);
+		}
+		
+		this.layersPane = timelineLayers;
+		mainTimelinePanel.add(timelineLayers,0);
+	}
 	
-	private void updateFromMouse(MouseEvent e) {
-		JSlider sourceSlider=(JSlider)e.getSource();
-	    BasicSliderUI ui = (BasicSliderUI)sourceSlider.getUI();
-	    int value = ui.valueForXPosition(e.getX());
-	    getSession().setCurrentTimepoint(value);
-	    getSession().refreshDrawPanel();
+	private void buildIndividualLayerTimeline(Layer layer) {
+		KeyFrames frames = layer.getFrames();
+		// THe last tick on the timeline slider
+		int longestTimepoint = getSession().getLongestTimepoint();
+		
+		
+		ArrayList<Interval> layerIntervals = new ArrayList<>();
+		Interval current = new Interval();
+		for (int i = 0; i <= longestTimepoint; i++ ) {
+			// Our interval hasn't started, and we now find something in our timeline
+			if (frames.containsKey(i) && current.getStart() == null) {
+				current.setStart(i);
+			} 
+			// Our interval has started, and we just came upon a time where there isn't an entry in frames, so
+			// end the interval and create a new interval object
+			else if (!frames.containsKey(i) && current.getStart() != null){
+				current.setEnd(i-1);
+				layerIntervals.add(current);
+				current = new Interval();
+			}
+		}
+		// If our interval has a start, then that means it goes from that start all the way to the end
+		if (current.getStart() != null) {
+			current.setEnd(longestTimepoint);
+			layerIntervals.add(current);
+		} 
+		drawLayerIntervals(layerIntervals);
+	}
+	
+	// Draw all of the boxes
+	private void drawLayerIntervals(ArrayList<Interval> intervals) {
+		// Need to first write code to get slider info stuff
+	}
+	
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
+		Graphics2D g2d = (Graphics2D) g;
+		GeneralPath gp =  new GeneralPath();
+		BasicStroke s = null;
+		
+		gp.moveTo(sliderBarx, slider.getY());
+		
+		g2d.setPaint(Color.black);
+		s = new BasicStroke(5, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+		g2d.setStroke(s);
+		gp.lineTo(sliderBarx, slider.getY()+200);
+		
+		g2d.draw(gp);
+		if (this.sliderBarx != null) {
+			System.out.println(slider.getY());
+			
+		}
 	}
 	
 	public void build() {
@@ -136,6 +174,19 @@ public class Timeline implements UIComponent, Serializable{
 		mainTimelinePanel.setPreferredSize(new Dimension(0,200));
 		mainTimelinePanel.setLayout(new BorderLayout());
 		buildSlider();
+		buildLayers();
+		layersPane.addMouseListener(new MouseAdapter() {
+			@Override 
+			public void mouseClicked(MouseEvent e) {
+				sliderBarx = slider.updateFromMouse(e);
+			}
+		});
+		layersPane.addMouseMotionListener(new MouseAdapter() {
+			@Override 
+			public void mouseDragged(MouseEvent e) {
+				sliderBarx = slider.updateFromMouse(e);
+			}
+		});
 	}
 
 	@Override

@@ -1,8 +1,11 @@
-package keyframes;
+package datatypes;
 
 import java.awt.Color;
 import java.awt.Point;
 import java.io.Serializable;
+
+import keyframes.EnumFactory;
+import keyframes.EnumFactory.PaintSetting;
 
 public class DrawPoint implements Serializable {
 

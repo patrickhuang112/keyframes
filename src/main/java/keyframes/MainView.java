@@ -46,9 +46,6 @@ import javax.swing.SwingWorker;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 
-
-
-
 public class MainView implements SessionObject, Serializable{
 	
 	private static final long serialVersionUID = -4390147842958702501L;
@@ -248,14 +245,11 @@ public class MainView implements SessionObject, Serializable{
 	
 	private void buildTopToolBar() {
 		topToolBar = new JToolBar(JToolBar.HORIZONTAL);
-		topToolBar.setLayout(new BoxLayout(topToolBar, BoxLayout.X_AXIS));
+		//topToolBar.setLayout(new BoxLayout(topToolBar, BoxLayout.X_AXIS));
 		topToolBar.setPreferredSize(new Dimension(0,30));
 		topToolBar.setFloatable(false);
 		
-		buildTopToolBarButtons();
-		topToolBar.add(Box.createHorizontalGlue());
-		buildLayersDropdownButton();
-		
+		buildTopToolBarButtons();		
 		topBar.add(topToolBar, BorderLayout.PAGE_END);
 		
 	}

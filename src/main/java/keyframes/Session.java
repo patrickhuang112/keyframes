@@ -12,6 +12,11 @@ import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import datatypes.DrawPoint;
+import datatypes.KeyFrames;
+import datatypes.Layer;
+import datatypes.TimelineSlider;
+
 public class Session implements Serializable {
 	
 	
@@ -38,7 +43,12 @@ public class Session implements Serializable {
 	
 	public Session() {
 		super();
+		// Initialize new HashMap of times and frames for default layer
+		KeyFrames drawFrames = 
+			new KeyFrames();
+		
 		drawFrames.put(0, new ArrayList<>());
+		
 		drawLayers.add(new Layer(0, drawFrames));
 		brushSize = 5;
 		eraserSize = 5;
@@ -52,7 +62,7 @@ public class Session implements Serializable {
 	private String savePath = null;
 	public boolean isPlaying = false;
 	private DrawablePanel drawPanel = null;
-	private JSlider timelineSlider = null;
+	private TimelineSlider timelineSlider = null;
 	private Hashtable<Integer, JLabel> timelineLabelDict = new Hashtable<Integer, JLabel>();
 	
 	private Color brushColor = Color.red;
@@ -63,9 +73,10 @@ public class Session implements Serializable {
 	// This contains layer info, and time info
 	private ArrayList<Layer> drawLayers = new ArrayList<Layer>();
 	// This just contains time info
-	private HashMap<Integer, ArrayList<ArrayList<DrawPoint>>> drawFrames = 
-			new HashMap<Integer, ArrayList<ArrayList<DrawPoint>>>();
-	
+	/*
+	private KeyFrames drawFrames = 
+			new KeyFrames();
+	*/
 	private HashMap<Integer, BufferedImage> drawImages = new HashMap<Integer, BufferedImage>();
 	
 	//REPLACE BY SETTINGS
@@ -75,7 +86,10 @@ public class Session implements Serializable {
 	private int framesPerSecond;
 	private int minTimepoint = 0;
 	private int longestTimepoint = longestTimeInSeconds * framesPerSecond;
-	private ArrayList<ArrayList<DrawPoint>> clipboardFrames = null;
+	// Current frames copied to clipboard
+	// Hashmap key: the number of the layer
+	// Hashmap entry: the frames associated with that layer
+	private KeyFrames clipboardFrames = null;
 	
 	
 	public Color getDrawablePanelBackgroundColor () {
@@ -115,7 +129,7 @@ public class Session implements Serializable {
 		return drawPanel.getHeight();
 	}
 	
-	public void setTimelineSlider(JSlider ts) {
+	public void setTimelineSlider(TimelineSlider ts) {
 		this.timelineSlider = ts;
 	}
 	
@@ -164,17 +178,16 @@ public class Session implements Serializable {
 		return res;
 	}
 	
-	public void copyFrames() {
-		clipboardFrames = getCurrentFrame();
+	public void copyFramesFromCurrentLayerAndCurrentTime() {
+		clipboardFrames.put(getCurrentLayerNum(), getCurrentLayerFrameAtCurrentTime());
 	}
 	
-	public void pasteFrames() {
-		if(clipboardFrames != null) {
-			setCurrentFrame(deepCopyFrames(clipboardFrames));
+	public void pasteFramesToCurrentLayerAndCurrentTime() {
+		if (clipboardFrames.containsKey(getCurrentLayerNum())) {
+			setCurrentLayerFrameAtCurrentTime(deepCopyFrames(clipboardFrames.get(getCurrentLayerNum())));
 			refreshDrawPanel();
 		}
-	}
-	
+	}	
 	
 	// Set the longest timepoint for the composition (from the slider)
 	public void setLongestTimeInSeconds(int time) {
@@ -182,7 +195,7 @@ public class Session implements Serializable {
 			this.longestTimeInSeconds = time;
 			longestTimepoint = framesPerSecond * longestTimeInSeconds;
 			updateTimeline(framesPerSecond, framesPerSecond);
-			updateFrames(framesPerSecond, framesPerSecond);
+			updateAllLayerFramesFromFPS(framesPerSecond, framesPerSecond);
 			
 			refreshDrawPanel();
 		}
@@ -221,7 +234,7 @@ public class Session implements Serializable {
 			int newFps = fps;
 			
 			updateTimeline(oldFps, newFps);
-			updateFrames(oldFps, newFps);
+			updateAllLayerFramesFromFPS(oldFps, newFps);
 			
 			
 			framesPerSecond = fps;
@@ -244,17 +257,26 @@ public class Session implements Serializable {
 		return newTimepoint;
 	}
 	
-	private void updateFrames(int oldFps, int newFps) {
-		HashMap<Integer, ArrayList<ArrayList<DrawPoint>>> newFrames = 
-				new HashMap<Integer, ArrayList<ArrayList<DrawPoint>>>();
-		for(Integer i : drawFrames.keySet()) {
+	// A function to update all frames in all layers, where the change is due to FPS change
+	private void updateAllLayerFramesFromFPS(int oldFps, int newFps) {
+		for (Layer layer : drawLayers) {
+			updateLayerFramesFromFPS(oldFps, newFps, layer);
+		}
+	}
+	
+	private void updateLayerFramesFromFPS(int oldFps, int newFps, Layer layer) {
+		KeyFrames newFrames = 
+				new KeyFrames();
+		KeyFrames currentDrawFrames = 
+				layer.getFrames();
+		for(Integer i : currentDrawFrames.keySet()) {
 			int newKey = calculateNewTimelinePointerPositionFromOldFps(oldFps, newFps, i);
 			if(!newFrames.containsKey(newKey) && i <= longestTimepoint) {
-				newFrames.put(newKey, drawFrames.get(i));
+				newFrames.put(newKey, currentDrawFrames.get(i));
 			} 
 		}
 		
-		drawFrames = newFrames;
+		layer.setFrames(newFrames);
 	}
 	
 	
@@ -270,6 +292,10 @@ public class Session implements Serializable {
 	}
 	
 	// CURRENT LAYER
+	public ArrayList<Layer> getLayers() {
+		return this.drawLayers;
+	}
+	
 	public Integer getCurrentLayerNum () {
 		return this.currentLayerNum;
 	}
@@ -287,35 +313,35 @@ public class Session implements Serializable {
 	}
 	
 	//DRAWABLE GET/SET FRAMEs
-	public void setFrame(Integer timePoint, ArrayList<ArrayList<DrawPoint>> drawing) {
-		this.drawFrames.put(timePoint, drawing);
+	// Set the frame at a certain time point for the current layer frame
+	public void setCurrentLayerFrameAtTime(Integer timePoint, ArrayList<ArrayList<DrawPoint>> drawing) {
+		Layer curLayer = getCurrentLayer();
+		curLayer.getFrames().put(timePoint, drawing);
 	}
 	
 
-	public ArrayList<ArrayList<DrawPoint>> getFrame(Integer timePoint) {
-		if(this.drawFrames.containsKey(timePoint)) {
-			return this.drawFrames.get(timePoint);
+	public ArrayList<ArrayList<DrawPoint>> getCurrentLayerFrameAtTime(Integer timePoint) {
+		Layer curLayer = getCurrentLayer();
+		HashMap<Integer,ArrayList<ArrayList<DrawPoint>>> drawFrames = curLayer.getFrames();
+		if(drawFrames.containsKey(timePoint)) {
+			return drawFrames.get(timePoint);
 		} else {
-			setFrame(timePoint, new ArrayList<>());
-			return this.drawFrames.get(timePoint);
+			setCurrentLayerFrameAtTime(timePoint, new ArrayList<>());
+			return drawFrames.get(timePoint);
 		}
 	}
 	
-	public void setCurrentFrame(ArrayList<ArrayList<DrawPoint>> drawing) {
-		this.drawFrames.put(currentTimepoint, drawing);
+	public void setCurrentLayerFrameAtCurrentTime(ArrayList<ArrayList<DrawPoint>> drawing) {
+		setCurrentLayerFrameAtTime(currentTimepoint, drawing);
 	}
 	
 	
-	public ArrayList<ArrayList<DrawPoint>> getCurrentFrame() {
-		if(this.drawFrames.containsKey(currentTimepoint)) {
-			return this.drawFrames.get(currentTimepoint);
-		} else {
-			setCurrentFrame(new ArrayList<>());
-			return this.drawFrames.get(currentTimepoint);
-		}
-		
+	public ArrayList<ArrayList<DrawPoint>> getCurrentLayerFrameAtCurrentTime() {
+		return getCurrentLayerFrameAtTime(currentTimepoint);
 	}
 	
+	
+	// With Rendering stuff
 	public void setCurrentImage(BufferedImage img) {
 		drawImages.put(currentTimepoint, img);
 	}
@@ -324,10 +350,20 @@ public class Session implements Serializable {
 		return drawImages;
 	}
 
+	
+	
 	//BYE BYE ALL FRAMES
-	public void eraseAllFrames() {
-		this.drawFrames = new HashMap<Integer, ArrayList<ArrayList<DrawPoint>>>();
+	public void eraseAllLayerFrames() {
+		for (Layer layer : drawLayers) {
+			eraseAllFramesFromLayer(layer);
+		}
+		
 	}
+	
+	public void eraseAllFramesFromLayer(Layer layer) {
+		layer.setFrames(new KeyFrames());
+	}
+	
 	
 	
 	//DRAWABLE PAINT SETTING
@@ -338,6 +374,9 @@ public class Session implements Serializable {
 	public EnumFactory.PaintSetting getPaintSetting() {
 		return this.paintSetting;
 	}
+	
+	
+	
 	
 	//DRAWABLE BRUSH/ERASER SETTINGS
 	public int getBrushSize() {

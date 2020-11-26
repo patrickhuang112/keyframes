@@ -21,6 +21,8 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import datatypes.DrawPoint;
+
 public class DrawablePanel extends JPanel implements MouseMotionListener, MouseListener{
 	
 	private static final long serialVersionUID = -4890309349957259630L;
@@ -50,7 +52,7 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	public void clearAll() {
 		currentDraggedPoints = null;
 		pointCollection = new ArrayList<>();
-		parent.getSession().setCurrentFrame(pointCollection);
+		parent.getSession().setCurrentLayerFrameAtCurrentTime(pointCollection);
 		repaint();
 	}
 	private void drawAndErasePoint(Graphics2D g2d, DrawPoint p) {
@@ -87,7 +89,7 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
-		pointCollection = parent.getSession().getCurrentFrame();
+		pointCollection = parent.getSession().getCurrentLayerFrameAtCurrentTime();
 		BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), 
 				BufferedImage.TYPE_INT_RGB);
 		Graphics2D imgG = img.createGraphics();
@@ -115,9 +117,8 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	
 	
 	private void updateSession(BufferedImage img) {
-		parent.getSession().setCurrentFrame(pointCollection);
+		parent.getSession().setCurrentLayerFrameAtCurrentTime(pointCollection);
 		parent.getSession().setCurrentImage(img);
-		
 	}
 	
 
