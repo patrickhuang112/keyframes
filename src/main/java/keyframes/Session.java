@@ -74,10 +74,7 @@ public class Session implements Serializable {
 	// This contains layer info, and time info
 	private ArrayList<Layer> drawLayers = new ArrayList<Layer>();
 	// This just contains time info
-	/*
-	private KeyFrames drawFrames = 
-			new KeyFrames();
-	*/
+	
 	private HashMap<Integer, BufferedImage> drawImages = new HashMap<Integer, BufferedImage>();
 	
 	//REPLACE BY SETTINGS
@@ -180,6 +177,7 @@ public class Session implements Serializable {
 	}
 	
 	public void copyFramesFromCurrentLayerAndCurrentTime() {
+		clipboardFrames = new KeyFrames();
 		clipboardFrames.put(getCurrentLayerNum(), getCurrentLayerFrameAtCurrentTime());
 	}
 	

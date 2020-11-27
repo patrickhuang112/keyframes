@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -16,12 +17,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 
+import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.KeyStroke;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 import datatypes.DrawPoint;
@@ -58,6 +61,24 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		if(addToParent) { 
 			this.parent.getMainComponent().add(mainTimelinePanel, BorderLayout.PAGE_END);
 		}
+		
+		mainTimelinePanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control C"), "copied");
+		mainTimelinePanel.getActionMap().put("copied", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				getSession().copyFramesFromCurrentLayerAndCurrentTime();
+			}
+			
+		});
+		
+		mainTimelinePanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control V"), "pasted");
+		mainTimelinePanel.getActionMap().put("pasted", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				getSession().pasteFramesToCurrentLayerAndCurrentTime();
+			}
+			
+		});
 	}
 	
 	private void buildSlider() {
@@ -110,6 +131,8 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 			}
 		});
 		
+		
+		/*
 		timelineSlider.addKeyListener(new KeyListener() {
 
 			@Override
@@ -121,8 +144,10 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_C && e.isControlDown()) {
+					System.out.println("Copied");
 					getSession().copyFramesFromCurrentLayerAndCurrentTime();
 				} else if(e.getKeyCode() == KeyEvent.VK_V && e.isControlDown()) {
+					System.out.println("Pasted");
 					getSession().pasteFramesToCurrentLayerAndCurrentTime();
 				}
 			}
@@ -132,17 +157,19 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 				// TODO Auto-generated method stub
 			}
 		});
+		*/
+		
 		
 		mainTimelinePanel.add(timelineSlider, BorderLayout.NORTH);
 	}
 	
 	private void buildLayers() {
 		layersPane = new TimelineLayersPanel();
+		
 		ArrayList<Layer> layers = getSession().getLayers();
 		for (Layer layer : layers) {
 			buildIndividualLayerTimeline(layer);
 		}
-		layersPane.repaint();
 		mainTimelinePanel.add(layersPane);
 	}
 	
