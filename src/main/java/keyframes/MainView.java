@@ -45,6 +45,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import datatypes.SessionObject;
+import factories.EnumFactory;
+import factories.SliderFactory;
+
 
 public class MainView implements SessionObject, Serializable{
 	
@@ -68,7 +72,8 @@ public class MainView implements SessionObject, Serializable{
 	private JMenuItem openProjectMenuItem;
 	private JMenuItem saveProjectMenuItem;
 	private JMenuItem saveProjectAsMenuItem;
-	private JMenuItem renderAsMenuItem;
+	private JMenuItem renderMP4AsMenuItem;
+	private JMenuItem renderGIFAsMenuItem;
 	
 	private JMenuItem editFpsMenuItem;
 	private JMenuItem editTimeMenuItem;
@@ -199,19 +204,26 @@ public class MainView implements SessionObject, Serializable{
 			}
 		});
 		
-		renderAsMenuItem = new JMenuItem(new AbstractAction("Render As..") {
+		renderMP4AsMenuItem = new JMenuItem(new AbstractAction("Render MP4 As..") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Utils.renderFile(e, session, saveProjectAsMenuItem, session.getFramesPerSecond());
+				Utils.renderFile(e, session, renderMP4AsMenuItem, session.getFramesPerSecond());
 			}
 		});
 		
+		renderGIFAsMenuItem = new JMenuItem(new AbstractAction("Render GIF As..") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Utils.renderGif(e, session, renderGIFAsMenuItem, session.getFramesPerSecond());
+			}
+		});
 			
 		fileMenu.add(newProjectMenuItem);
 		fileMenu.add(openProjectMenuItem);
 		fileMenu.add(saveProjectMenuItem);
 		fileMenu.add(saveProjectAsMenuItem);
-		fileMenu.add(renderAsMenuItem);
+		fileMenu.add(renderMP4AsMenuItem);
+		fileMenu.add(renderGIFAsMenuItem);
 		
 		topMenuBar.add(fileMenu);
 		

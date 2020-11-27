@@ -1,4 +1,4 @@
-package keyframes;
+package settings;
 
 import java.awt.Color;
 import java.io.Serializable;

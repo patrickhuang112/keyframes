@@ -1,4 +1,4 @@
-package datatypes;
+package keyframes;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -11,6 +11,7 @@ import java.awt.geom.GeneralPath;
 import javax.swing.JComponent;
 import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
+import javax.swing.event.MouseInputAdapter;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.plaf.basic.BasicSliderUI;
 
@@ -18,43 +19,46 @@ public class TimelineSliderUI extends BasicSliderUI {
 	
 	public TimelineSliderUI(JSlider slider) {
 		super(slider);
+		slider.setEnabled(false);
 	}
 	
 	public int getXPosForValue(int value) {
 		return super.xPositionForValue(value);
 	}
 	
+	// Gets the center of the thumb rect of the slider, which allows for the drawing of the line down below
 	public double getThumbRectMidX() {
 		return thumbRect.getCenterX();
-	}
-	
-	public double getThumbRectMaxY() {
-		return thumbRect.getMaxX();
 	}
 	
 	@Override
 	public void paintThumb(Graphics g) {
 		super.paintThumb(g);
+		
 		Graphics2D g2d = (Graphics2D)g;
-		Rectangle knobBounds = thumbRect;
-		int knobLeftx = knobBounds.x;
-		int knobY = (int)knobBounds.getMaxY();
-        int w = knobBounds.width;
-        
-        int knobMidx = knobLeftx + w / 2;
+
+		int bottomy = (int)thumbRect.getMaxY();
+        int midx = (int)thumbRect.getCenterX();
         
 		
 		GeneralPath gp =  new GeneralPath();
 		BasicStroke s = null;
 		
-		gp.moveTo(knobMidx, knobY);
+		gp.moveTo(midx, bottomy);
 		
 		g2d.setPaint(Color.black);
 		s = new BasicStroke(5, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2d.setStroke(s);
-		gp.lineTo(knobMidx, knobY+50);
+		
+		// 50 is an arbitrary number just to make sure it draws on the screen properly
+		gp.lineTo(midx, bottomy+50);
 		
 		g2d.draw(gp);
         
+	}
+	
+	public class TrackListener extends MouseInputAdapter {
+		
+		
 	}
 }

@@ -1,4 +1,4 @@
-package keyframes;
+package settings;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -21,6 +21,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+
+import factories.SliderFactory;
+import keyframes.MainMenu;
 
 public class SettingsView {
 

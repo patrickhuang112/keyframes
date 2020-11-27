@@ -9,6 +9,8 @@ import java.io.ObjectInputStream;
 
 import javax.swing.JFrame;
 
+import settings.Settings;
+
 public class Main {
 	
 	public static void main(String[] args) {

@@ -1,9 +1,11 @@
-package keyframes;
+package factories;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JSlider;
+
+import keyframes.Session;
 
 public class SliderFactory {
 	

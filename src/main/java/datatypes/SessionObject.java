@@ -1,4 +1,6 @@
-package keyframes;
+package datatypes;
+
+import keyframes.Session;
 
 // Any class/object that relates with the session.
 public interface SessionObject {

@@ -9,12 +9,18 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 
 import org.jcodec.api.awt.AWTSequenceEncoder;
+
+import external.GifSequenceWriter;
+import settings.Settings;
 
 
 public class Utils {
@@ -82,7 +88,7 @@ public class Utils {
 	
 	public static void renderFile(ActionEvent e, Session session, JComponent parent, int fps) {
 		try {
-			System.out.println("Rendering...");
+			System.out.println("Rendering video...");
 			final JFileChooser fc = new JFileChooser();
 			fc.setDialogTitle("Render video");
 			int returnVal = fc.showSaveDialog(parent);
@@ -110,10 +116,73 @@ public class Utils {
 					enc.encodeImage(img);
 				}
 				enc.finish();
-				System.out.println("Rendering finished!");
+				System.out.println("Rendering video finished!");
 				
 			} else {
-				System.out.println("Rendering aborted");
+				System.out.println("Rendering video aborted");
+			}
+			
+		} catch (Exception ex) {
+			System.out.println("Error rendering video");
+			session = new Session();
+		}
+	}
+	
+	public static void renderGif(ActionEvent e, Session session, JComponent parent, int fps) {
+		try {
+			System.out.println("Rendering gif...");
+			final JFileChooser fc = new JFileChooser();
+			fc.setDialogTitle("Render gif");
+			int returnVal = fc.showSaveDialog(parent);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				String filePath = file.getAbsolutePath() + ".gif";
+				File newFile = new File(filePath);
+				
+				HashMap<Integer, BufferedImage> images = session.getImages();
+				ImageOutputStream output = new FileImageOutputStream(newFile);
+				
+				ArrayList<BufferedImage> finalImages = new ArrayList<>();
+				
+				
+				for(int i = 0; i < session.getLongestTimepoint(); i++) {
+					BufferedImage img;
+					if(images.containsKey(i)) {
+						img = images.get(i);
+					} else {
+						int w = session.getDrawablePaneWidth();
+						int h = session.getDrawablePaneHeight();
+						
+						img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+						Graphics2D g = img.createGraphics();
+						g.setPaint(session.getDrawablePanelBackgroundColor());
+						g.fillRect(0,0, w, h);
+					}
+					finalImages.add(img);
+				}
+				
+				int timeBetweenFrames = 1000 / fps;
+				
+				GifSequenceWriter writer = 
+						new GifSequenceWriter(output, finalImages.get(0).getType(), timeBetweenFrames, true);
+			      
+			    // create a gif sequence with the type of the first image, 1 second
+			    // between frames, which loops continuously
+			    
+			      
+			    // write out the first image to our sequence...
+			    writer.writeToSequence(finalImages.get(0));
+			    for (int i=1; i < finalImages.size(); i++) {
+			        BufferedImage nextImage = finalImages.get(i);
+			        writer.writeToSequence(nextImage);
+			    }
+			      
+			    writer.close();
+			    output.close();
+			    System.out.println("Rendering gif finished");
+				
+			} else {
+				System.out.println("Rendering gif aborted");
 			}
 			
 		} catch (Exception ex) {

@@ -11,6 +11,8 @@ import java.io.Serializable;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import datatypes.UIComponent;
+
 public class Drawable implements UIComponent, Serializable {
 	
 	private static final long serialVersionUID = -7498204826751850301L;

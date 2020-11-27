@@ -1,6 +1,8 @@
-package keyframes;
+package datatypes;
 
 import javax.swing.JComponent;
+
+import keyframes.Session;
 
 public interface UIComponent {
 	

@@ -1,4 +1,4 @@
-package keyframes;
+package factories;
 
 import java.io.Serializable;
 

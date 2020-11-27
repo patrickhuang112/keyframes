@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.awt.Point;
 import java.io.Serializable;
 
-import keyframes.EnumFactory;
-import keyframes.EnumFactory.PaintSetting;
+import factories.EnumFactory;
+import factories.EnumFactory.PaintSetting;
 
 public class DrawPoint implements Serializable {
 

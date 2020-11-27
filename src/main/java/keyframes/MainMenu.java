@@ -23,6 +23,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import settings.Settings;
+import settings.SettingsView;
+
 public class MainMenu implements Serializable {
 	
 	private static final long serialVersionUID = -3854588841281613072L;

@@ -22,6 +22,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import datatypes.DrawPoint;
+import datatypes.UIComponent;
+import factories.EnumFactory;
 
 public class DrawablePanel extends JPanel implements MouseMotionListener, MouseListener{
 	

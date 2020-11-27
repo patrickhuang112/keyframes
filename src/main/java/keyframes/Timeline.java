@@ -28,16 +28,15 @@ import datatypes.DrawPoint;
 import datatypes.Interval;
 import datatypes.KeyFrames;
 import datatypes.Layer;
-import datatypes.TimelineSlider;
+import datatypes.UIComponent;
 
 public class Timeline extends JComponent implements UIComponent, Serializable{
 	
 	private static final long serialVersionUID = -4549310200115960539L;
 	private UIComponent parent;
-	private JLayeredPane mainTimelinePanel;
-	private TimelineSlider slider;
-	private JScrollPane layersPane;
-	private Double sliderBarx;
+	private JPanel mainTimelinePanel;
+	private TimelineSlider timelineSlider;
+	private TimelineLayersPanel layersPane;
 	
 	@Override
 	public void addChild(UIComponent child) {
@@ -55,7 +54,7 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 	
 	public Timeline(UIComponent parent, boolean addToParent) {
 		this.parent = parent;
-		mainTimelinePanel = new JLayeredPane();
+		mainTimelinePanel = new JPanel();
 		if(addToParent) { 
 			this.parent.getMainComponent().add(mainTimelinePanel, BorderLayout.PAGE_END);
 		}
@@ -70,7 +69,7 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		int fps = getSession().getFramesPerSecond();
 		
 		
-		TimelineSlider timelineSlider = new TimelineSlider(JSlider.HORIZONTAL, 
+		timelineSlider = new TimelineSlider(JSlider.HORIZONTAL, 
 				//STARTPOINT
 				0, 
 				//ENDPOINT
@@ -96,21 +95,55 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		//ADD THE ENDPOINT LABEL
 		labelDict.put(endPoint, new JLabel(((Integer)endSec).toString()));
 		timelineSlider.setLabelTable(labelDict);
-		timelineSlider.setPreferredSize(new Dimension (0, 100));
 		
-		this.slider = timelineSlider;
-		mainTimelinePanel.add(timelineSlider, BorderLayout.NORTH, 1);
+		// MOUSE WITH SLIDER FUNCTIONALITY
+		timelineSlider.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				updateFromMouse(e);
+			}
+		});
+		timelineSlider.addMouseMotionListener(new MouseAdapter() {
+			@Override 
+			public void mouseDragged(MouseEvent e) {
+				updateFromMouse(e);
+			}
+		});
+		
+		timelineSlider.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+			}
+			
+			// COPY PASTE FUNCTIONALITY
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_C && e.isControlDown()) {
+					getSession().copyFramesFromCurrentLayerAndCurrentTime();
+				} else if(e.getKeyCode() == KeyEvent.VK_V && e.isControlDown()) {
+					getSession().pasteFramesToCurrentLayerAndCurrentTime();
+				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+			}
+		});
+		
+		mainTimelinePanel.add(timelineSlider, BorderLayout.NORTH);
 	}
 	
 	private void buildLayers() {
-		JScrollPane timelineLayers = new JScrollPane();
+		layersPane = new TimelineLayersPanel();
 		ArrayList<Layer> layers = getSession().getLayers();
 		for (Layer layer : layers) {
 			buildIndividualLayerTimeline(layer);
 		}
-		
-		this.layersPane = timelineLayers;
-		mainTimelinePanel.add(timelineLayers,0);
+		layersPane.repaint();
+		mainTimelinePanel.add(layersPane);
 	}
 	
 	private void buildIndividualLayerTimeline(Layer layer) {
@@ -147,26 +180,6 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		// Need to first write code to get slider info stuff
 	}
 	
-	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
-		Graphics2D g2d = (Graphics2D) g;
-		GeneralPath gp =  new GeneralPath();
-		BasicStroke s = null;
-		
-		gp.moveTo(sliderBarx, slider.getY());
-		
-		g2d.setPaint(Color.black);
-		s = new BasicStroke(5, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-		g2d.setStroke(s);
-		gp.lineTo(sliderBarx, slider.getY()+200);
-		
-		g2d.draw(gp);
-		if (this.sliderBarx != null) {
-			System.out.println(slider.getY());
-			
-		}
-	}
 	
 	public void build() {
 		mainTimelinePanel.setBackground(Color.gray);
@@ -178,17 +191,36 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		layersPane.addMouseListener(new MouseAdapter() {
 			@Override 
 			public void mouseClicked(MouseEvent e) {
-				sliderBarx = slider.updateFromMouse(e);
+				updateFromMouse(e);
+			}
+			@Override 
+			public void mouseReleased(MouseEvent e) {
+				updateFromMouse(e);
 			}
 		});
 		layersPane.addMouseMotionListener(new MouseAdapter() {
 			@Override 
 			public void mouseDragged(MouseEvent e) {
-				sliderBarx = slider.updateFromMouse(e);
+				updateFromMouse(e);
 			}
 		});
 	}
 
+	
+	public void updateFromMouse(MouseEvent e) {
+		TimelineSliderUI ui = timelineSlider.getUI();
+	    int value = ui.valueForXPosition(e.getX());
+	    getSession().setCurrentTimepoint(value);
+	    getSession().refreshDrawPanel();
+	    
+	    timelineSlider.setValue(value); 
+	    timelineSlider.requestFocus();
+	    
+	    double sliderBarx = ui.getThumbRectMidX();
+	    layersPane.setSliderBarx(sliderBarx);
+		layersPane.repaint();
+	}
+	
 	@Override
 	public Session getSession() {
 		return parent.getSession();

@@ -15,7 +15,8 @@ import javax.swing.plaf.basic.BasicSliderUI;
 import datatypes.DrawPoint;
 import datatypes.KeyFrames;
 import datatypes.Layer;
-import datatypes.TimelineSlider;
+import factories.EnumFactory;
+import settings.Settings;
 
 public class Session implements Serializable {
 	

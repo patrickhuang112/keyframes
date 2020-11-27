@@ -6,6 +6,9 @@ import java.io.Serializable;
 import javax.swing.JComponent;
 import javax.swing.JSplitPane;
 
+import datatypes.SessionObject;
+import datatypes.UIComponent;
+
 public class SplitPaneManager implements UIComponent, Serializable {
 
 	private static final long serialVersionUID = -4937128517824428147L;
