@@ -1,5 +1,9 @@
 # Keyframes
 
+<br/>
+<img src = "https://i.imgur.com/GofOgDi.gif" style="margin:auto;" width = "90%" height = "90%"/>
+<br />
+
 A Java Swing desktop application focusing on replicating popular animation apps. 
 
 ## How to Build

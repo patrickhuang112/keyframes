@@ -30,7 +30,7 @@ public class Session implements Serializable {
 	public final int fpsMin = 10;
 	public final int fpsMax = 30;
 	public final int lengthMin = 5;
-	public final int lengthMax = 60;
+	public final int lengthMax = 30;
 	
 
 	public Session(Settings settings) {

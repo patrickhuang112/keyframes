@@ -62,6 +62,7 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 			this.parent.getMainComponent().add(mainTimelinePanel, BorderLayout.PAGE_END);
 		}
 		
+		// Key bindings for anything within the mainTimelinePanel window
 		mainTimelinePanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control C"), "copied");
 		mainTimelinePanel.getActionMap().put("copied", new AbstractAction() {
 			@Override
@@ -70,7 +71,7 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 			}
 			
 		});
-		
+		// Key bindings for anything within the mainTimelinePanel window
 		mainTimelinePanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control V"), "pasted");
 		mainTimelinePanel.getActionMap().put("pasted", new AbstractAction() {
 			@Override

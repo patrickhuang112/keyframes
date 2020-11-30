@@ -20,14 +20,14 @@ public class Settings implements Serializable {
 	public final int fpsMin = 10;
 	public final int fpsMax = 30;
 	public final int lengthMin = 5;
-	public final int lengthMax = 60;
+	public final int lengthMax = 30;
 	
 	private Color brushColor = Color.red;
 	private Color eraserColor = Color.white;
 	private int brushSize = 5;
 	private int eraserSize = 5;
 	private int fps = 30;
-	private int compLength = 60;
+	private int compLength = 30;
 	
 	
 	public void setCompLength(int length) {
