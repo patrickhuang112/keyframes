@@ -4,7 +4,8 @@
 <img src = "https://i.imgur.com/GofOgDi.gif" style="margin:auto;" width = "90%" height = "90%"/>
 <br />
 
-A Java Swing desktop application focusing on replicating popular animation apps. 
+A Java Swing desktop application focusing on replicating popular animation apps. The above GIF was
+created in Keyframes.
 
 ## How to Build
 <ul>
@@ -24,8 +25,9 @@ A Java Swing desktop application focusing on replicating popular animation apps.
 <li>Erasing tools with different eraser sizes</li> 
 <li>Animation/Video video preview</li> 
 <li>FPS and Composition length adjustment</li> 
-<li>Session saving (save your work and work on it another time!)</li> 
+<li>Session saving (save your work locally as a file and work on it another time!)</li> 
 <li>MP4 rendering; once you're finished, you have a video you can share!</li>
+<li>GIF rendering; share your animation as a video image!
 </ul>
 
 ### Future features: 
@@ -36,5 +38,4 @@ A Java Swing desktop application focusing on replicating popular animation apps.
 <li>Fill in color</li> 
 <li>User settings (in progress)</li> 
 <li>More rendering options (AVI?, different resolutions)</li> 
-<li>Actual executable packaging (so you can download it and try it yourself!)</li>
 </ul>
