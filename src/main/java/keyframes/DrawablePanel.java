@@ -22,10 +22,12 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import datatypes.DrawPoint;
+import datatypes.Layer;
+import datatypes.SessionObject;
 import datatypes.UIComponent;
 import factories.EnumFactory;
 
-public class DrawablePanel extends JPanel implements MouseMotionListener, MouseListener{
+public class DrawablePanel extends JPanel implements SessionObject, MouseMotionListener, MouseListener{
 	
 	private static final long serialVersionUID = -4890309349957259630L;
 
@@ -39,7 +41,7 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	Graphics2D old;
 	
 	ArrayList<DrawPoint> currentDraggedPoints = null;
-	ArrayList<ArrayList<DrawPoint>> pointCollection = new ArrayList<>();	
+	//ArrayList<ArrayList<DrawPoint>> pointCollection = new ArrayList<>();	
 	
 	Integer currentLayer;
 	
@@ -48,13 +50,12 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 		this.parent = parent;
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		parent.getSession().setDrawPanel(this);
+		getSession().setDrawPanel(this);
 	}
 	
 	public void clearAll() {
 		currentDraggedPoints = null;
-		pointCollection = new ArrayList<>();
-		parent.getSession().setCurrentLayerFrameAtCurrentTime(pointCollection);
+		getSession().setCurrentLayerFrameAtCurrentTime(new ArrayList<>());
 		repaint();
 	}
 	private void drawAndErasePoint(Graphics2D g2d, DrawPoint p) {
@@ -91,27 +92,47 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
-		pointCollection = parent.getSession().getCurrentLayerFrameAtCurrentTime();
+		
+		// Because of pass by reference, this when we update pointCollection down below in the mouse listeners
+		// it will actually directly update the pointCollection that is in the session object,
+		// which means now calling this is just getting the most up to date point collection, I'm not actually
+		// overwriting (which it may seem like I'm doing at first)
+		// pointCollection = parent.getSession().getCurrentLayerFrameAtCurrentTime();
 		BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), 
 				BufferedImage.TYPE_INT_RGB);
 		Graphics2D imgG = img.createGraphics();
 		imgG.setPaint(parent.getSession().getDrawablePanelBackgroundColor());
 		imgG.fillRect(0,0, this.getWidth(), this.getHeight());
 		
+		// WHy do i create two graphics here?
+		// I create two graphics because imgG is for when rendering, i needed the Buffered image,
+		// so this is why I draw to two different graphics
+		// g2d is for the screen, imgG is for rendering later.
 		Graphics2D[] allGraphics = new Graphics2D[] {g2d, imgG};
  		for(Graphics2D gr : allGraphics) {
- 			for(ArrayList<DrawPoint> points : pointCollection) {
- 				if(points.size() == 1) {
- 					drawAndErasePoint(gr, points.get(0));
- 				} else {
- 					drawAndErasePath(gr, points);
- 				}
+ 			ArrayList<Layer> layers = getSession().getLayers();
+ 			// Start from the bottom layer, thats the first one we want to draw, and draw higher layers
+ 			// on top of bottom layers
+ 			for(int i = layers.size() - 1; i >= 0; i--) {
+ 				Layer layer = layers.get(i);
+ 				int time = getSession().getCurrentTimepoint();
+ 				ArrayList<ArrayList<DrawPoint>> pointsList = layer.getPointCollectionAtTime(time);
+ 				if (pointsList != null) {
+ 					for(ArrayList<DrawPoint> points : pointsList) {
+ 	 	 				if(points.size() == 1) {
+ 	 	 					drawAndErasePoint(gr, points.get(0));
+ 	 	 				} else {
+ 	 	 					drawAndErasePath(gr, points);
+ 	 	 				}
+ 	 	 			}
+ 				}			
+ 	 			
+ 	 			// The currently dragged stuff
+ 	 			if(getSession().getCurrentLayerNum() == i && currentDraggedPoints != null) {
+ 	 				drawAndErasePath(gr, currentDraggedPoints);
+ 	 			}
  			}
  			
- 			// The currently dragged stuff
- 			if(currentDraggedPoints != null) {
- 				drawAndErasePath(gr, currentDraggedPoints);
- 			}
  		}
 		updateSession(img);
 	}
@@ -119,8 +140,7 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	
 	
 	private void updateSession(BufferedImage img) {
-		parent.getSession().setCurrentLayerFrameAtCurrentTime(pointCollection);
-		parent.getSession().setCurrentImage(img);
+		getSession().setCurrentImage(img);
 	}
 	
 
@@ -173,7 +193,7 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 					: parent.getSession().getEraserColor();	
 			
 			singlePointCollection.add(new DrawPoint(point, drawSize, setting, pointColor));
-			pointCollection.add(singlePointCollection);
+			getSession().getCurrentLayerFrameAtCurrentTime().add(singlePointCollection);
 			repaint();
 		}
 	}
@@ -186,7 +206,8 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if(currentDraggedPoints != null) {
-			pointCollection.add(currentDraggedPoints);
+			
+			getSession().getCurrentLayerFrameAtCurrentTime().add(currentDraggedPoints);
 			currentDraggedPoints = null;
 		}
 		repaint();
@@ -201,9 +222,14 @@ public class DrawablePanel extends JPanel implements MouseMotionListener, MouseL
 	public void mouseExited(MouseEvent e) {
 		cursorInScreen = false;
 		if(currentDraggedPoints != null) {
-			pointCollection.add(currentDraggedPoints);
+			getSession().getCurrentLayerFrameAtCurrentTime().add(currentDraggedPoints);
 			currentDraggedPoints = null;
 		}
 		repaint();
+	}
+
+	@Override
+	public Session getSession() {
+		return parent.getSession();
 	}
 }

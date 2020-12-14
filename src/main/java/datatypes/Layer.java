@@ -1,9 +1,12 @@
 package datatypes;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,10 +20,12 @@ public class Layer extends JPanel{
 	private KeyFrames frames;
 	private String layerName;
 	
-	private int UIwidth = 40;
+	private int UIwidth = 400;
 	private int UIheight = 40;
 	private Color color = Color.black;
-	
+
+	ArrayList<Rectangle> boundingBoxes =  new ArrayList<>();
+	private boolean isVisible = true;
 	private boolean isSelected = false;
 	
 	public Layer() {
@@ -31,14 +36,23 @@ public class Layer extends JPanel{
 		this.layerNum = layerNum;
 		this.frames = frames;
 		this.setPreferredSize(new Dimension(UIwidth, UIheight));
+		
+		int boundx = 0;
+		int boundy = layerNum * UIheight;
+		boundingBoxes.add(new Rectangle(boundx, boundy, UIwidth, UIheight));
 	}
-
-
-	private void drawRectangle(Graphics2D g2d, int x1, int y1, int x2, int y2) {
-		int width = x2 - x1;
-		int height = y2 - y1;
-		g2d.setPaint(color);
-		g2d.fillRect(x1, y1, width, height);
+	
+	public boolean inBounds(int x, int y) {
+		for (Rectangle box : boundingBoxes) {
+			int x1 = box.x;
+			int y1 = box.y;
+			int x2 = box.x + box.width;
+			int y2 = box.y + box.height;
+			if ((x >= x1 && x <= x2) && (y >= y1 && y <= y2)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override
@@ -47,6 +61,12 @@ public class Layer extends JPanel{
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setPaint(color);
 		g2d.fillRect(0, 0, UIwidth, UIheight);
+		if (isSelected) {
+			g2d.setPaint(Color.black);
+			Stroke s = new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+			g2d.setStroke(s);
+			g2d.drawRoundRect(0, 0, UIwidth, UIheight, 2, 2);
+		}
 	}
 	
 	public Integer getLayerNum() {
@@ -55,6 +75,10 @@ public class Layer extends JPanel{
 	
 	public void setLayerNum(Integer num) {
 		this.layerNum = num;
+	}
+	
+	public ArrayList<ArrayList<DrawPoint>> getPointCollectionAtTime(Integer time) {
+		return frames.get(time);
 	}
 	
 	public KeyFrames getFrames() {
@@ -87,6 +111,14 @@ public class Layer extends JPanel{
 	
 	public boolean isSelected() {
 		return isSelected;
+	}
+	
+	public void setVisible(boolean option) {
+		isVisible = option;
+	}
+	
+	public boolean isVisible() {
+		return isVisible;
 	}
 	
 }

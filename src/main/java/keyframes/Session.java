@@ -51,8 +51,9 @@ public class Session implements Serializable {
 			new KeyFrames();
 		
 		drawFrames.put(0, new ArrayList<>());
-		
-		drawLayers.add(new Layer(0, drawFrames));
+		Layer newLayer = new Layer(0, drawFrames);
+		newLayer.setSelected(true);
+		drawLayers.add(newLayer);
 		brushSize = 5;
 		eraserSize = 5;
 		
@@ -248,12 +249,15 @@ public class Session implements Serializable {
 	}
 	
 	public void copyFramesFromCurrentLayerAndCurrentTime() {
-		clipboardFrames = new KeyFrames();
-		clipboardFrames.put(getCurrentLayerNum(), getCurrentLayerFrameAtCurrentTime());
+		if (getCurrentLayerNum() != null) {
+			clipboardFrames = new KeyFrames();
+			clipboardFrames.put(getCurrentLayerNum(), getCurrentLayerFrameAtCurrentTime());
+		}
+		
 	}
 	
 	public void pasteFramesToCurrentLayerAndCurrentTime() {
-		if (clipboardFrames.containsKey(getCurrentLayerNum())) {
+		if (getCurrentLayerNum() != null && clipboardFrames.containsKey(getCurrentLayerNum())) {
 			setCurrentLayerFrameAtCurrentTime(deepCopyFrames(clipboardFrames.get(getCurrentLayerNum())));
 			refreshDrawPanel();
 		}
@@ -359,10 +363,12 @@ public class Session implements Serializable {
 		this.currentLayerNum = num;
 	}
 	
+	// Not sure if needed
+	/*
 	public void setCurrentLayer (Layer layer) {
 		this.drawLayers.set(this.currentLayerNum, layer);
 	}
-	
+	*/
 	public Layer getCurrentLayer () {
 		return this.drawLayers.get(this.currentLayerNum);
 	}
@@ -371,7 +377,18 @@ public class Session implements Serializable {
 	public void addNewLayer() {
 		KeyFrames newDrawFrames = new KeyFrames();
 		int numLayers = drawLayers.size();
-		drawLayers.add(new Layer(numLayers, newDrawFrames));
+		Layer newLayer = new Layer(numLayers, newDrawFrames);
+		
+		// The new layer should be selected when created
+		for (Layer layer : drawLayers) {
+			if(layer.isSelected()) {
+				layer.setSelected(false);
+			}
+		}
+		newLayer.setSelected(true);
+		this.setCurrentLayerNum(numLayers);
+		
+		drawLayers.add(newLayer);
 		timelineLayersPanel.updateTimelineLayersPanel();
 		refreshTimeline();
 	}
@@ -405,6 +422,13 @@ public class Session implements Serializable {
 		return getCurrentLayerFrameAtTime(currentTimepoint);
 	}
 	
+	public void eraseAllLayersAtCurrentFrame() {
+		for (Layer layer : drawLayers) {
+			KeyFrames frames = layer.getFrames();
+			frames.put(getCurrentTimepoint(), new ArrayList<>());
+			drawPanel.repaint();
+		}
+	}
 	
 	// With Rendering stuff
 	public void setCurrentImage(BufferedImage img) {

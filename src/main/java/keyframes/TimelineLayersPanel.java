@@ -7,18 +7,25 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.Box.Filler;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 
 import datatypes.Layer;
 import datatypes.SessionObject;
@@ -45,7 +52,6 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 		layersParentPane.setLayout(new BoxLayout(layersParentPane, BoxLayout.Y_AXIS));
 		layersParentPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 		viewport.add(layersParentPane);
-		
 		updateTimelineLayersPanel();
 		
 	}
@@ -59,7 +65,8 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 				layer.setColor(defaultColors.get(i % defaultColors.size()));
 			}
 			layer.setAlignmentX(Component.LEFT_ALIGNMENT);
-			layer.setMaximumSize(new Dimension(40,40));
+			// THIS IS PURELY TO MAKE SURE THERE IS NO SPACE BETWEEN LAYERS
+			layer.setMaximumSize(new Dimension(400,40));
 			layersParentPane.add(layer);
 			
 		}
@@ -85,13 +92,6 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 	
 	public double getSliderBarx() {
 		return sliderBarx;
-	}
-	
-	private void drawRectangle(Graphics2D g2d, int x1, int y1, int x2, int y2) {
-		int width = x2 - x1;
-		int height = y2 - y1;
-		g2d.setPaint(Color.black);
-		g2d.fillRect(x1, y1, width, height);
 	}
 	
 	@Override

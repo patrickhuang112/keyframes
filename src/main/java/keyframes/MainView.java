@@ -38,6 +38,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
@@ -348,8 +349,22 @@ public class MainView implements SessionObject, Serializable{
 			eraseAllTool.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					DrawablePanel drawPane = (DrawablePanel)drawableAndTimelinePane.getTopOrLeft().getMainComponent();
-					drawPane.clearAll();
+					if(SwingUtilities.isLeftMouseButton(e)) {
+						DrawablePanel drawPane = (DrawablePanel)drawableAndTimelinePane.getTopOrLeft().getMainComponent();
+						drawPane.clearAll();
+					}
+					else if(SwingUtilities.isRightMouseButton(e)) {
+						JPopupMenu menu = new JPopupMenu();
+						JMenuItem eraseAllLayersAtCurrentTimeMenuItem 
+							= new JMenuItem(new AbstractAction("Erase all layer frames at current time") {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								getSession().eraseAllLayersAtCurrentFrame();
+							}
+						});
+						menu.add(eraseAllLayersAtCurrentTimeMenuItem);
+						menu.show(e.getComponent(), e.getX(), e.getY());
+					}
 				}
 			});
 			
@@ -394,7 +409,6 @@ public class MainView implements SessionObject, Serializable{
 		}
 	}
 	
-
 	@Override
 	public Session getSession() {
 		return session;
