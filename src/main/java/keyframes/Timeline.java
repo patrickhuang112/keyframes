@@ -21,10 +21,13 @@ import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 import datatypes.DrawPoint;
@@ -32,6 +35,8 @@ import datatypes.Interval;
 import datatypes.KeyFrames;
 import datatypes.Layer;
 import datatypes.UIComponent;
+import factories.EnumFactory;
+import factories.SliderFactory;
 
 public class Timeline extends JComponent implements UIComponent, Serializable{
 	
@@ -103,7 +108,22 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		timelineSlider.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				updateFromMouse(e);
+				if(SwingUtilities.isLeftMouseButton(e)) {
+					updateFromMouse(e);
+				}
+				else if(SwingUtilities.isRightMouseButton(e)) {
+					System.out.println("here");
+					JPopupMenu menu = new JPopupMenu();
+					JMenuItem newLayerMenuItem = new JMenuItem(new AbstractAction("New Layer") {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							getSession().addNewLayer();
+						}
+					});
+					menu.add(newLayerMenuItem);
+					menu.show(e.getComponent(), e.getX(), e.getY());
+					
+				}
 			}
 		});
 		timelineSlider.addMouseMotionListener(new MouseAdapter() {
@@ -117,7 +137,7 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 	}
 	
 	private void buildLayers() {
-		layersPane = new TimelineLayersPanel();
+		layersPane = new TimelineLayersPanel(this);
 		getSession().setLayersPanel(layersPane);
 		ArrayList<Layer> layers = getSession().getLayers();
 		for (Layer layer : layers) {
@@ -171,12 +191,23 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		layersPane.addMouseListener(new MouseAdapter() {
 			@Override 
 			public void mouseClicked(MouseEvent e) {
-				updateFromMouse(e);
+				if(SwingUtilities.isLeftMouseButton(e)) {
+					updateFromMouse(e);
+				}
+				else if(SwingUtilities.isRightMouseButton(e)) {
+					JPopupMenu menu = new JPopupMenu();
+					JMenuItem newLayerMenuItem = new JMenuItem(new AbstractAction("New Layer") {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							getSession().addNewLayer();
+						}
+					});
+					menu.add(newLayerMenuItem);
+					menu.show(e.getComponent(), e.getX(), e.getY());
+					
+				}
 			}
-			@Override 
-			public void mouseReleased(MouseEvent e) {
-				updateFromMouse(e);
-			}
+			
 		});
 		layersPane.addMouseMotionListener(new MouseAdapter() {
 			@Override 
@@ -187,7 +218,7 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 	}
 
 	
-	public void updateFromMouse(MouseEvent e) {
+	private void updateFromMouse(MouseEvent e) {
 		TimelineSliderUI ui = timelineSlider.getUI();
 	    int value = ui.valueForXPosition(e.getX());
 	    getSession().updateTimelineFromValue(value);

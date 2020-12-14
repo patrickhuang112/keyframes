@@ -89,33 +89,49 @@ public class MainView implements SessionObject, Serializable{
 
 	public void buildUI() {
 		mainWindow.setBackground(Color.blue);
-		
+		setKeyMaps();
 		buildTopBar();
 		buildDrawableAndTimeline();
 		parent.revalidate();
 		parent.repaint();
 		
-		// Key bindings for anything within the main window
+		
+	}
+	
+	public void setKeyMaps() {
+		// Copy frames from current layer
 		mainWindow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control C"), "copied");
 		mainWindow.getActionMap().put("copied", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				getSession().copyFramesFromCurrentLayerAndCurrentTime();
 			}
-			
 		});
-		// Key bindings for anything within the mainTimelinePanel window
+		// Paste copied frames into current layer
 		mainWindow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control V"), "pasted");
 		mainWindow.getActionMap().put("pasted", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				getSession().pasteFramesToCurrentLayerAndCurrentTime();
 			}
-			
 		});
-	}
-	
-	public void setKeyMaps() {
+		
+		// Play and pause movie
+		mainWindow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("SPACE"), "movieplaypause");
+		mainWindow.getActionMap().put("movieplaypause", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				getSession().playOrPauseMovie();
+			}
+		});
+		
+		mainWindow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control S"), "save");
+		mainWindow.getActionMap().put("save", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Utils.saveFile(e, session, saveProjectMenuItem);
+			}
+		});
 		
 	}
 	
@@ -148,84 +164,36 @@ public class MainView implements SessionObject, Serializable{
 	}
 	
 	private void buildTopMenuBar() {
+		
 		topMenuBar = new JMenuBar();
 		topMenuBar.setPreferredSize(new Dimension(0,30));
+		
+		// FILE MENU
 		fileMenu = new JMenu("File");
 		newProjectMenuItem = new JMenuItem(new AbstractAction("New Project") {
-
 			@Override
 			public void actionPerformed(ActionEvent ae) {
-				session = new Session();
-				session.setDrawPanel((DrawablePanel)drawableAndTimelinePane.getTopOrLeft().getMainComponent());
-				session.refreshDrawPanel();
-				
-				System.out.println("New project created");
+				Utils.newFile(session, drawableAndTimelinePane);
 			}
 		});
 		openProjectMenuItem = new JMenuItem(new AbstractAction("Open Project") {
 			public void actionPerformed(ActionEvent e) {
-				Session session;
-				try {
-					System.out.println("Loading project...");
-					final JFileChooser fc = new JFileChooser();
-					int returnVal = fc.showOpenDialog(openProjectMenuItem);
-					
-					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						File file = fc.getSelectedFile();
-						if(Utils.getExtension(file).equals("ser")) {
-							FileInputStream fileIn = new FileInputStream(file);
-					        ObjectInputStream in = new ObjectInputStream(fileIn);
-					        session = (Session) in.readObject();
-					        in.close();
-					        fileIn.close();
-					        parent.getContentPane().removeAll();
-							MainView mv = new MainView(parent, session);
-							mv.buildUI();
-						} else {
-							System.out.println("Incompatible file");
-						}
-					} else {
-						System.out.println("Loading aborted");
-					}
-					
-				} catch (Exception ex) {
-					System.out.println("Error loading file");
-					session = new Session();
-				}
-				System.out.println("Loaded project");
+				Utils.openFile(e, session, openProjectMenuItem, parent);
 			}
 		});
-		
 		
 		saveProjectMenuItem = new JMenuItem(new AbstractAction("Save") {
 
 			@Override
-			public void actionPerformed(ActionEvent ae) {
-				if(session.getSavePath() == null) {
-					Utils.saveFile(ae, session, saveProjectMenuItem);
-				} else {
-					try {
-						FileOutputStream fos = new FileOutputStream(session.getSavePath());
-						ObjectOutputStream oos = new ObjectOutputStream(fos);
-						// write object to file
-						oos.writeObject(session);
-						System.out.println("Saving Successful!");
-						// closing resources
-						oos.close();
-						fos.close();
-					} catch (Exception e) {
-						System.out.println("SAVING FAILED");
-						System.out.println(e.getMessage());
-					}
-				}
+			public void actionPerformed(ActionEvent e) {
+				Utils.saveFile(e, session, saveProjectMenuItem);
 			}
 		});
-		
 		
 		saveProjectAsMenuItem = new JMenuItem(new AbstractAction("Save As..") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Utils.saveFile(e, session, saveProjectAsMenuItem);
+				Utils.saveAsFile(e, session, saveProjectAsMenuItem);
 			}
 		});
 		
@@ -252,25 +220,21 @@ public class MainView implements SessionObject, Serializable{
 		
 		topMenuBar.add(fileMenu);
 		
+		// EDIT MENU
 		editMenu = new JMenu("Edit");
 		
 		editFpsMenuItem = new JMenuItem(new AbstractAction("Edit Frames Per Second") {
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				SliderFactory.createFPSDialogSlider(mainWindow, session);
 			}
-				
 		});
 		
-		
 		editTimeMenuItem = new JMenuItem(new AbstractAction("Edit Composition Endpoint") {
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				SliderFactory.createCompositionEndpointDialogSlider(mainWindow, session);
 			}
-				
 		});
 		
 		editMenu.add(editFpsMenuItem);
@@ -282,7 +246,6 @@ public class MainView implements SessionObject, Serializable{
 	
 	private void buildTopToolBar() {
 		topToolBar = new JToolBar(JToolBar.HORIZONTAL);
-		//topToolBar.setLayout(new BoxLayout(topToolBar, BoxLayout.X_AXIS));
 		topToolBar.setPreferredSize(new Dimension(0,30));
 		topToolBar.setFloatable(false);
 		
@@ -290,21 +253,6 @@ public class MainView implements SessionObject, Serializable{
 		topBar.add(topToolBar, BorderLayout.PAGE_END);
 		
 	}
-	
-	/*
-	private void buildLayersDropdownButton() {
-		try {
-			JComboBox<Integer> layersDropdown = new JComboBox<Integer>();
-			layersDropdown.setVisible(true);
-			layersDropdown.setPreferredSize(new Dimension(40, 20));
-			
-			topToolBar.add(layersDropdown);
-		} catch (Exception e) {
-			System.out.println("Layers Icon failed");
-		}
-		
-	}
-	*/
 	
 	private void buildTopToolBarEraserButton() {
 		try {
@@ -357,29 +305,6 @@ public class MainView implements SessionObject, Serializable{
 		}
 	}
 	
-	private void playMovie() {
-		
-		SwingWorker sw = new SwingWorker() {
-			@Override
-			protected Object doInBackground() throws Exception {
-				while(getSession().isPlaying) {
-					getSession().playOneFrame();
-					
-					long increment = 1000 / getSession().getFramesPerSecond();
-					Thread.sleep(increment);
-					System.out.println("Playing movie...");
-				}
-				return "DONE";
-			}
-			
-			@Override
-			protected void done() {
-				System.out.println("Finished playing movie");
-			}
-		};
-		sw.execute();
-	}
-	
 	private void buildTopToolBarPlayAndPauseButtons() {
 		try {
 			Image playImage = ImageIO.read(this.getClass().getResource("/playIcon.bmp"));
@@ -393,8 +318,7 @@ public class MainView implements SessionObject, Serializable{
 			playTool.addMouseListener(new MouseAdapter( ) {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					getSession().isPlaying = true;
-					playMovie();
+					getSession().playMovie();
 				}
 			});
 			
@@ -403,7 +327,7 @@ public class MainView implements SessionObject, Serializable{
 			pauseTool.addMouseListener(new MouseAdapter( ) {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					getSession().isPlaying = false;
+					getSession().pauseMovie();
 				}
 			});
 			topToolBar.add(playTool);
@@ -428,7 +352,6 @@ public class MainView implements SessionObject, Serializable{
 					drawPane.clearAll();
 				}
 			});
-			
 			
 			topToolBar.add(eraseAllTool);
 		} catch(Exception e) {
@@ -460,7 +383,6 @@ public class MainView implements SessionObject, Serializable{
 	}
 	
 	private void buildTopToolBarButtons() {
-		
 		try {
 			buildTopToolBarBrushButton();
 			buildTopToolBarEraserButton();

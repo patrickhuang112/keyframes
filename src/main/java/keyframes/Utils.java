@@ -16,6 +16,7 @@ import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 
 import org.jcodec.api.awt.AWTSequenceEncoder;
 
@@ -54,7 +55,50 @@ public class Utils {
         return ext;
     }
 	
-	public static void saveFile(ActionEvent e, Session session, JComponent parent) {
+	public static void newFile(Session oldSession, SplitPaneManager pane) {
+		// DO STUFF WITH OLD SESSION (NOT IMPLEMENTED YET)
+		
+		Session newSession = new Session();
+		newSession.setDrawPanel((DrawablePanel)pane.getTopOrLeft().getMainComponent());
+		newSession.refreshDrawPanel();
+		
+		System.out.println("New project created");
+	}
+	
+	public static void openFile(ActionEvent e, Session oldSession, JComponent parent, JFrame frame) {
+		// DO STUFF WITH OLD SESSION (NOT IMPLEMENTED YET)
+		
+		Session newSession;
+		try {
+			System.out.println("Loading project...");
+			final JFileChooser fc = new JFileChooser();
+			int returnVal = fc.showOpenDialog(parent);
+			
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				if(Utils.getExtension(file).equals("ser")) {
+					FileInputStream fileIn = new FileInputStream(file);
+			        ObjectInputStream in = new ObjectInputStream(fileIn);
+			        newSession = (Session) in.readObject();
+			        in.close();
+			        fileIn.close();
+			        frame.getContentPane().removeAll();
+					MainView mv = new MainView(frame, newSession);
+					mv.buildUI();
+				} else {
+					System.out.println("Incompatible file");
+				}
+			} else {
+				System.out.println("Loading aborted");
+			}
+			
+		} catch (Exception ex) {
+			System.out.println("Error loading file");
+		}
+		System.out.println("Loaded project");
+	}
+	
+	public static void saveAsFile(ActionEvent e, Session session, JComponent parent) {
 		try {
 			System.out.println("Loading project...");
 			final JFileChooser fc = new JFileChooser();
@@ -83,6 +127,26 @@ public class Utils {
 		} catch (Exception ex) {
 			System.out.println("Error saving file");
 			session = new Session();
+		}
+	}
+	
+	public static void saveFile(ActionEvent ae, Session session, JComponent parent) {
+		if(session.getSavePath() == null) {
+			Utils.saveAsFile(ae, session, parent);
+		} else {
+			try {
+				FileOutputStream fos = new FileOutputStream(session.getSavePath());
+				ObjectOutputStream oos = new ObjectOutputStream(fos);
+				// write object to file
+				oos.writeObject(session);
+				System.out.println("Saving Successful!");
+				// closing resources
+				oos.close();
+				fos.close();
+			} catch (Exception e) {
+				System.out.println("SAVING FAILED");
+				System.out.println(e.getMessage());
+			}
 		}
 	}
 	

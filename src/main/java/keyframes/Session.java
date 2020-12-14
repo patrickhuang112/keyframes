@@ -11,6 +11,7 @@ import java.util.Hashtable;
 
 import javax.swing.JLabel;
 import javax.swing.JSlider;
+import javax.swing.SwingWorker;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 import datatypes.DrawPoint;
@@ -62,7 +63,7 @@ public class Session implements Serializable {
 	
 	private Integer currentLayerNum = 0;
 	private String savePath = null;
-	public boolean isPlaying = false;
+	private boolean isPlaying = false;
 	private DrawablePanel drawPanel = null;
 	private TimelineLayersPanel timelineLayersPanel = null;
 	private TimelineSlider timelineSlider = null;
@@ -76,7 +77,6 @@ public class Session implements Serializable {
 	// This contains layer info, and time info
 	private ArrayList<Layer> drawLayers = new ArrayList<Layer>();
 	// This just contains time info
-	
 	private HashMap<Integer, BufferedImage> drawImages = new HashMap<Integer, BufferedImage>();
 	
 	//REPLACE BY SETTINGS
@@ -90,7 +90,6 @@ public class Session implements Serializable {
 	// Hashmap key: the number of the layer
 	// Hashmap entry: the frames associated with that layer
 	private KeyFrames clipboardFrames = null;
-	
 	
 	
 	public Color getDrawablePanelBackgroundColor () {
@@ -170,6 +169,39 @@ public class Session implements Serializable {
 		return this.currentTimepoint;
 	}
 	
+	public void playOrPauseMovie() {
+		if (isPlaying) {
+			pauseMovie();
+		} else {
+			playMovie();
+		}
+	}
+	
+	public void playMovie() {
+		isPlaying = true;
+		SwingWorker sw = new SwingWorker() {
+			@Override
+			protected Object doInBackground() throws Exception {
+				while(isPlaying) {
+					playOneFrame();
+					long increment = 1000 / getFramesPerSecond();
+					Thread.sleep(increment);
+					System.out.println("Playing movie...");
+				}
+				return "DONE";
+			}
+			
+			@Override
+			protected void done() {
+				System.out.println("Finished playing movie");
+			}
+		};
+		sw.execute();
+	}
+	
+	public void pauseMovie() {
+		isPlaying = false;
+	}
 	
 	public void playOneFrame() {
 		incrementTimepoint();
@@ -182,7 +214,7 @@ public class Session implements Serializable {
 		drawPanel.revalidate();
 	}
 	
-	private void updateTimelineUI() {
+	private void refreshTimelineUI() {
 		// UPDATES the line on the layers panel
 		TimelineSliderUI ui = timelineSlider.getUI();
 		double sliderBarx = ui.getThumbMidX();
@@ -194,16 +226,12 @@ public class Session implements Serializable {
 	// USUALLY FROM MOUSE EVENT
 	public void updateTimelineFromValue(int value) {
 		setCurrentTimepoint(value);
-		
-		// BOTH updates the slider value and UI (TimelineSliderUI paint function updates based on internal values)
-	
 	    refreshTimeline();
-	   
 	}
 	
 	public void refreshTimeline() {
 		refreshDrawPanel();
-		updateTimelineUI();
+		refreshTimelineUI();
 	}
 	
 	private ArrayList<ArrayList<DrawPoint>> deepCopyFrames(ArrayList<ArrayList<DrawPoint>> originalFrame) {
@@ -276,13 +304,11 @@ public class Session implements Serializable {
 			updateTimeline(oldFps, newFps);
 			updateAllLayerFramesFromFPS(oldFps, newFps);
 			
-			
 			framesPerSecond = fps;
 			longestTimepoint = fps * longestTimeInSeconds;
 			
 			refreshTimeline();
 		}
-		
 	}
 	
 	public int getFramesPerSecond() {
@@ -340,6 +366,16 @@ public class Session implements Serializable {
 	public Layer getCurrentLayer () {
 		return this.drawLayers.get(this.currentLayerNum);
 	}
+	
+	// ADD LAYERS
+	public void addNewLayer() {
+		KeyFrames newDrawFrames = new KeyFrames();
+		int numLayers = drawLayers.size();
+		drawLayers.add(new Layer(numLayers, newDrawFrames));
+		timelineLayersPanel.updateTimelineLayersPanel();
+		refreshTimeline();
+	}
+	
 	
 	//DRAWABLE GET/SET FRAMEs
 	// Set the frame at a certain time point for the current layer frame
