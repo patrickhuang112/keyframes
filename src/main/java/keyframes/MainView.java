@@ -41,6 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.plaf.basic.BasicSliderUI;
@@ -93,6 +94,29 @@ public class MainView implements SessionObject, Serializable{
 		buildDrawableAndTimeline();
 		parent.revalidate();
 		parent.repaint();
+		
+		// Key bindings for anything within the main window
+		mainWindow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control C"), "copied");
+		mainWindow.getActionMap().put("copied", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				getSession().copyFramesFromCurrentLayerAndCurrentTime();
+			}
+			
+		});
+		// Key bindings for anything within the mainTimelinePanel window
+		mainWindow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control V"), "pasted");
+		mainWindow.getActionMap().put("pasted", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				getSession().pasteFramesToCurrentLayerAndCurrentTime();
+			}
+			
+		});
+	}
+	
+	public void setKeyMaps() {
+		
 	}
 	
 	private void buildDrawableAndTimeline() {
@@ -134,6 +158,7 @@ public class MainView implements SessionObject, Serializable{
 				session = new Session();
 				session.setDrawPanel((DrawablePanel)drawableAndTimelinePane.getTopOrLeft().getMainComponent());
 				session.refreshDrawPanel();
+				
 				System.out.println("New project created");
 			}
 		});
@@ -266,6 +291,7 @@ public class MainView implements SessionObject, Serializable{
 		
 	}
 	
+	/*
 	private void buildLayersDropdownButton() {
 		try {
 			JComboBox<Integer> layersDropdown = new JComboBox<Integer>();
@@ -278,6 +304,7 @@ public class MainView implements SessionObject, Serializable{
 		}
 		
 	}
+	*/
 	
 	private void buildTopToolBarEraserButton() {
 		try {
@@ -336,9 +363,7 @@ public class MainView implements SessionObject, Serializable{
 			@Override
 			protected Object doInBackground() throws Exception {
 				while(getSession().isPlaying) {
-					getSession().incrementTimepoint();
-					getSession().refreshDrawPanel();
-					getSession().updateTimelineSliderPosition();
+					getSession().playOneFrame();
 					
 					long increment = 1000 / getSession().getFramesPerSecond();
 					Thread.sleep(increment);

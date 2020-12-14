@@ -22,12 +22,8 @@ public class TimelineSliderUI extends BasicSliderUI {
 		slider.setEnabled(false);
 	}
 	
-	public int getXPosForValue(int value) {
-		return super.xPositionForValue(value);
-	}
-	
 	// Gets the center of the thumb rect of the slider, which allows for the drawing of the line down below
-	public double getThumbRectMidX() {
+	public double getThumbMidX() {
 		return thumbRect.getCenterX();
 	}
 	
@@ -56,9 +52,5 @@ public class TimelineSliderUI extends BasicSliderUI {
 		g2d.draw(gp);
         
 	}
-	
-	public class TrackListener extends MouseInputAdapter {
-		
-		
-	}
+
 }

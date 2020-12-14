@@ -61,25 +61,6 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		if(addToParent) { 
 			this.parent.getMainComponent().add(mainTimelinePanel, BorderLayout.PAGE_END);
 		}
-		
-		// Key bindings for anything within the mainTimelinePanel window
-		mainTimelinePanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control C"), "copied");
-		mainTimelinePanel.getActionMap().put("copied", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				getSession().copyFramesFromCurrentLayerAndCurrentTime();
-			}
-			
-		});
-		// Key bindings for anything within the mainTimelinePanel window
-		mainTimelinePanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control V"), "pasted");
-		mainTimelinePanel.getActionMap().put("pasted", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				getSession().pasteFramesToCurrentLayerAndCurrentTime();
-			}
-			
-		});
 	}
 	
 	private void buildSlider() {
@@ -131,42 +112,13 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 				updateFromMouse(e);
 			}
 		});
-		
-		
-		/*
-		timelineSlider.addKeyListener(new KeyListener() {
-
-			@Override
-			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-			}
-			
-			// COPY PASTE FUNCTIONALITY
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_C && e.isControlDown()) {
-					System.out.println("Copied");
-					getSession().copyFramesFromCurrentLayerAndCurrentTime();
-				} else if(e.getKeyCode() == KeyEvent.VK_V && e.isControlDown()) {
-					System.out.println("Pasted");
-					getSession().pasteFramesToCurrentLayerAndCurrentTime();
-				}
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-			}
-		});
-		*/
-		
-		
+				
 		mainTimelinePanel.add(timelineSlider, BorderLayout.NORTH);
 	}
 	
 	private void buildLayers() {
 		layersPane = new TimelineLayersPanel();
-		
+		getSession().setLayersPanel(layersPane);
 		ArrayList<Layer> layers = getSession().getLayers();
 		for (Layer layer : layers) {
 			buildIndividualLayerTimeline(layer);
@@ -238,15 +190,8 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 	public void updateFromMouse(MouseEvent e) {
 		TimelineSliderUI ui = timelineSlider.getUI();
 	    int value = ui.valueForXPosition(e.getX());
-	    getSession().setCurrentTimepoint(value);
-	    getSession().refreshDrawPanel();
-	    
-	    timelineSlider.setValue(value); 
+	    getSession().updateTimelineFromValue(value);
 	    timelineSlider.requestFocus();
-	    
-	    double sliderBarx = ui.getThumbRectMidX();
-	    layersPane.setSliderBarx(sliderBarx);
-		layersPane.repaint();
 	}
 	
 	@Override

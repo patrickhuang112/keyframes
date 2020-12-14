@@ -2,6 +2,7 @@ package keyframes;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -54,8 +55,8 @@ public class Session implements Serializable {
 		brushSize = 5;
 		eraserSize = 5;
 		
-		longestTimeInSeconds = 10;
-		framesPerSecond = 15;
+		longestTimeInSeconds = 5;
+		framesPerSecond = 10;
 		longestTimepoint = longestTimeInSeconds * framesPerSecond;
 	}
 	
@@ -63,6 +64,7 @@ public class Session implements Serializable {
 	private String savePath = null;
 	public boolean isPlaying = false;
 	private DrawablePanel drawPanel = null;
+	private TimelineLayersPanel timelineLayersPanel = null;
 	private TimelineSlider timelineSlider = null;
 	private Hashtable<Integer, JLabel> timelineLabelDict = new Hashtable<Integer, JLabel>();
 	
@@ -88,6 +90,7 @@ public class Session implements Serializable {
 	// Hashmap key: the number of the layer
 	// Hashmap entry: the frames associated with that layer
 	private KeyFrames clipboardFrames = null;
+	
 	
 	
 	public Color getDrawablePanelBackgroundColor () {
@@ -131,36 +134,76 @@ public class Session implements Serializable {
 		this.timelineSlider = ts;
 	}
 	
-	public void updateTimelineSliderPosition() {
-		timelineSlider.setValue(currentTimepoint);
-	}
-	
 	public Hashtable<Integer, JLabel> getTimelineLabelDict() {
 		return timelineLabelDict;
 	}
-	
 	
 	public void setDrawPanel(DrawablePanel dp) {
 		this.drawPanel = dp;
 	}
 	
+	public void setLayersPanel(TimelineLayersPanel pane) {
+		this.timelineLayersPanel = pane;
+	}
 	
 	public int getLongestTimepoint() {
 		return this.longestTimepoint;
 	}
 	
-	public void incrementTimepoint() {
+	private void incrementTimepoint() {
 		if(currentTimepoint == longestTimepoint) {
-			currentTimepoint = 0;
+			setCurrentTimepoint(0);
 		} else {
-			currentTimepoint++;
+			setCurrentTimepoint(currentTimepoint + 1);
 		}
 	}
 	
+	//TIMELINE CURRENT TIME
+	public void setCurrentTimepoint(int time) {
+		if(time >= minTimepoint && time <= longestTimepoint) {
+			this.currentTimepoint = time;
+		}
+		timelineSlider.setValue(time);
+	}
+	
+	public int getCurrentTimepoint() {
+		return this.currentTimepoint;
+	}
+	
+	
+	public void playOneFrame() {
+		incrementTimepoint();
+		refreshTimeline();
+	}
+	
+	// REFRESH and REDRAW DRAW PANEL
 	public void refreshDrawPanel(){
 		drawPanel.repaint();
 		drawPanel.revalidate();
+	}
+	
+	private void updateTimelineUI() {
+		// UPDATES the line on the layers panel
+		TimelineSliderUI ui = timelineSlider.getUI();
+		double sliderBarx = ui.getThumbMidX();
+	    timelineLayersPanel.setSliderBarx(sliderBarx);
+	    timelineLayersPanel.repaint();
+		timelineLayersPanel.revalidate();
+	}
+	
+	// USUALLY FROM MOUSE EVENT
+	public void updateTimelineFromValue(int value) {
+		setCurrentTimepoint(value);
 		
+		// BOTH updates the slider value and UI (TimelineSliderUI paint function updates based on internal values)
+	
+	    refreshTimeline();
+	   
+	}
+	
+	public void refreshTimeline() {
+		refreshDrawPanel();
+		updateTimelineUI();
 	}
 	
 	private ArrayList<ArrayList<DrawPoint>> deepCopyFrames(ArrayList<ArrayList<DrawPoint>> originalFrame) {
@@ -196,7 +239,7 @@ public class Session implements Serializable {
 			updateTimeline(framesPerSecond, framesPerSecond);
 			updateAllLayerFramesFromFPS(framesPerSecond, framesPerSecond);
 			
-			refreshDrawPanel();
+			refreshTimeline();
 		}
 	}
 	
@@ -220,11 +263,9 @@ public class Session implements Serializable {
 		timelineLabelDict.put(longestTimeInSeconds * newFps, 
 				new JLabel(((Integer)longestTimeInSeconds).toString()));
 		timelineSlider.setLabelTable(timelineLabelDict);
-		
-		timelineSlider.setValue(newTimepoint);
+	
 		setCurrentTimepoint(newTimepoint);
-		timelineSlider.repaint();
-		timelineSlider.revalidate();
+		refreshTimeline();
 	}
 	
 	public void setFramesPerSecond(int fps) {
@@ -239,7 +280,7 @@ public class Session implements Serializable {
 			framesPerSecond = fps;
 			longestTimepoint = fps * longestTimeInSeconds;
 			
-			refreshDrawPanel();
+			refreshTimeline();
 		}
 		
 	}
@@ -278,17 +319,6 @@ public class Session implements Serializable {
 		layer.setFrames(newFrames);
 	}
 	
-	
-	//TIMELINE CURRENT TIME
-	public void setCurrentTimepoint(int time) {
-		if(time >= minTimepoint && time <= longestTimepoint) {
-			this.currentTimepoint = time;
-		}
-	}
-	
-	public int getCurrentTimepoint() {
-		return this.currentTimepoint;
-	}
 	
 	// CURRENT LAYER
 	public ArrayList<Layer> getLayers() {
@@ -373,8 +403,6 @@ public class Session implements Serializable {
 	public EnumFactory.PaintSetting getPaintSetting() {
 		return this.paintSetting;
 	}
-	
-	
 	
 	
 	//DRAWABLE BRUSH/ERASER SETTINGS
