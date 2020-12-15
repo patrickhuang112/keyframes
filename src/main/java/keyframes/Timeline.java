@@ -67,6 +67,9 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		if(addToParent) { 
 			this.parent.getMainComponent().add(mainTimelinePanel, BorderLayout.PAGE_END);
 		}
+		// Default heights of the timeline on the bottom
+		setPreferredSize(new Dimension(0,200));
+		setMinimumSize(new Dimension(0, 200));
 	}
 	
 	private void buildSlider() {
@@ -132,11 +135,12 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		getSession().setLayersPanel(layersPane);
 		ArrayList<Layer> layers = getSession().getLayers();
 		for (Layer layer : layers) {
-			buildIndividualLayerTimeline(layer);
+			//buildIndividualLayerTimeline(layer);
 		}
 		mainTimelinePanel.add(layersPane);
 	}
 	
+	/*
 	private void buildIndividualLayerTimeline(Layer layer) {
 		KeyFrames frames = layer.getFrames();
 		// THe last tick on the timeline slider
@@ -163,16 +167,10 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 			current.setEnd(longestTimepoint);
 			layerIntervals.add(current);
 		} 
-		drawLayerIntervals(layerIntervals);
 	}
+	*/
 	
-	// Draw all of the boxes
-	private void drawLayerIntervals(ArrayList<Interval> intervals) {
-		// Need to first write code to get slider info stuff
-	}
-	
-	
-	public void build() {
+	public void buildUI() {
 		mainTimelinePanel.setBackground(Color.gray);
 		//CHANGELATER
 		mainTimelinePanel.setPreferredSize(new Dimension(0,200));
@@ -249,6 +247,7 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 	private void updateTimelineFromMouseClick(MouseEvent e) {
 		selectLayer(e);
 		updateTimelineFromMouse(e);
+		
 	}
 	
 	private void updateTimelineFromMouse(MouseEvent e) {

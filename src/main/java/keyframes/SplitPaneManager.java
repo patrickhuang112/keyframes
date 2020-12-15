@@ -73,15 +73,12 @@ public class SplitPaneManager implements UIComponent, Serializable {
 	public void setTopOrLeft(UIComponent topOrLeft) {
 		this.topOrLeft = topOrLeft;
 		this.topOrLeftComp = topOrLeft.getMainComponent();
-		this.topOrLeftComp.setMinimumSize(new Dimension(0, 200));
-		this.topOrLeftComp.setPreferredSize(new Dimension(0, 500));
 		splitPane.setTopComponent(this.topOrLeftComp);
 	}
 	
 	public void setBottomOrRight(UIComponent bottomOrRight) {
 		this.bottomOrRight = bottomOrRight;
 		this.bottomOrRightComp = bottomOrRight.getMainComponent();
-		this.bottomOrRightComp.setMinimumSize(new Dimension(0, 200));
 		splitPane.setBottomComponent(this.bottomOrRightComp);
 	}
 	

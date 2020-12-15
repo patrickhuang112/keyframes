@@ -56,12 +56,13 @@ public class Utils {
         return ext;
     }
 	
-	public static void newFile(Session oldSession, SplitPaneManager pane) {
+	public static void newFile(Session oldSession, JFrame frame) {
 		// DO STUFF WITH OLD SESSION (NOT IMPLEMENTED YET)
 		
+		frame.getContentPane().removeAll();
 		Session newSession = new Session();
-		newSession.setDrawPanel((DrawablePanel)pane.getTopOrLeft().getMainComponent());
-		newSession.refreshDrawPanel();
+		MainView mv = new MainView(frame, newSession);
+		mv.buildUI();
 		
 		System.out.println("New project created");
 	}

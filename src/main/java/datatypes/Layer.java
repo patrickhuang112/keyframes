@@ -2,6 +2,7 @@ package datatypes;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -14,6 +15,8 @@ import javax.swing.JPanel;
 
 public class Layer extends JPanel{
 	
+	private static int MaxWidth = 1534;
+	private static int MaxHeight = 40;
 	// Layer num is the priority of the list being drawn
 	private Integer layerNum;
 	// All the timestamped points for a layer
@@ -24,7 +27,7 @@ public class Layer extends JPanel{
 	private int UIheight = 40;
 	private Color color = Color.black;
 
-	ArrayList<Rectangle> boundingBoxes =  new ArrayList<>();
+	ArrayList<LayerBoundingBox> boundingBoxes =  new ArrayList<>();
 	private boolean isVisible = true;
 	private boolean isSelected = false;
 	
@@ -35,15 +38,23 @@ public class Layer extends JPanel{
 	public Layer(Integer layerNum, KeyFrames frames) {
 		this.layerNum = layerNum;
 		this.frames = frames;
-		this.setPreferredSize(new Dimension(UIwidth, UIheight));
 		
 		int boundx = 0;
 		int boundy = layerNum * UIheight;
-		boundingBoxes.add(new Rectangle(boundx, boundy, UIwidth, UIheight));
+		
+		//Default rectangle just to fill the whole screen right now, I'll figure out how to change
+		//this when I actually implement acutal boxes for each point
+		Rectangle box = new Rectangle(boundx, boundy, Layer.MaxWidth, Layer.MaxHeight);
+		boundingBoxes.add(new LayerBoundingBox(0, box));
+		
+		// THIS IS PURELY TO MAKE SURE THERE IS NO SPACE BETWEEN LAYERS
+		setAlignmentX(Component.LEFT_ALIGNMENT);
+		setMaximumSize(new Dimension(Layer.MaxWidth,Layer.MaxHeight));
 	}
 	
 	public boolean inBounds(int x, int y) {
-		for (Rectangle box : boundingBoxes) {
+		for (LayerBoundingBox bbox : boundingBoxes) {
+			Rectangle box = bbox.getBox();
 			int x1 = box.x;
 			int y1 = box.y;
 			int x2 = box.x + box.width;
@@ -59,14 +70,30 @@ public class Layer extends JPanel{
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2d = (Graphics2D) g;
+
 		g2d.setPaint(color);
-		g2d.fillRect(0, 0, UIwidth, UIheight);
-		if (isSelected) {
-			g2d.setPaint(Color.black);
-			Stroke s = new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-			g2d.setStroke(s);
-			g2d.drawRoundRect(0, 0, UIwidth, UIheight, 2, 2);
+		for (LayerBoundingBox bbox : boundingBoxes) {
+			// These coordinates I think are relative to our layer coordinates, so 
+			// y coordinates should basically always start at 0
+			Rectangle box = bbox.getBox();
+			g2d.setPaint(color);
+			g2d.fillRect(box.x, 0, box.width, box.height);
+			if (isSelected) {
+				g2d.setPaint(Color.black);
+				Stroke s = new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+				g2d.setStroke(s);
+				g2d.drawRoundRect(box.x, 0, box.width, box.height, 2, 2);
+			}
 		}
+	}
+	
+	public ArrayList<LayerBoundingBox> getLayerBoundingBoxes() {
+		return boundingBoxes;
+	}
+	
+	public void setLayerBoundingBoxes(ArrayList<LayerBoundingBox> boxes) {
+		this.boundingBoxes = boxes;
+		repaint();
 	}
 	
 	public Integer getLayerNum() {
@@ -121,4 +148,19 @@ public class Layer extends JPanel{
 		return isVisible;
 	}
 	
+	public static void setMaxWidth(int newWidth) {
+		Layer.MaxWidth = newWidth;
+	}
+	
+	public static int getMaxWidth() {
+		return Layer.MaxWidth;
+	}
+	
+	public static void setMaxHeight(int newHeight) {
+		Layer.MaxHeight = newHeight;
+	}
+	
+	public static int getMaxHeight() {
+		return Layer.MaxHeight;
+	}
 }

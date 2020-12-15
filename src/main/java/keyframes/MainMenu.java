@@ -51,8 +51,6 @@ public class MainMenu implements Serializable {
 		parent.add(rightPanel, BorderLayout.LINE_END);
 		
 		menuPanel.setLayout(new GridBagLayout());
-
-		
 		menuPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		menuPanel.revalidate();
 		menuPanel.repaint();

@@ -25,10 +25,8 @@ public class Main {
 		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		
 		Settings settings = Utils.getSettings();
-		
 		MainMenu menu = new MainMenu(window, settings);
 		menu.buildUI();
-		
 		System.out.println("App Started...");
 	}
 

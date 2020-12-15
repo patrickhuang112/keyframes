@@ -32,18 +32,12 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 	private static final long serialVersionUID = -4890309349957259630L;
 
 	private UIComponent parent;
-	
 	boolean cursorInScreen = true;
 	//VERY BROKEN
+	//Transparency (maybe use some other time?)
 	//https://www.rgagnon.com/javadetails/java-0265.html
-	//LOOK AT THAT WHEN I WANT TO IMPLEMENT LAYERS
-	Point drawPoint;
-	Graphics2D old;
 	
 	ArrayList<DrawPoint> currentDraggedPoints = null;
-	//ArrayList<ArrayList<DrawPoint>> pointCollection = new ArrayList<>();	
-	
-	Integer currentLayer;
 	
 	DrawablePanel(UIComponent parent) {
 		super();
@@ -137,10 +131,9 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 		updateSession(img);
 	}
 
-	
-	
 	private void updateSession(BufferedImage img) {
 		getSession().setCurrentImage(img);
+		getSession().refreshUI();
 	}
 	
 
@@ -193,7 +186,7 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 					: parent.getSession().getEraserColor();	
 			
 			singlePointCollection.add(new DrawPoint(point, drawSize, setting, pointColor));
-			getSession().getCurrentLayerFrameAtCurrentTime().add(singlePointCollection);
+			getSession().addToCurrentLayerFrameAtCurrentTime(singlePointCollection);
 			repaint();
 		}
 	}
@@ -206,8 +199,7 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if(currentDraggedPoints != null) {
-			
-			getSession().getCurrentLayerFrameAtCurrentTime().add(currentDraggedPoints);
+			getSession().addToCurrentLayerFrameAtCurrentTime(currentDraggedPoints);
 			currentDraggedPoints = null;
 		}
 		repaint();
@@ -222,7 +214,7 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 	public void mouseExited(MouseEvent e) {
 		cursorInScreen = false;
 		if(currentDraggedPoints != null) {
-			getSession().getCurrentLayerFrameAtCurrentTime().add(currentDraggedPoints);
+			getSession().addToCurrentLayerFrameAtCurrentTime(currentDraggedPoints);
 			currentDraggedPoints = null;
 		}
 		repaint();

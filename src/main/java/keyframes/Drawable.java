@@ -2,6 +2,7 @@ package keyframes;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -18,7 +19,6 @@ public class Drawable implements UIComponent, Serializable {
 	private static final long serialVersionUID = -7498204826751850301L;
 	private UIComponent parent;
 	private JPanel drawPanel;
-	private float brushSize;
 	
 	public Drawable(UIComponent parent) {
 		this(parent, true);
@@ -30,9 +30,12 @@ public class Drawable implements UIComponent, Serializable {
 		if(addToParent) {
 			parent.getMainComponent().add(drawPanel, BorderLayout.CENTER);
 		}
+		// Set default heights
+		drawPanel.setMinimumSize(new Dimension(0, 200));
+		drawPanel.setPreferredSize(new Dimension(0, 500));
 	}
 	
-	public void build() {
+	public void buildUI() {
 		drawPanel.setBackground(Color.white);
 	}
 	

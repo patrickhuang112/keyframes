@@ -79,7 +79,7 @@ public class MainView implements SessionObject, Serializable{
 	
 	private JMenuItem editFpsMenuItem;
 	private JMenuItem editTimeMenuItem;
-	
+	private MainView self = this;
 	
 	public MainView(JFrame parent, Session session) {
 		this.session = session;
@@ -95,7 +95,6 @@ public class MainView implements SessionObject, Serializable{
 		buildDrawableAndTimeline();
 		parent.revalidate();
 		parent.repaint();
-		
 		
 	}
 	
@@ -146,10 +145,9 @@ public class MainView implements SessionObject, Serializable{
 		
 		drawableAndTimelinePane.setTopOrLeft(mainDrawable);
 		drawableAndTimelinePane.setBottomOrRight(mainTimeline);
-		drawableAndTimelinePane.getBottomOrRight().getMainComponent().setPreferredSize(new Dimension(0,200));
 		
-		mainTimeline.build();
-		mainDrawable.build();
+		mainTimeline.buildUI();
+		mainDrawable.buildUI();
 	
 		mainWindow.add(drawableAndTimelinePane.getMainComponent());
 	}
@@ -174,7 +172,7 @@ public class MainView implements SessionObject, Serializable{
 		newProjectMenuItem = new JMenuItem(new AbstractAction("New Project") {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
-				Utils.newFile(session, drawableAndTimelinePane);
+				Utils.newFile(session, parent);
 			}
 		});
 		openProjectMenuItem = new JMenuItem(new AbstractAction("Open Project") {
@@ -413,6 +411,5 @@ public class MainView implements SessionObject, Serializable{
 	public Session getSession() {
 		return session;
 	}
-
-
+	
 }

@@ -64,13 +64,8 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 			if (layer.getColor() == Color.black) {
 				layer.setColor(defaultColors.get(i % defaultColors.size()));
 			}
-			layer.setAlignmentX(Component.LEFT_ALIGNMENT);
-			// THIS IS PURELY TO MAKE SURE THERE IS NO SPACE BETWEEN LAYERS
-			layer.setMaximumSize(new Dimension(400,40));
 			layersParentPane.add(layer);
-			
 		}
-		
 	}
 	
 	private void initializeDefaultColors() {

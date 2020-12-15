@@ -27,10 +27,14 @@ public class TimelineSliderUI extends BasicSliderUI {
 		return thumbRect.getCenterX();
 	}
 	
+	// NEEDED FOR LAYERS UI
+	public int getSpacingBetweenTicks () {
+		return xPositionForValue(1) - valueForXPosition(0);
+	}
+	
 	@Override
 	public void paintThumb(Graphics g) {
 		super.paintThumb(g);
-		
 		Graphics2D g2d = (Graphics2D)g;
 
 		int bottomy = (int)thumbRect.getMaxY();
@@ -50,7 +54,6 @@ public class TimelineSliderUI extends BasicSliderUI {
 		gp.lineTo(midx, bottomy+50);
 		
 		g2d.draw(gp);
-        
 	}
 
 }
