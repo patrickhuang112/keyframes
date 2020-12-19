@@ -56,11 +56,13 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 		
 	}
 	
+	// This is where we also update the layer nums of all the layers.
 	public void updateTimelineLayersPanel() {
 		ArrayList<Layer> layers = parent.getSession().getLayers();
 		layersParentPane.removeAll();
 		for (int i = 0; i < layers.size(); i++) {
 			Layer layer = layers.get(i);
+			layer.setLayerNum(i);
 			if (layer.getColor() == Color.black) {
 				layer.setColor(defaultColors.get(i % defaultColors.size()));
 			}
@@ -74,7 +76,6 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 		defaultColors.add(Color.pink);
 		defaultColors.add(Color.orange);
 		defaultColors.add(Color.blue);
-		defaultColors.add(Color.orange);
 		defaultColors.add(Color.green);
 		defaultColors.add(Color.gray);
 		defaultColors.add(Color.magenta);

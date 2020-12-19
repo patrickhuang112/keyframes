@@ -15,6 +15,13 @@ public class LayerBoundingBox {
 		this.numFrames = frames;
 	}
 	
+	public LayerBoundingBox deepCopy() {
+		LayerBoundingBox newBox = new LayerBoundingBox(this.numFrames);
+		Rectangle newRect = new Rectangle(box.x, box.y, box.width, box.height);
+		newBox.setBox(newRect);
+		return newBox;
+	}
+	
 	public Rectangle getBox() {
 		return box;
 	}

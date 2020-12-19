@@ -18,7 +18,7 @@ public class Layer extends JPanel{
 	private static int MaxWidth = 1534;
 	private static int MaxHeight = 40;
 	// Layer num is the priority of the list being drawn
-	private Integer layerNum;
+	private int layerNum;
 	// All the timestamped points for a layer
 	private KeyFrames frames;
 	private String layerName;
@@ -30,12 +30,13 @@ public class Layer extends JPanel{
 	ArrayList<LayerBoundingBox> boundingBoxes =  new ArrayList<>();
 	private boolean isVisible = true;
 	private boolean isSelected = false;
+	private boolean isGhost = false;
 	
 	public Layer() {
 		super();
 	}
 		
-	public Layer(Integer layerNum, KeyFrames frames) {
+	public Layer(int layerNum, KeyFrames frames) {
 		this.layerNum = layerNum;
 		this.frames = frames;
 		
@@ -49,8 +50,37 @@ public class Layer extends JPanel{
 		
 		// THIS IS PURELY TO MAKE SURE THERE IS NO SPACE BETWEEN LAYERS
 		setAlignmentX(Component.LEFT_ALIGNMENT);
+		setMinimumSize(new Dimension(Layer.MaxWidth,Layer.MaxHeight));
+		setPreferredSize(new Dimension(Layer.MaxWidth,Layer.MaxHeight));
 		setMaximumSize(new Dimension(Layer.MaxWidth,Layer.MaxHeight));
 	}
+	
+	public Layer deepCopy() {
+		KeyFrames newFrames = this.frames.deepCopy();
+		Layer newLayer = new Layer(this.layerNum, newFrames);
+		newLayer.setName(this.layerName);
+		// Hopefully this doesn't cause problems
+		newLayer.setColor(this.color);
+		newLayer.setVisible(this.isVisible);
+		newLayer.setSelected(this.isSelected);
+		
+		// All the timestamped points for a layer
+		
+		ArrayList<LayerBoundingBox> newBoundingBoxes =  deepCopyBoundingBoxes();
+		newLayer.setLayerBoundingBoxes(newBoundingBoxes);
+		return newLayer;
+		
+	}
+
+	public ArrayList<LayerBoundingBox> deepCopyBoundingBoxes() {
+		ArrayList<LayerBoundingBox> newBoundingBoxes =  new ArrayList<>();
+		for (LayerBoundingBox box : this.boundingBoxes) {
+			LayerBoundingBox newBox = box.deepCopy();
+			newBoundingBoxes.add(newBox);
+		}
+		return newBoundingBoxes;
+	}
+	
 	
 	public boolean inBounds(int x, int y) {
 		for (LayerBoundingBox bbox : boundingBoxes) {
@@ -71,20 +101,42 @@ public class Layer extends JPanel{
 		super.paint(g);
 		Graphics2D g2d = (Graphics2D) g;
 
-		g2d.setPaint(color);
-		for (LayerBoundingBox bbox : boundingBoxes) {
-			// These coordinates I think are relative to our layer coordinates, so 
-			// y coordinates should basically always start at 0
-			Rectangle box = bbox.getBox();
-			g2d.setPaint(color);
-			g2d.fillRect(box.x, 0, box.width, box.height);
-			if (isSelected) {
-				g2d.setPaint(Color.black);
-				Stroke s = new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-				g2d.setStroke(s);
+		if (isGhost) {
+			g2d.setPaint(Color.LIGHT_GRAY);
+			for (LayerBoundingBox bbox : boundingBoxes) {
+				// These coordinates I think are relative to our layer coordinates, so 
+				// y coordinates should basically always start at 0
+				
+				//LIGHT GREY INSIDE
+				Rectangle box = bbox.getBox();
+				g2d.fillRect(box.x, 0, box.width, box.height);
+				
+				//YELLOW DASHES?
+				g2d.setPaint(Color.yellow);
+				float dash1[] = { 10.0f };
+				BasicStroke dashed = new BasicStroke(1.0f,
+					      BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
+				g2d.setStroke(dashed);
 				g2d.drawRoundRect(box.x, 0, box.width, box.height, 2, 2);
+				}
+			}
+		else {
+			g2d.setPaint(color);
+			for (LayerBoundingBox bbox : boundingBoxes) {
+				// These coordinates I think are relative to our layer coordinates, so 
+				// y coordinates should basically always start at 0
+				Rectangle box = bbox.getBox();
+				g2d.setPaint(color);
+				g2d.fillRect(box.x, 0, box.width, box.height);
+				if (isSelected) {
+					g2d.setPaint(Color.black);
+					Stroke s = new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+					g2d.setStroke(s);
+					g2d.drawRoundRect(box.x, 0, box.width, box.height, 2, 2);
+				}
 			}
 		}
+		
 	}
 	
 	public ArrayList<LayerBoundingBox> getLayerBoundingBoxes() {
@@ -96,11 +148,15 @@ public class Layer extends JPanel{
 		repaint();
 	}
 	
-	public Integer getLayerNum() {
+	public int getLayerNum() {
 		return layerNum;
 	}
-	
-	public void setLayerNum(Integer num) {
+	// Setting a new layer num should also update its bounding boxes
+	public void setLayerNum(int num) {
+		int diff = num - layerNum;
+		for(LayerBoundingBox bbox : boundingBoxes) {
+			bbox.getBox().y += diff * UIheight;
+		}
 		this.layerNum = num;
 	}
 	
@@ -140,6 +196,14 @@ public class Layer extends JPanel{
 		return isSelected;
 	}
 	
+	public void setGhost(boolean option) {
+		isGhost = option;
+	}
+	
+	public boolean isGhost() {
+		return isGhost;
+	}
+	
 	public void setVisible(boolean option) {
 		isVisible = option;
 	}
@@ -163,4 +227,5 @@ public class Layer extends JPanel{
 	public static int getMaxHeight() {
 		return Layer.MaxHeight;
 	}
+	
 }

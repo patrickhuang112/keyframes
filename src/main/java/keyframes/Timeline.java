@@ -47,6 +47,9 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 	private TimelineSlider timelineSlider;
 	private TimelineLayersPanel layersPane;
 	
+	private Layer layerBeingDragged = null;
+	private ArrayList<Layer> layersCopy = null;
+	
 	@Override
 	public void addChild(UIComponent child) {
 		mainTimelinePanel.add(child.getMainComponent());
@@ -70,6 +73,7 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		// Default heights of the timeline on the bottom
 		setPreferredSize(new Dimension(0,200));
 		setMinimumSize(new Dimension(0, 200));
+		layersCopy = getSession().deepCopyLayers();
 	}
 	
 	private void buildSlider() {
@@ -188,10 +192,55 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 				}
 			}
 			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				updateTimelineFromMouse(e);
+				Layer layer = selectLayer(e);
+				if (layer != null) {
+					layerBeingDragged = layer;
+					layerBeingDragged.setGhost(true);
+					layersCopy = getSession().deepCopyLayers();
+				}
+			}
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (layerBeingDragged != null) {
+					layerBeingDragged.setGhost(false);
+					layerBeingDragged = null;
+				}
+			}
+			
 		});
 		layersPane.addMouseMotionListener(new MouseAdapter() {
 			@Override 
 			public void mouseDragged(MouseEvent e) {
+				
+				if (layerBeingDragged != null) {
+					ArrayList<Layer> layers = getSession().getLayers();
+					for (int i = 0; i < layers.size(); i++) {
+						Layer layer = layers.get(i);
+						if(layer.inBounds(e.getX(), e.getY())) {
+							int curLayNum = getSession().getCurrentLayerNum();
+							
+							//ASSERT statements are just for piece of mind so I know i'm doing the right
+							//logic thing here
+							assert(curLayNum == layerBeingDragged.getLayerNum());
+							int boundLayNum = layer.getLayerNum();
+							assert(boundLayNum == i);
+							if (curLayNum != boundLayNum) {
+								layers.remove(curLayNum);
+								layers.add(boundLayNum, layerBeingDragged);
+								getSession().setCurrentLayerNum(i);
+							}
+							break;
+						}
+					}
+					
+				}
+				// This includes the timeline redraw refresh (so the timeline visual will be updated) 
+				// so have this at the end after all the stuff above
+				
 				updateTimelineFromMouse(e);
 			}
 		});
@@ -202,10 +251,8 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		for (int i = 0; i < layers.size(); i++) {
 			Layer layer = layers.get(i);
 			if(layer.inBounds(e.getX(), e.getY())) {
-				Integer curLayNum = getSession().getCurrentLayerNum();
-				if (curLayNum != null) {
-					layers.get(curLayNum).setSelected(false);
-				}
+				int curLayNum = getSession().getCurrentLayerNum();
+				layers.get(curLayNum).setSelected(false);
 				layer.setSelected(true);
 				getSession().setCurrentLayerNum(i);
 				return layer;

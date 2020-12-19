@@ -375,8 +375,14 @@ public class Session implements Serializable {
 		TimelineSliderUI ui = timelineSlider.getUI();
 		double sliderBarx = ui.getThumbMidX();
 	    timelineLayersPanel.setSliderBarx(sliderBarx);
+	    
+	    //Updates the layers order on the layers panel
+	    timelineLayersPanel.updateTimelineLayersPanel();
+	    
 	    timelineLayersPanel.repaint();
 		timelineLayersPanel.revalidate();
+		
+		
 	}
 	
 	// For another day when I have boxes that don't fill the whole timeline, leave it for now...
@@ -425,15 +431,12 @@ public class Session implements Serializable {
 	}
 	
 	public void copyFramesFromCurrentLayerAndCurrentTime() {
-		if (getCurrentLayerNum() != null) {
-			clipboardFrames = new KeyFrames();
-			clipboardFrames.put(getCurrentLayerNum(), getCurrentLayerFrameAtCurrentTime());
-		}
-		
+		clipboardFrames = new KeyFrames();
+		clipboardFrames.put(getCurrentLayerNum(), getCurrentLayerFrameAtCurrentTime());
 	}
 	
 	public void pasteFramesToCurrentLayerAndCurrentTime() {
-		if (getCurrentLayerNum() != null && clipboardFrames.containsKey(getCurrentLayerNum())) {
+		if (clipboardFrames.containsKey(getCurrentLayerNum())) {
 			setCurrentLayerFrameAtCurrentTime(deepCopyFrames(clipboardFrames.get(getCurrentLayerNum())));
 			refreshUI();
 		}
@@ -442,13 +445,23 @@ public class Session implements Serializable {
 	//-------------------------------------------------------------------------------------------------
 	// Layers management
 	
+	public ArrayList<Layer> deepCopyLayers() {
+		ArrayList<Layer> newLayers = new ArrayList<Layer>();
+		for (Layer layer : drawLayers) {
+			newLayers.add(layer.deepCopy());
+		}
+		return newLayers;
+	}
+	
 	// CURRENT LAYER
 	public ArrayList<Layer> getLayers() {
 		return this.drawLayers;
 	}
 	
 	// Return what the session thinks is the currently selected layer (num)
-	public Integer getCurrentLayerNum () {
+	// Was an Integer (object) but I think it should be an int because there should always be 
+	// a current layer (otherwise what do we draw to?)
+	public int getCurrentLayerNum () {
 		return this.currentLayerNum;
 	}
 	

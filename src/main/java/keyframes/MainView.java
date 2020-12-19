@@ -79,7 +79,6 @@ public class MainView implements SessionObject, Serializable{
 	
 	private JMenuItem editFpsMenuItem;
 	private JMenuItem editTimeMenuItem;
-	private MainView self = this;
 	
 	public MainView(JFrame parent, Session session) {
 		this.session = session;
@@ -361,7 +360,10 @@ public class MainView implements SessionObject, Serializable{
 							}
 						});
 						menu.add(eraseAllLayersAtCurrentTimeMenuItem);
-						menu.show(e.getComponent(), e.getX(), e.getY());
+						
+						//Very arbitrary right now just to make it look good
+						int offset = 5;
+						menu.show(e.getComponent(), e.getX() + offset, e.getY() + offset);
 					}
 				}
 			});
