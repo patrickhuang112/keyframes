@@ -2,6 +2,7 @@ package keyframes;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -81,8 +82,7 @@ public class Session implements Serializable {
 	private EnumFactory.PaintSetting paintSetting = EnumFactory.PaintSetting.DRAW;
 	// This contains layer info, and time info
 	private ArrayList<Layer> drawLayers = new ArrayList<Layer>();
-	// This just contains time info
-	private HashMap<Integer, BufferedImage> drawImages = new HashMap<Integer, BufferedImage>();
+	
 	
 	//REPLACE BY SETTINGS
 	private int currentTimepoint = 0;
@@ -110,12 +110,38 @@ public class Session implements Serializable {
 		savePath = path;
 	}
 	
-	// With Rendering stuff
-	public void setCurrentImage(BufferedImage img) {
-		drawImages.put(currentTimepoint, img);
-	}
 	
+	// With Rendering stuff
+	// We used to keep the hashmap as an actual variable in session, but its not serializable...
+	// So we will just create it when we want to render so we can actually still serializable the stuff
+	// with local saves
 	public HashMap<Integer, BufferedImage> getImages() {
+		HashMap<Integer, BufferedImage> drawImages = new HashMap<Integer, BufferedImage>();
+		
+		BufferedImage img = new BufferedImage(drawPanel.getImageWidth(), drawPanel.getImageHeight(), 
+				BufferedImage.TYPE_INT_RGB);
+		Graphics2D gr = img.createGraphics();
+		gr.setPaint(getDrawablePanelBackgroundColor());
+		gr.fillRect(0,0, drawPanel.getImageWidth(), drawPanel.getImageHeight());
+		
+		// Start from the bottom layer, thats the first one we want to draw, and draw higher layers
+		// on top of bottom layers
+		for(int t = 0; t <= getLongestTimepoint(); t++) {
+			for(int i = drawLayers.size() - 1; i >= 0; i--) {
+				Layer layer = drawLayers.get(i);
+				ArrayList<ArrayList<DrawPoint>> pointsList = layer.getPointCollectionAtTime(t);
+				if (pointsList != null) {
+					for(ArrayList<DrawPoint> points : pointsList) {
+	 	 				if(points.size() == 1) {
+	 	 					DrawablePanel.drawAndErasePoint(gr, points.get(0));
+	 	 				} else {
+	 	 					DrawablePanel.drawAndErasePath(gr, points);
+	 	 				}
+	 	 			}
+				}			
+			}
+		}
+		
 		return drawImages;
 	}
 	

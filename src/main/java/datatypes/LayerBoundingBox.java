@@ -1,8 +1,12 @@
 package datatypes;
 
 import java.awt.Rectangle;
+import java.io.Serializable;
 
-public class LayerBoundingBox {
+public class LayerBoundingBox implements Serializable {
+
+	private static final long serialVersionUID = 7866263167732213747L;
+	
 	private Rectangle box;
 	private int numFrames;
 	

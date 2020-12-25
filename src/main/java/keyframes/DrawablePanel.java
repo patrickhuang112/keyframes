@@ -47,12 +47,20 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 		getSession().setDrawPanel(this);
 	}
 	
+	public int getImageWidth() {
+		return this.getWidth();
+	}
+	
+	public int getImageHeight() {
+		return this.getHeight();
+	}
+	
 	public void clearAll() {
 		currentDraggedPoints = null;
 		getSession().setCurrentLayerFrameAtCurrentTime(new ArrayList<>());
 		repaint();
 	}
-	private void drawAndErasePoint(Graphics2D g2d, DrawPoint p) {
+	public static void drawAndErasePoint(Graphics2D g2d, DrawPoint p) {
 		Point point = p.point;
 		float xPos = (float)point.getX();
 		float yPos = (float)point.getY();
@@ -63,7 +71,7 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 		g2d.fill(newPoint);
 	}
 	
-	private void drawAndErasePath(Graphics2D g2d, ArrayList<DrawPoint> points) {
+	public static void drawAndErasePath(Graphics2D g2d, ArrayList<DrawPoint> points) {
 		GeneralPath gp =  new GeneralPath();
 		BasicStroke s = null;
 		
@@ -114,16 +122,16 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
  				if (pointsList != null) {
  					for(ArrayList<DrawPoint> points : pointsList) {
  	 	 				if(points.size() == 1) {
- 	 	 					drawAndErasePoint(gr, points.get(0));
+ 	 	 					DrawablePanel.drawAndErasePoint(gr, points.get(0));
  	 	 				} else {
- 	 	 					drawAndErasePath(gr, points);
+ 	 	 					DrawablePanel.drawAndErasePath(gr, points);
  	 	 				}
  	 	 			}
  				}			
  	 			
  	 			// The currently dragged stuff
  	 			if(getSession().getCurrentLayerNum() == i && currentDraggedPoints != null) {
- 	 				drawAndErasePath(gr, currentDraggedPoints);
+ 	 				DrawablePanel.drawAndErasePath(gr, currentDraggedPoints);
  	 			}
  			}
  			
@@ -132,7 +140,6 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 	}
 
 	private void updateSession(BufferedImage img) {
-		getSession().setCurrentImage(img);
 		getSession().refreshUI();
 	}
 	

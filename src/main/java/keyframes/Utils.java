@@ -70,7 +70,7 @@ public class Utils {
 	public static void openFile(ActionEvent e, Session oldSession, JComponent parent, JFrame frame) {
 		// DO STUFF WITH OLD SESSION (NOT IMPLEMENTED YET)
 		
-		Session newSession;
+		
 		try {
 			System.out.println("Loading project...");
 			final JFileChooser fc = new JFileChooser();
@@ -81,7 +81,7 @@ public class Utils {
 				if(Utils.getExtension(file).equals("ser")) {
 					FileInputStream fileIn = new FileInputStream(file);
 			        ObjectInputStream in = new ObjectInputStream(fileIn);
-			        newSession = (Session) in.readObject();
+			        Session newSession = (Session) in.readObject();
 			        in.close();
 			        fileIn.close();
 			        frame.getContentPane().removeAll();
@@ -110,9 +110,7 @@ public class Utils {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
 				String savePath = file.getAbsolutePath() + ".ser";
-				
 				session.setSavePath(savePath);
-				
 				FileOutputStream fos = new FileOutputStream(savePath);
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 				// write object to file
@@ -127,6 +125,7 @@ public class Utils {
 			}
 			
 		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
 			System.out.println("Error saving file");
 			session = new Session();
 		}

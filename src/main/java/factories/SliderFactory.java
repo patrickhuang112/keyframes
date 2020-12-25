@@ -31,7 +31,7 @@ public class SliderFactory {
 	
 	public static void createCompositionEndpointDialogSlider (JComponent parent, Session session) {
 		JOptionPane timeSelector = new JOptionPane();
-		JSlider timeSlider = createBasicTenTickSlider(session.getLongestTimeInSeconds(), 0, 60);
+		JSlider timeSlider = createBasicTenTickSlider(session.getLongestTimeInSeconds(), session.lengthMin, session.lengthMax);
 		
 		timeSelector.setMessage(new Object[] { "Adjust composition length ", timeSlider});
 		timeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
@@ -53,7 +53,7 @@ public class SliderFactory {
 	
 	public static void createFPSDialogSlider (JComponent parent, Session session) {
 		JOptionPane fpsSelector = new JOptionPane();
-		JSlider fpsSlider = createBasicTenTickSlider(session.getFramesPerSecond(), 10, 30);
+		JSlider fpsSlider = createBasicTenTickSlider(session.getFramesPerSecond(), session.fpsMin, session.fpsMax);
 		
 		fpsSelector.setMessage(new Object[] { "Adjust Composition Frames Per Second ", fpsSlider});
 		fpsSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
@@ -75,7 +75,7 @@ public class SliderFactory {
 	
 	public static void createEraserSizeDialogSlider (JComponent parent, Session session) {
 		JOptionPane eraserSizeSelector = new JOptionPane();
-		JSlider eraserSizeSlider = createBasicTenTickSlider(session.getEraserSize(), 0, 30);
+		JSlider eraserSizeSlider = createBasicTenTickSlider(session.getEraserSize(), session.eraserMin, session.eraserMax);
 		
 		eraserSizeSelector.setMessage(new Object[] { "Select an Eraser Size: ", eraserSizeSlider});
 		eraserSizeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
@@ -97,7 +97,7 @@ public class SliderFactory {
 	
 	public static void createBrushSizeDialogSlider (JComponent parent, Session session) {
 		JOptionPane brushSizeSelector = new JOptionPane();
-		JSlider brushSizeSlider = createBasicTenTickSlider(session.getBrushSize(), 0, 30);
+		JSlider brushSizeSlider = createBasicTenTickSlider(session.getBrushSize(), session.brushMin, session.brushMax);
 		
 		brushSizeSelector.setMessage(new Object[] { "Select a Brush Size: ", brushSizeSlider});
 		brushSizeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);

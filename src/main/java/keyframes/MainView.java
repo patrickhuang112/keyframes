@@ -171,12 +171,12 @@ public class MainView implements SessionObject, Serializable{
 		newProjectMenuItem = new JMenuItem(new AbstractAction("New Project") {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
-				Utils.newFile(session, parent);
+				Utils.newFile(getSession(), parent);
 			}
 		});
 		openProjectMenuItem = new JMenuItem(new AbstractAction("Open Project") {
 			public void actionPerformed(ActionEvent e) {
-				Utils.openFile(e, session, openProjectMenuItem, parent);
+				Utils.openFile(e, getSession(), openProjectMenuItem, parent);
 			}
 		});
 		
@@ -184,28 +184,28 @@ public class MainView implements SessionObject, Serializable{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Utils.saveFile(e, session, saveProjectMenuItem);
+				Utils.saveFile(e, getSession(), saveProjectMenuItem);
 			}
 		});
 		
 		saveProjectAsMenuItem = new JMenuItem(new AbstractAction("Save As..") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Utils.saveAsFile(e, session, saveProjectAsMenuItem);
+				Utils.saveAsFile(e, getSession(), saveProjectAsMenuItem);
 			}
 		});
 		
 		renderMP4AsMenuItem = new JMenuItem(new AbstractAction("Render MP4 As..") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Utils.renderFile(e, session, renderMP4AsMenuItem, session.getFramesPerSecond());
+				Utils.renderFile(e, getSession(), renderMP4AsMenuItem, getSession().getFramesPerSecond());
 			}
 		});
 		
 		renderGIFAsMenuItem = new JMenuItem(new AbstractAction("Render GIF As..") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Utils.renderGif(e, session, renderGIFAsMenuItem, session.getFramesPerSecond());
+				Utils.renderGif(e, getSession(), renderGIFAsMenuItem, getSession().getFramesPerSecond());
 			}
 		});
 			
@@ -224,14 +224,14 @@ public class MainView implements SessionObject, Serializable{
 		editFpsMenuItem = new JMenuItem(new AbstractAction("Edit Frames Per Second") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				SliderFactory.createFPSDialogSlider(mainWindow, session);
+				SliderFactory.createFPSDialogSlider(mainWindow, getSession());
 			}
 		});
 		
 		editTimeMenuItem = new JMenuItem(new AbstractAction("Edit Composition Endpoint") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				SliderFactory.createCompositionEndpointDialogSlider(mainWindow, session);
+				SliderFactory.createCompositionEndpointDialogSlider(mainWindow, getSession());
 			}
 		});
 		
@@ -289,10 +289,10 @@ public class MainView implements SessionObject, Serializable{
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					if(SwingUtilities.isLeftMouseButton(e)) {
-						session.setPaintSetting(EnumFactory.PaintSetting.DRAW);
+						getSession().setPaintSetting(EnumFactory.PaintSetting.DRAW);
 					}
 					else if(SwingUtilities.isRightMouseButton(e)) {
-						SliderFactory.createBrushSizeDialogSlider(mainWindow, session);
+						SliderFactory.createBrushSizeDialogSlider(mainWindow, getSession());
 					}
 				}
 			});
