@@ -1,7 +1,7 @@
 # Keyframes
 
 <br/>
-<img src = "images/keyframes.gif" style="margin:auto;" width = "100%" height = "100%"/>
+<img src = "docs/readmeimages/keyframes.gif" style="margin:auto;" width = "100%" height = "100%"/>
 <br />
 
 A Java Swing desktop application focusing on replicating animation features of Adobe After Effects. The above GIF was
@@ -20,13 +20,26 @@ created in Keyframes.
 
 ### Current Features:
 <ul>
-<li>Frame by frame editing and animation playthrough/preview</li>
-<li>Drag and drop layers
-
-    Right click to add a new layer or to change a layer color, and scroll to view all layers.
+<li>Paint and erase with different brush sizes and colors (right click the pencil and eraser icons to change sizes)
+<br/>
+    <img src = "docs/readmeimages/brushsizecolor.gif" style="margin:auto;" width = "100%" height = "100%"/>
+    <br/>
+</li> 
+<li>Frame by frame editing and animation playthrough/preview
+    <br/>
+    <img src = "docs/readmeimages/framesedit.gif" style="margin:auto;" width = "100%" height = "100%"/>
+    <br/>
 </li>
-<li>Paint and erase with different brush sizes and colors (right click the pencil and eraser icons to change sizes)</li> 
-<li>Erasing tools with different eraser sizes</li> 
+<li>Drag and drop layers. Layers at the top of the list are drawn on top of layers below.
+    <br/>
+    <img src = "docs/readmeimages/dragdroplayers.gif" style="margin:auto;" width = "100%" height = "100%"/>
+    <br/>
+    Right click to add a new layer or to change a layer color.
+    <br/>
+    <img src = "docs/readmeimages/addlayers.gif" style="margin:auto;" width = "100%" height = "100%"/>
+    <br/>
+</li>
+
 <li>FPS and Composition length adjustment</li> 
 <li>Session saving (save your work locally as a file and work on it another time!) (Currently Broken - FIXING)</li> 
 <li>MP4 rendering; once you're finished, you have a video you can share! (Currently Broken - FIXING)</li>
