@@ -8,16 +8,16 @@ A Java Swing desktop application focusing on replicating animation features of A
 created in Keyframes.
 
 ## How to build 
-<ul>
-<li>cd keyframes</li>
-<li>./gradlew.bat build (windows) or ./gradlew build(Linux/Mac)</li>
-</ul>
+```
+cd keyframes
+./gradlew.bat build (windows) or ./gradlew build(Linux/Mac)</li>
+```
 
 ## How to run
 After building, you should have a built jar. Navigate to the folder with the built jar and execute the following command.
-<ul>
-<li>java -jar build/libs/keyframes-1.0-SNAPSHOT</li>
-</ul>
+```
+java -jar build/libs/keyframes-1.0-SNAPSHOT
+```
 
 ### Current Features:
 <ul>
