@@ -3,6 +3,7 @@
 .project
 /.settings/
 /.gradle/
+/images/
 
 # Ignore Gradle project-specific cache directory
 .gradle

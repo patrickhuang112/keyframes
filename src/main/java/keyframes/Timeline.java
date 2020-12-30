@@ -110,22 +110,8 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		labelDict.put(endPoint, new JLabel(((Integer)endSec).toString()));
 		timelineSlider.setLabelTable(labelDict);
 		
-		// MOUSE WITH SLIDER FUNCTIONALITY
-		timelineSlider.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(SwingUtilities.isLeftMouseButton(e)) {
-					updateTimelineFromMouse(e);
-				}
-			}
-		});
-		timelineSlider.addMouseMotionListener(new MouseAdapter() {
-			@Override 
-			public void mouseDragged(MouseEvent e) {
-				updateTimelineFromMouse(e);
-			}
-		});
-				
+		configureTimelineSliderListeners();
+		
 		mainTimelinePanel.add(timelineSlider, BorderLayout.NORTH);
 	}
 	
@@ -168,6 +154,24 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		} 
 	}
 	*/
+	
+	private void configureTimelineSliderListeners() {
+		// MOUSE WITH SLIDER FUNCTIONALITY
+		timelineSlider.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(SwingUtilities.isLeftMouseButton(e)) {
+					updateTimelineFromMouse(e);
+				}
+			}
+		});
+		timelineSlider.addMouseMotionListener(new MouseAdapter() {
+			@Override 
+			public void mouseDragged(MouseEvent e) {
+				updateTimelineFromMouse(e);
+			}
+		});
+	}
 	
 	public void buildUI() {
 		mainTimelinePanel.setBackground(Color.gray);

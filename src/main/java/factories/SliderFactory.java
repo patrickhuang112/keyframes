@@ -44,7 +44,11 @@ public class SliderFactory {
 	    if(timeSelector.getValue() != null) {
 	    	int res = (int)(timeSelector.getValue());
 	    	if(res == JOptionPane.YES_OPTION) {
-	    		session.setLongestTimeInSeconds(timeSlider.getValue());
+	    		int val = timeSlider.getValue();
+	    		if (val == 0) {
+	    			val++;
+	    		}
+	    		session.setLongestTimeInSeconds(val);
 	    	} else {
 	    		System.out.println("Slider cancelled");
 	    	}	
@@ -66,7 +70,11 @@ public class SliderFactory {
 	    if(fpsSelector.getValue() != null) {
 	    	int res = (int)(fpsSelector.getValue());
 	    	if(res == JOptionPane.YES_OPTION) {
-	    		session.setFramesPerSecond(fpsSlider.getValue());
+	    		int val = fpsSlider.getValue();
+	    		if (val == 0) {
+	    			val++;
+	    		}
+	    		session.setFramesPerSecond(val);
 	    	} else {
 	    		System.out.println("Slider cancelled");
 	    	}	
@@ -88,7 +96,11 @@ public class SliderFactory {
 	    if(eraserSizeSelector.getValue() != null) {
 	    	int res = (int)(eraserSizeSelector.getValue());
 	    	if(res == JOptionPane.YES_OPTION) {
-	    		session.setEraserSize(eraserSizeSlider.getValue());
+	    		int val = eraserSizeSlider.getValue();
+	    		if (val == 0) {
+	    			val++;
+	    		}
+	    		session.setEraserSize(val);
 	    	} else {
 	    		System.out.println("Slider cancelled");
 	    	}	
@@ -110,7 +122,11 @@ public class SliderFactory {
 	    if(brushSizeSelector.getValue() != null) {
 	    	int res = (int)(brushSizeSelector.getValue());
 	    	if(res == JOptionPane.YES_OPTION) {
-	    		session.setBrushSize(brushSizeSlider.getValue());
+	    		int val = brushSizeSlider.getValue();
+	    		if (val == 0) {
+	    			val++;
+	    		}
+	    		session.setBrushSize(val);
 	    	} else {
 	    		System.out.println("Slider cancelled");
 	    	}	

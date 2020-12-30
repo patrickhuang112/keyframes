@@ -32,10 +32,10 @@ public class Session implements Serializable {
 	public final int brushMax = 30;
 	public final int eraserMin = 1;
 	public final int eraserMax = 30;
-	public final int fpsMin = 10;
+	public final int fpsMin = 0;
 	public final int fpsMax = 30;
-	public final int lengthMin = 5;
-	public final int lengthMax = 30;
+	public final int lengthMin = 0;
+	public final int lengthMax = 20;
 	public final Color defaultDrawPanelBackgroundColor = Color.gray;
 	
 
