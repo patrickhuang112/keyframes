@@ -1,7 +1,7 @@
 # Keyframes
 
 <br/>
-<img src = "docs/readmeimages/keyframes.gif" style="margin:auto;" width = "100%" height = "100%"/>
+<img src = "docs/readmeimages/keyframes.gif" style="margin:auto;" width = "80%" height = "80%"/>
 <br />
 
 A Java Swing desktop application focusing on replicating animation features of Adobe After Effects. The above GIF was
@@ -22,21 +22,21 @@ created in Keyframes.
 <ul>
 <li>Paint and erase with different brush sizes and colors (right click the pencil and eraser icons to change sizes)
 <br/>
-    <img src = "docs/readmeimages/brushsizecolor.gif" style="margin:auto;" width = "100%" height = "100%"/>
+    <img src = "docs/readmeimages/brushsizecolor.gif" style="margin:auto;" width = "80%" height = "80%"/>
     <br/>
 </li> 
 <li>Frame by frame editing and animation playthrough/preview
     <br/>
-    <img src = "docs/readmeimages/framesedit.gif" style="margin:auto;" width = "100%" height = "100%"/>
+    <img src = "docs/readmeimages/framesedit.gif" style="margin:auto;" width = "80%" height = "80%"/>
     <br/>
 </li>
 <li>Drag and drop layers. Layers at the top of the list are drawn on top of layers below.
     <br/>
-    <img src = "docs/readmeimages/dragdroplayers.gif" style="margin:auto;" width = "100%" height = "100%"/>
+    <img src = "docs/readmeimages/dragdroplayers.gif" style="margin:auto;" width = "80%" height = "80%"/>
     <br/>
     Right click to add a new layer or to change a layer color.
     <br/>
-    <img src = "docs/readmeimages/addlayers.gif" style="margin:auto;" width = "100%" height = "100%"/>
+    <img src = "docs/readmeimages/addlayers.gif" style="margin:auto;" width = "80%" height = "80%"/>
     <br/>
 </li>
 
