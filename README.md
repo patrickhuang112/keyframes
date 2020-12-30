@@ -14,7 +14,6 @@ created in Keyframes.
 </ul>
 
 ## How to run
-<br>
 After building, you should have a built jar. Navigate to the folder with the built jar and execute the following command.
 <ul>
 <li>java -jar build/libs/keyframes-1.0-SNAPSHOT</li>
