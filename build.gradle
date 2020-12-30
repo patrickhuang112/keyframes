@@ -34,4 +34,6 @@ dependencies {
     //use following if gradle version > 3.0 
     //implementation group: 'org.jcodec', name: 'jcodec-javase', version: '0.2.0'
     testCompile group: 'junit', name: 'junit', version: '4.11'
+
+    implementation 'com.formdev:flatlaf:0.46'
 }

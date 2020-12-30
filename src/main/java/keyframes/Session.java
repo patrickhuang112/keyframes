@@ -36,6 +36,7 @@ public class Session implements Serializable {
 	public final int fpsMax = 30;
 	public final int lengthMin = 5;
 	public final int lengthMax = 30;
+	public final Color defaultDrawPanelBackgroundColor = Color.gray;
 	
 
 	public Session(Settings settings) {
@@ -147,6 +148,11 @@ public class Session implements Serializable {
 	
 	//-------------------------------------------------------------------------------------------------
 	//Draw settings
+	
+	public void setDrawablePanelBackgroundColor (Color color) {
+		drawPanel.setBackground(color);
+		refreshUI();
+	}
 	
 	public Color getDrawablePanelBackgroundColor () {
 		return drawPanel.getBackground();

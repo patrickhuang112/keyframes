@@ -47,8 +47,6 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 	private TimelineSlider timelineSlider;
 	private TimelineLayersPanel layersPane;
 	
-	private Layer layerBeingDragged = null;
-	private ArrayList<Layer> layersCopy = null;
 	
 	@Override
 	public void addChild(UIComponent child) {
@@ -73,7 +71,7 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		// Default heights of the timeline on the bottom
 		setPreferredSize(new Dimension(0,200));
 		setMinimumSize(new Dimension(0, 200));
-		layersCopy = getSession().deepCopyLayers();
+		
 	}
 	
 	private void buildSlider() {
@@ -117,10 +115,7 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					updateTimelineFromMouseClick(e);
-				}
-				else if(SwingUtilities.isRightMouseButton(e)) {
-					displayRightClickMenu(e);
+					updateTimelineFromMouse(e);
 				}
 			}
 		});
@@ -181,128 +176,16 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		mainTimelinePanel.setLayout(new BorderLayout());
 		buildSlider();
 		buildLayers();
-		layersPane.addMouseListener(new MouseAdapter() {
-			@Override 
-			public void mouseClicked(MouseEvent e) {
-				if(SwingUtilities.isLeftMouseButton(e)) {
-					updateTimelineFromMouseClick(e);
-				}
-				else if(SwingUtilities.isRightMouseButton(e)) {
-					displayRightClickMenu(e);
-				}
-			}
-			
-			@Override
-			public void mousePressed(MouseEvent e) {
-				updateTimelineFromMouse(e);
-				Layer layer = selectLayer(e);
-				if (layer != null) {
-					layerBeingDragged = layer;
-					layerBeingDragged.setGhost(true);
-					layersCopy = getSession().deepCopyLayers();
-				}
-			}
-			
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				if (layerBeingDragged != null) {
-					layerBeingDragged.setGhost(false);
-					layerBeingDragged = null;
-				}
-			}
-			
-		});
-		layersPane.addMouseMotionListener(new MouseAdapter() {
-			@Override 
-			public void mouseDragged(MouseEvent e) {
-				
-				if (layerBeingDragged != null) {
-					ArrayList<Layer> layers = getSession().getLayers();
-					for (int i = 0; i < layers.size(); i++) {
-						Layer layer = layers.get(i);
-						if(layer.inBounds(e.getX(), e.getY())) {
-							int curLayNum = getSession().getCurrentLayerNum();
-							
-							//ASSERT statements are just for piece of mind so I know i'm doing the right
-							//logic thing here
-							assert(curLayNum == layerBeingDragged.getLayerNum());
-							int boundLayNum = layer.getLayerNum();
-							assert(boundLayNum == i);
-							if (curLayNum != boundLayNum) {
-								layers.remove(curLayNum);
-								layers.add(boundLayNum, layerBeingDragged);
-								getSession().setCurrentLayerNum(i);
-							}
-							break;
-						}
-					}
-					
-				}
-				// This includes the timeline redraw refresh (so the timeline visual will be updated) 
-				// so have this at the end after all the stuff above
-				
-				updateTimelineFromMouse(e);
-			}
-		});
-	}
-	
-	private Layer selectLayer(MouseEvent e) {
-		ArrayList<Layer> layers = getSession().getLayers();
-		for (int i = 0; i < layers.size(); i++) {
-			Layer layer = layers.get(i);
-			if(layer.inBounds(e.getX(), e.getY())) {
-				int curLayNum = getSession().getCurrentLayerNum();
-				layers.get(curLayNum).setSelected(false);
-				layer.setSelected(true);
-				getSession().setCurrentLayerNum(i);
-				return layer;
-			}
-		}
-		return null;
-	}
-	
-	private void displayRightClickMenu(MouseEvent e) {
-		JPopupMenu menu = new JPopupMenu();
-		JMenuItem newLayerMenuItem = new JMenuItem(new AbstractAction("New layer") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				getSession().addNewLayer();
-			}
-		});
-		menu.add(newLayerMenuItem);
-		
-		Layer layer = selectLayer(e);
-		if (layer != null) {
-			// We do this first here, JUST so the selected black box shows around the layer
-			updateTimelineFromMouse(e);
-			JMenuItem recolorLayerMenuItem = new JMenuItem(new AbstractAction("Change layer color") {
-				@Override
-				public void actionPerformed(ActionEvent ae) {
-					Color newColor = JColorChooser.showDialog(null, "Choose a color", layer.getColor());
-					layer.setColor(newColor);
-					// We do this here to update the color of the layer straightaway
-					// Kind of messy butwhatever
-					updateTimelineFromMouse(e);
-				}
-			});
-			menu.add(recolorLayerMenuItem);
-		}
-		
-		menu.show(e.getComponent(), e.getX(), e.getY());
-	}
-	
-	private void updateTimelineFromMouseClick(MouseEvent e) {
-		selectLayer(e);
-		updateTimelineFromMouse(e);
 		
 	}
 	
-	private void updateTimelineFromMouse(MouseEvent e) {
+	public void updateTimelineFromMouse(MouseEvent e) {
 		TimelineSliderUI ui = timelineSlider.getUI();
 	    int value = ui.valueForXPosition(e.getX());
 	    getSession().updateTimelineFromValue(value);
 	    timelineSlider.requestFocus();
 	}
+	
 	
 	@Override
 	public Session getSession() {

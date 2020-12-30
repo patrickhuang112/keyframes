@@ -45,6 +45,17 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		getSession().setDrawPanel(this);
+		
+		// Using an invoke later because for some reason just doing it first here won't cause the panel to repaint
+		// initially
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				getSession().setDrawablePanelBackgroundColor(getSession().defaultDrawPanelBackgroundColor);
+			}
+			
+		});
+		
 	}
 	
 	public int getImageWidth() {

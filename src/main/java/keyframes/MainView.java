@@ -79,6 +79,7 @@ public class MainView implements SessionObject, Serializable{
 	
 	private JMenuItem editFpsMenuItem;
 	private JMenuItem editTimeMenuItem;
+	private JMenuItem editBackgroundColorItem;
 	
 	public MainView(JFrame parent, Session session) {
 		this.session = session;
@@ -139,14 +140,16 @@ public class MainView implements SessionObject, Serializable{
 		drawableAndTimelinePane = new SplitPaneManager(this, true);
 		
 		Timeline mainTimeline = new Timeline(drawableAndTimelinePane, false);
+		mainTimeline.buildUI();
+		
 		Drawable mainDrawable = new Drawable(drawableAndTimelinePane, false);
-
+		mainDrawable.buildUI();
 		
 		drawableAndTimelinePane.setTopOrLeft(mainDrawable);
 		drawableAndTimelinePane.setBottomOrRight(mainTimeline);
 		
-		mainTimeline.buildUI();
-		mainDrawable.buildUI();
+		
+		
 	
 		mainWindow.add(drawableAndTimelinePane.getMainComponent());
 	}
@@ -235,8 +238,18 @@ public class MainView implements SessionObject, Serializable{
 			}
 		});
 		
+		editBackgroundColorItem = new JMenuItem(new AbstractAction("Edit Background Color") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Color current = getSession().getDrawablePanelBackgroundColor();
+				Color newColor = JColorChooser.showDialog(null, "Choose a new background color", current);
+				getSession().setDrawablePanelBackgroundColor(newColor);
+			}
+		});
+		
 		editMenu.add(editFpsMenuItem);
 		editMenu.add(editTimeMenuItem);
+		editMenu.add(editBackgroundColorItem);
 		
 		topMenuBar.add(editMenu);
 		topBar.add(topMenuBar, BorderLayout.PAGE_START);
