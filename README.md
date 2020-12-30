@@ -22,21 +22,29 @@ created in Keyframes.
 <ul>
 <li>Paint and erase with different brush sizes and colors (right click the pencil and eraser icons to change sizes)
 <br/>
+<br/>
     <img src = "docs/readmeimages/brushsizecolor.gif" style="margin:auto;" width = "80%" height = "80%"/>
+    <br/>
     <br/>
 </li> 
 <li>Frame by frame editing and animation playthrough/preview
     <br/>
+    <br/>
     <img src = "docs/readmeimages/framesedit.gif" style="margin:auto;" width = "80%" height = "80%"/>
+    <br/>
     <br/>
 </li>
 <li>Drag and drop layers. Layers at the top of the list are drawn on top of layers below.
     <br/>
+    <br/>
     <img src = "docs/readmeimages/dragdroplayers.gif" style="margin:auto;" width = "80%" height = "80%"/>
+    <br/>
     <br/>
     Right click to add a new layer or to change a layer color.
     <br/>
+    <br/>
     <img src = "docs/readmeimages/addlayers.gif" style="margin:auto;" width = "80%" height = "80%"/>
+    <br/>
     <br/>
 </li>
 
