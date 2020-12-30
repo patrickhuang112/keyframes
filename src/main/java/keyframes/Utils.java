@@ -81,9 +81,10 @@ public class Utils {
 				if(Utils.getExtension(file).equals("ser")) {
 					FileInputStream fileIn = new FileInputStream(file);
 			        ObjectInputStream in = new ObjectInputStream(fileIn);
-			        Session newSession = (Session) in.readObject();
+			        SessionSave ss = (SessionSave) in.readObject();
 			        in.close();
 			        fileIn.close();
+			        Session newSession = new Session(ss);
 			        frame.getContentPane().removeAll();
 					MainView mv = new MainView(frame, newSession);
 					mv.buildUI();
@@ -111,10 +112,11 @@ public class Utils {
 				File file = fc.getSelectedFile();
 				String savePath = file.getAbsolutePath() + ".ser";
 				session.setSavePath(savePath);
+				SessionSave ss = new SessionSave(session);
 				FileOutputStream fos = new FileOutputStream(savePath);
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 				// write object to file
-				oos.writeObject(session);
+				oos.writeObject(ss);
 				System.out.println("Saving Successful!");
 				// closing resources
 				oos.close();
@@ -132,14 +134,17 @@ public class Utils {
 	}
 	
 	public static void saveFile(ActionEvent ae, Session session, JComponent parent) {
+		
 		if(session.getSavePath() == null) {
 			Utils.saveAsFile(ae, session, parent);
 		} else {
 			try {
-				FileOutputStream fos = new FileOutputStream(session.getSavePath());
+				SessionSave ss = new SessionSave(session);
+				assert(ss.savePath.equals(session.getSavePath()));
+				FileOutputStream fos = new FileOutputStream(ss.savePath);
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 				// write object to file
-				oos.writeObject(session);
+				oos.writeObject(ss);
 				System.out.println("Saving Successful!");
 				// closing resources
 				oos.close();

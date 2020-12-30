@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -20,6 +21,7 @@ import javax.swing.Box.Filler;
 import javax.swing.BoxLayout;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -46,6 +48,8 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 	private Layer layerBeingDragged = null;
 	private ArrayList<Layer> layersCopy = null;
 	
+	
+	
 	public TimelineLayersPanel(Timeline parent) {
 		super();
 		this.parent = parent;
@@ -59,7 +63,7 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 		layersParentPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 		viewport.add(layersParentPane);
 		setupLayersParentPaneListeners();
-		updateTimelineLayersPanel();
+		updateTimelineLayersPanelLayerNumbers();
 		
 	}
 	
@@ -181,7 +185,7 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 	}
 	
 	// This is where we also update the layer nums of all the layers.
-	public void updateTimelineLayersPanel() {
+	public void updateTimelineLayersPanelLayerNumbers() {
 		ArrayList<Layer> layers = parent.getSession().getLayers();
 		layersParentPane.removeAll();
 		for (int i = 0; i < layers.size(); i++) {

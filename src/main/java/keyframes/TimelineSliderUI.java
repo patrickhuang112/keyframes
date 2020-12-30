@@ -7,8 +7,10 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.GeneralPath;
+import java.util.Hashtable;
 
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
@@ -16,6 +18,8 @@ import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 public class TimelineSliderUI extends BasicSliderUI {
+	
+	private Hashtable<Integer, JLabel> timelineLabelsDict = new Hashtable<Integer, JLabel>();
 	
 	public TimelineSliderUI(JSlider slider) {
 		super(slider);
@@ -30,6 +34,10 @@ public class TimelineSliderUI extends BasicSliderUI {
 	// NEEDED FOR LAYERS UI
 	public int getSpacingBetweenTicks () {
 		return xPositionForValue(1) - valueForXPosition(0);
+	}
+	
+	public Hashtable<Integer, JLabel> getTimelineLabelsDict() {
+		return timelineLabelsDict;
 	}
 	
 	@Override

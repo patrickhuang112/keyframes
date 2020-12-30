@@ -54,7 +54,7 @@ public class MainMenu implements Serializable {
 		menuPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		menuPanel.revalidate();
 		menuPanel.repaint();
-		menuPanel.setBackground(Color.red);
+		menuPanel.setBackground(Color.gray);
 		
 		buildButtons();
 		parent.revalidate();
@@ -89,36 +89,7 @@ public class MainMenu implements Serializable {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Session session;
-				try {
-					System.out.println("Loading project...");
-					final JFileChooser fc = new JFileChooser();
-					int returnVal = fc.showOpenDialog(loadProjectButton);
-					
-					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						File file = fc.getSelectedFile();
-						String l = Utils.getExtension(file);
-						if(Utils.getExtension(file).equals("ser")) {
-							FileInputStream fileIn = new FileInputStream(file);
-					        ObjectInputStream in = new ObjectInputStream(fileIn);
-					        session = (Session) in.readObject();
-					        in.close();
-					        fileIn.close();
-					        parent.getContentPane().removeAll();
-							MainView mv = new MainView(parent, session);
-							mv.buildUI();
-						} else {
-							System.out.println("Incompatible file");
-						}
-					} else {
-						System.out.println("Loading aborted");
-					}
-					
-				} catch (Exception ex) {
-					System.out.println("Error loading file");
-					session = new Session();
-				}
-				System.out.println("Loaded project");
+				Utils.openFile(e, null, menuPanel, parent);
 			}
 		});
 		gbc.gridy = 1;

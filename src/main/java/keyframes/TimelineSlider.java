@@ -33,4 +33,6 @@ public class TimelineSlider extends JSlider {
 	public TimelineSliderUI getUI() {
 		return (TimelineSliderUI)(super.getUI());
 	}
+	
+	
 }

@@ -37,8 +37,18 @@ public class Session implements Serializable {
 	public final int lengthMin = 0;
 	public final int lengthMax = 20;
 	public final Color defaultDrawPanelBackgroundColor = Color.gray;
-	
+	public int minTimepoint = 0;
 
+	public Session(SessionSave ss) {
+		this();
+		this.drawLayers = ss.drawLayers;
+		this.framesPerSecond = ss.framesPerSecond;
+		this.longestTimeInSeconds = ss.longestTimeInSeconds;
+		this.longestTimepoint = ss.longestTimepoint;
+		this.spaceBetweenTicks = ss.spaceBetweenTicks;
+		this.savePath = ss.savePath;
+	}
+	
 	public Session(Settings settings) {
 		this();
 		brushSize = settings.getBrushSize();
@@ -74,7 +84,7 @@ public class Session implements Serializable {
 	private DrawablePanel drawPanel = null;
 	private TimelineLayersPanel timelineLayersPanel = null;
 	private TimelineSlider timelineSlider = null;
-	private Hashtable<Integer, JLabel> timelineLabelDict = new Hashtable<Integer, JLabel>();
+	
 	
 	private Color brushColor = Color.red;
 	private Color eraserColor = Color.white;
@@ -91,9 +101,9 @@ public class Session implements Serializable {
 	private int longestTimeInSeconds;
 	private int framesPerSecond;
 	//Dependent on frames persecond and time in seconds, updated when we set the timeline slider
-	private int spaceBetweenTicks;
+	private Integer spaceBetweenTicks = null;
 	
-	private int minTimepoint = 0;
+	
 	private int longestTimepoint = longestTimeInSeconds * framesPerSecond;
 	// Current frames copied to clipboard
 	// Hashmap key: the number of the layer
@@ -285,15 +295,18 @@ public class Session implements Serializable {
 			timelineSlider.setMaximum(longestTimeInSeconds * newFps);
 			timelineSlider.setMajorTickSpacing(newFps);
 			timelineSlider.setMinorTickSpacing(1);
-			timelineLabelDict = new Hashtable<Integer, JLabel>();
+			Hashtable<Integer, JLabel> timelineLabelsDict = timelineSlider.getUI().getTimelineLabelsDict();
+			timelineLabelsDict.clear();
+			//
+			timelineLabelsDict = new Hashtable<Integer, JLabel>();
 			
 			for(Integer i = 0; i < longestTimeInSeconds; i++) {
-				timelineLabelDict.put(i * newFps, new JLabel(i.toString()));
+				timelineLabelsDict.put(i * newFps, new JLabel(i.toString()));
 			}
 			//ADD THE ENDPOINT LABEL
-			timelineLabelDict.put(longestTimeInSeconds * newFps, 
+			timelineLabelsDict.put(longestTimeInSeconds * newFps, 
 					new JLabel(((Integer)longestTimeInSeconds).toString()));
-			timelineSlider.setLabelTable(timelineLabelDict);
+			timelineSlider.setLabelTable(timelineLabelsDict);
 
 			setCurrentTimepoint(newTimepoint);
 			refreshUI();
@@ -409,7 +422,7 @@ public class Session implements Serializable {
 	    timelineLayersPanel.setSliderBarx(sliderBarx);
 	    
 	    //Updates the layers order on the layers panel
-	    timelineLayersPanel.updateTimelineLayersPanel();
+	    timelineLayersPanel.updateTimelineLayersPanelLayerNumbers();
 	    
 	    timelineLayersPanel.repaint();
 		timelineLayersPanel.revalidate();
@@ -522,7 +535,7 @@ public class Session implements Serializable {
 		this.setCurrentLayerNum(numLayers);
 		
 		drawLayers.add(newLayer);
-		timelineLayersPanel.updateTimelineLayersPanel();
+		timelineLayersPanel.updateTimelineLayersPanelLayerNumbers();
 		refreshUI();
 	}
 	
@@ -566,6 +579,13 @@ public class Session implements Serializable {
 			frames.put(getCurrentTimepoint(), new ArrayList<>());
 		}
 		refreshUI();
+	}
+	
+	//-------------------------------------------------------------------------------------------------
+	// Other stuff category
+	
+	public Integer getSpacingBetweenTicks() {
+		return spaceBetweenTicks;
 	}
 	
 	//These two basically just create a new composition..., are they really even needed

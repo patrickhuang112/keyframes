@@ -8,12 +8,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Stroke;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.JPanel;
 
-public class Layer extends JPanel{
+public class Layer extends JPanel implements Serializable {
 	
 	private static int MaxWidth = 1534;
 	private static int MaxHeight = 40;
