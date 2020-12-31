@@ -27,7 +27,7 @@ java -jar build/libs/keyframes-1.0-SNAPSHOT
 <li>Paint and erase with different brush sizes and colors (right click the pencil and eraser icons to change sizes)
 <br/>
 <br/>
-    <img src = "docs/readmeimages/brushsizecolor.gif" style="margin:auto;" width = "80%" height = "80%"/>
+    <img src = "docs/readmeimages/brushsizecolor2.gif" style="margin:auto;" width = "80%" height = "80%"/>
     <br/>
     <br/>
 </li> 
@@ -52,10 +52,34 @@ java -jar build/libs/keyframes-1.0-SNAPSHOT
     <br/>
 </li>
 
-<li>FPS and Composition length adjustment</li> 
-<li>Session saving (save your work locally as a file and work on it another time!) (Currently Broken - FIXING)</li> 
-<li>MP4 rendering; once you're finished, you have a video you can share! (Currently Broken - FIXING)</li>
-<li>GIF rendering; share your animation as a video image! (Currently Broken - FIXING)</li>
+<li>FPS and Composition length adjustment
+<br/>
+    <br/>
+    <img src = "docs/readmeimages/fps.gif" style="margin:auto;" width = "80%" height = "80%"/>
+    <br/>
+    <br/>
+</li> 
+<li>Session saving (save your work locally as a file and work on it some other time!) 
+<br/>
+    <br/>
+    <img src = "docs/readmeimages/savex.gif" style="margin:auto;" width = "80%" height = "80%"/>
+    <br/>
+    <br/>
+</li> 
+<li>MP4 rendering; share your animation as a mp4 video! 
+<br/>
+    <br/>
+    <img src = "docs/readmeimages/mp4ex.gif" style="margin:auto;" width = "80%" height = "80%"/>
+    <br/>
+    <br/>
+</li>
+<li>GIF rendering; share your animation as a video image! 
+<br/>
+    <br/>
+    <img src = "docs/readmeimages/gifex.gif" style="margin:auto;" width = "80%" height = "80%"/>
+    <br/>
+    <br/>
+</li>
 </ul>
 
 ### Future features: 

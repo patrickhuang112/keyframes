@@ -30,9 +30,9 @@ public class Session implements Serializable {
 	
 	private static final long serialVersionUID = 3817282456552806335L;
 	
-	public final int brushMin = 1;
+	public final int brushMin = 0;
 	public final int brushMax = 30;
-	public final int eraserMin = 1;
+	public final int eraserMin = 0;
 	public final int eraserMax = 30;
 	public final int fpsMin = 0;
 	public final int fpsMax = 30;
