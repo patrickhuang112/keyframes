@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 
 import javax.swing.JLabel;
+import javax.swing.JProgressBar;
 import javax.swing.JSlider;
 import javax.swing.SwingWorker;
 import javax.swing.plaf.basic.BasicSliderUI;
@@ -20,6 +21,7 @@ import datatypes.DrawPoint;
 import datatypes.KeyFrames;
 import datatypes.Layer;
 import datatypes.LayerBoundingBox;
+import datatypes.ProgressBar;
 import factories.EnumFactory;
 import settings.Settings;
 
@@ -81,6 +83,7 @@ public class Session implements Serializable {
 	private Integer currentLayerNum = 0;
 	private String savePath = null;
 	private boolean isPlaying = false;
+	private ProgressBar progressBar = null;
 	private DrawablePanel drawPanel = null;
 	private TimelineLayersPanel timelineLayersPanel = null;
 	private TimelineSlider timelineSlider = null;
@@ -126,18 +129,25 @@ public class Session implements Serializable {
 	// We used to keep the hashmap as an actual variable in session, but its not serializable...
 	// So we will just create it when we want to render so we can actually still serializable the stuff
 	// with local saves
+	
+	//Now that I serialize and save SessionSave instead of save, I can maybe revert this change...
+	//We'll see...
 	public HashMap<Integer, BufferedImage> getImages() {
 		HashMap<Integer, BufferedImage> drawImages = new HashMap<Integer, BufferedImage>();
 		
-		BufferedImage img = new BufferedImage(drawPanel.getImageWidth(), drawPanel.getImageHeight(), 
-				BufferedImage.TYPE_INT_RGB);
-		Graphics2D gr = img.createGraphics();
-		gr.setPaint(getDrawablePanelBackgroundColor());
-		gr.fillRect(0,0, drawPanel.getImageWidth(), drawPanel.getImageHeight());
-		
 		// Start from the bottom layer, thats the first one we want to draw, and draw higher layers
 		// on top of bottom layers
+		
+		int drawWidth = drawPanel.getImageWidth();
+		int drawHeight = drawPanel.getImageHeight();
+		Color backgroundColor = getDrawablePanelBackgroundColor();
+		
 		for(int t = 0; t <= getLongestTimepoint(); t++) {
+			BufferedImage img = new BufferedImage(drawWidth, drawHeight, 
+					BufferedImage.TYPE_INT_RGB);
+			Graphics2D gr = img.createGraphics();
+			gr.setPaint(backgroundColor);
+			gr.fillRect(0,0, drawWidth, drawHeight);
 			for(int i = drawLayers.size() - 1; i >= 0; i--) {
 				Layer layer = drawLayers.get(i);
 				ArrayList<ArrayList<DrawPoint>> pointsList = layer.getPointCollectionAtTime(t);
@@ -151,6 +161,7 @@ public class Session implements Serializable {
 	 	 			}
 				}			
 			}
+			drawImages.put(t, img);
 		}
 		
 		return drawImages;
@@ -226,6 +237,18 @@ public class Session implements Serializable {
 		return drawPanel.getHeight();
 	}
 	
+	public void updateProgressBar(int progress) {
+		progressBar.updateProgressBar(progress);
+	}
+	
+	public void setProgressBarVisible(boolean visible) {
+		progressBar.setVisibility(visible);
+	}
+	
+	public void resetProgressBar() {
+		progressBar.resetProgressBar();
+	}
+	
 	//-------------------------------------------------------------------------------------------------
 	// INITIALIZE UI Components in Session
 	// These should only be called at the beginning
@@ -243,6 +266,10 @@ public class Session implements Serializable {
 	
 	public void setLayersPanel(TimelineLayersPanel pane) {
 		this.timelineLayersPanel = pane;
+	}
+	
+	public void setProgressBar(ProgressBar pb) {
+		this.progressBar = pb;
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -279,7 +306,7 @@ public class Session implements Serializable {
 				longestTimepoint = framesPerSecond * longestTimeInSeconds;
 				updateTimeline(framesPerSecond, framesPerSecond);
 				updateAllLayerFramesFromFPS(framesPerSecond, framesPerSecond);
-				
+				refreshProgressBarEndpoint();
 				refreshUI();
 			}
 		}
@@ -288,6 +315,9 @@ public class Session implements Serializable {
 			return this.longestTimeInSeconds;
 		}
 		
+		private void refreshProgressBarEndpoint() {
+			this.progressBar.setProgressBarEndpoint(longestTimepoint);
+		}
 		
 		//FPS
 		private void updateTimeline(int oldFps, int newFps) {
@@ -323,6 +353,7 @@ public class Session implements Serializable {
 				framesPerSecond = fps;
 				longestTimepoint = fps * longestTimeInSeconds;
 				
+				refreshProgressBarEndpoint();
 				refreshUI();
 			}
 		}

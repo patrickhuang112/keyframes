@@ -39,6 +39,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
@@ -47,6 +48,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import datatypes.ProgressBar;
 import datatypes.SessionObject;
 import factories.EnumFactory;
 import factories.SliderFactory;
@@ -63,6 +65,8 @@ public class MainView implements SessionObject, Serializable{
 	
 	private JPanel topBar;
 	private JMenuBar topMenuBar;
+	// Contains topToolBar and progressBar
+	private JPanel topToolBarContainer;
 	private JToolBar topToolBar;
 	
 	private SplitPaneManager drawableAndTimelinePane;
@@ -80,6 +84,9 @@ public class MainView implements SessionObject, Serializable{
 	private JMenuItem editFpsMenuItem;
 	private JMenuItem editTimeMenuItem;
 	private JMenuItem editBackgroundColorItem;
+	
+	private JProgressBar renderingProgressBar;
+	private ProgressBar progressBar;
 	
 	public MainView(JFrame parent, Session session) {
 		this.session = session;
@@ -161,7 +168,7 @@ public class MainView implements SessionObject, Serializable{
 		topBar.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mainWindow.add(topBar, BorderLayout.PAGE_START);
 		buildTopMenuBar();
-		buildTopToolBar();
+		buildTopToolBarContainer();
 	}
 	
 	private void buildTopMenuBar() {
@@ -255,14 +262,39 @@ public class MainView implements SessionObject, Serializable{
 		topBar.add(topMenuBar, BorderLayout.PAGE_START);
 	}
 	
+	private void buildTopToolBarContainer() {
+		topToolBarContainer = new JPanel();
+		topToolBarContainer.setLayout(new BoxLayout(topToolBarContainer, BoxLayout.X_AXIS));
+		
+		buildTopToolBar();
+		buildHorizontalGlue();
+		buildProgressBar();
+		
+		topBar.add(topToolBarContainer, BorderLayout.PAGE_END);
+	}
+	
+	private void buildHorizontalGlue() {
+		topToolBarContainer.add(Box.createHorizontalGlue());
+	}
+	
 	private void buildTopToolBar() {
 		topToolBar = new JToolBar(JToolBar.HORIZONTAL);
-		topToolBar.setPreferredSize(new Dimension(0,30));
+		topToolBar.setPreferredSize(new Dimension(300,30));
 		topToolBar.setFloatable(false);
 		
-		buildTopToolBarButtons();		
-		topBar.add(topToolBar, BorderLayout.PAGE_END);
+		buildTopToolBarButtons();
+		topToolBarContainer.add(topToolBar);
 		
+	}
+	
+	private void buildProgressBar() {
+		
+		renderingProgressBar = new JProgressBar(0,getSession().getLongestTimepoint());
+		String label = "Rendering Progress: ";
+		progressBar = new ProgressBar(renderingProgressBar, label);
+		getSession().setProgressBar(progressBar);
+		
+		topToolBarContainer.add(progressBar);
 	}
 	
 	private void buildTopToolBarEraserButton() {

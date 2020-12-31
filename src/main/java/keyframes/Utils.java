@@ -12,12 +12,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.SwingWorker;
 
 import org.jcodec.api.awt.AWTSequenceEncoder;
 
@@ -157,107 +160,131 @@ public class Utils {
 	}
 	
 	public static void renderFile(ActionEvent e, Session session, JComponent parent, int fps) {
-		try {
-			System.out.println("Rendering video...");
-			final JFileChooser fc = new JFileChooser();
-			fc.setDialogTitle("Render video");
-			int returnVal = fc.showSaveDialog(parent);
-			
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File file = fc.getSelectedFile();
-				String filePath = file.getAbsolutePath() + ".mp4";
-				File newFile = new File(filePath);
-				AWTSequenceEncoder enc = AWTSequenceEncoder.createSequenceEncoder(newFile, fps);
-				HashMap<Integer, BufferedImage> images = session.getImages();
-				
-				for(int i = 0; i < session.getLongestTimepoint(); i++) {
-					BufferedImage img;
-					if(images.containsKey(i)) {
-						img = images.get(i);
-					} else {
-						int w = session.getDrawablePaneWidth();
-						int h = session.getDrawablePaneHeight();
+		SwingWorker sw = new SwingWorker() {
+			@Override
+			protected Object doInBackground() throws Exception {
+				try {
+					System.out.println("Rendering video...");
+					final JFileChooser fc = new JFileChooser();
+					fc.setDialogTitle("Render video");
+					int returnVal = fc.showSaveDialog(parent);
+					
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
+						File file = fc.getSelectedFile();
+						String filePath = file.getAbsolutePath() + ".mp4";
+						File newFile = new File(filePath);
 						
-						img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-						Graphics2D g = img.createGraphics();
-						g.setPaint(session.getDrawablePanelBackgroundColor());
-						g.fillRect(0,0, w, h);
+						session.setProgressBarVisible(true);
+						
+						AWTSequenceEncoder enc = AWTSequenceEncoder.createSequenceEncoder(newFile, fps);
+						HashMap<Integer, BufferedImage> images = session.getImages();
+						
+						for(int i = 0; i <= session.getLongestTimepoint(); i++) {
+							BufferedImage img = images.get(i);
+							enc.encodeImage(img);
+							
+							//Update progress bar
+							session.updateProgressBar(i);
+						}
+						enc.finish();
+						
+						// After 3 seconds of finishing, toggle off the progress bar and reset it to 0
+					    new Timer().schedule( 
+					            new TimerTask() {
+					                @Override
+					                public void run() {
+					                    session.setProgressBarVisible(false);
+					                    session.resetProgressBar();
+					                }
+					            }, 3000);
+						
+					} else {
+						System.out.println("Rendering video aborted");
 					}
-					enc.encodeImage(img);
+					
+				} catch (Exception ex) {
+					System.out.println("Error rendering video");
 				}
-				enc.finish();
-				System.out.println("Rendering video finished!");
-				
-			} else {
-				System.out.println("Rendering video aborted");
+				return "VIDEO FINISHED";
 			}
 			
-		} catch (Exception ex) {
-			System.out.println("Error rendering video");
-			session = new Session();
-		}
+			@Override
+			protected void done() {
+				System.out.println("Rendering mp4 finished");
+			}
+		};
+		
+		sw.execute();
+			
 	}
 	
 	public static void renderGif(ActionEvent e, Session session, JComponent parent, int fps) {
-		try {
-			System.out.println("Rendering gif...");
-			final JFileChooser fc = new JFileChooser();
-			fc.setDialogTitle("Render gif");
-			int returnVal = fc.showSaveDialog(parent);
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File file = fc.getSelectedFile();
-				String filePath = file.getAbsolutePath() + ".gif";
-				File newFile = new File(filePath);
-				
-				HashMap<Integer, BufferedImage> images = session.getImages();
-				ImageOutputStream output = new FileImageOutputStream(newFile);
-				
-				ArrayList<BufferedImage> finalImages = new ArrayList<>();
-				
-				
-				for(int i = 0; i < session.getLongestTimepoint(); i++) {
-					BufferedImage img;
-					if(images.containsKey(i)) {
-						img = images.get(i);
-					} else {
-						int w = session.getDrawablePaneWidth();
-						int h = session.getDrawablePaneHeight();
+		SwingWorker sw = new SwingWorker() {
+			@Override
+			protected Object doInBackground() throws Exception {
+				try {
+					System.out.println("Rendering gif...");
+					final JFileChooser fc = new JFileChooser();
+					fc.setDialogTitle("Render gif");
+					int returnVal = fc.showSaveDialog(parent);
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
+						File file = fc.getSelectedFile();
+						String filePath = file.getAbsolutePath() + ".gif";
+						File newFile = new File(filePath);
 						
-						img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-						Graphics2D g = img.createGraphics();
-						g.setPaint(session.getDrawablePanelBackgroundColor());
-						g.fillRect(0,0, w, h);
+						session.setProgressBarVisible(true);
+						
+						HashMap<Integer, BufferedImage> images = session.getImages();
+						ImageOutputStream output = new FileImageOutputStream(newFile);
+						
+						int timeBetweenFrames = 1000 / fps;
+						
+						//Don't change unless I change how buffered images are made.1
+						int imgType = BufferedImage.TYPE_INT_RGB;
+						
+						// create a gif sequence with the type of the first image, 1 second
+					    // between frames, which loops continuously
+						
+						GifSequenceWriter writer = 
+								new GifSequenceWriter(output, imgType, timeBetweenFrames, true);
+					      
+					    // write images to the sequence
+						for(int i = 0; i <= session.getLongestTimepoint(); i++) {
+							BufferedImage img = images.get(i);
+							writer.writeToSequence(img);
+							
+							//Update progress bar
+							session.updateProgressBar(i);
+						}
+						
+					    writer.close();
+					    output.close();
+					    
+					    // After 3 seconds of finishing, toggle off the progress bar and reset it to 0
+					    new Timer().schedule( 
+					            new TimerTask() {
+					                @Override
+					                public void run() {
+					                    session.setProgressBarVisible(false);
+					                    session.resetProgressBar();
+					                }
+					            }, 3000);
+					} else {
+						System.out.println("Rendering gif aborted");
 					}
-					finalImages.add(img);
+					
+				} catch (Exception ex) {
+					System.out.println("Error rendering");
 				}
-				
-				int timeBetweenFrames = 1000 / fps;
-				
-				GifSequenceWriter writer = 
-						new GifSequenceWriter(output, finalImages.get(0).getType(), timeBetweenFrames, true);
-			      
-			    // create a gif sequence with the type of the first image, 1 second
-			    // between frames, which loops continuously
-			    
-			      
-			    // write out the first image to our sequence...
-			    writer.writeToSequence(finalImages.get(0));
-			    for (int i=1; i < finalImages.size(); i++) {
-			        BufferedImage nextImage = finalImages.get(i);
-			        writer.writeToSequence(nextImage);
-			    }
-			      
-			    writer.close();
-			    output.close();
-			    System.out.println("Rendering gif finished");
-				
-			} else {
-				System.out.println("Rendering gif aborted");
+				return "GIF FINISHED";
 			}
 			
-		} catch (Exception ex) {
-			System.out.println("Error rendering");
-			session = new Session();
-		}
+			@Override
+			protected void done() {
+				System.out.println("Rendering gif finished");
+			}
+		};
+		
+		sw.execute();
 	}
 }
