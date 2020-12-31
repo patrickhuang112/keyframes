@@ -62,7 +62,7 @@ java -jar build/libs/keyframes-1.0-SNAPSHOT
 <li>Session saving (save your work locally as a file and work on it some other time!) 
 <br/>
     <br/>
-    <img src = "docs/readmeimages/savex.gif" style="margin:auto;" width = "80%" height = "80%"/>
+    <img src = "docs/readmeimages/saveex.gif" style="margin:auto;" width = "80%" height = "80%"/>
     <br/>
     <br/>
 </li> 
