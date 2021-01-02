@@ -14,6 +14,8 @@ import java.awt.geom.GeneralPath;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -83,10 +85,24 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 			public void mousePressed(MouseEvent e) {
 				parent.updateTimelineFromMouse(e);
 				Layer layer = selectLayer(e);
-				if (layer != null) {
+				if (SwingUtilities.isLeftMouseButton(e) && layer != null) {
 					layerBeingDragged = layer;
-					layerBeingDragged.setGhost(true);
 					layersCopy = getSession().deepCopyLayers();
+					// This is so that only when the mouse is really being held will the layer
+					// turn into a ghost visually
+					// Mainly because without this, it keeps flickering whenever there is any simple
+					// mouse click which is pretty annoying
+					new Timer().schedule( 
+				            new TimerTask() {
+				                @Override
+				                public void run() {
+				                	if (layerBeingDragged != null) {
+				                		layerBeingDragged.setGhost(true);
+				                	}
+				                	
+				                }
+				                //300 kind of aribitrary, just thought it looked okay
+				            }, 100);
 				}
 			}
 			
