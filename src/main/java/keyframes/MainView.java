@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -299,7 +300,7 @@ public class MainView implements SessionObject, Serializable{
 	
 	private void buildTopToolBarEraserButton() {
 		try {
-			Image eraserImage = ImageIO.read(this.getClass().getResource("/eraseIcon.bmp"));
+			Image eraserImage = ImageIO.read(this.getClass().getResource("/eraseIcon.png"));
 			JButton eraseTool = new JButton(new ImageIcon(eraserImage));
 			
 			eraseTool.setVisible(true);
@@ -325,7 +326,7 @@ public class MainView implements SessionObject, Serializable{
 	
 	private void buildTopToolBarBrushButton() {
 		try {
-			Image drawImage = ImageIO.read(this.getClass().getResource("/brushIcon.bmp"));
+			Image drawImage = ImageIO.read(this.getClass().getResource("/drawIcon.png"));
 			JButton brushTool = new JButton(new ImageIcon(drawImage));
 			
 			brushTool.setVisible(true);
@@ -350,8 +351,8 @@ public class MainView implements SessionObject, Serializable{
 	
 	private void buildTopToolBarPlayAndPauseButtons() {
 		try {
-			Image playImage = ImageIO.read(this.getClass().getResource("/playIcon.bmp"));
-			Image pauseImage = ImageIO.read(this.getClass().getResource("/pauseIcon.bmp"));
+			Image playImage = ImageIO.read(this.getClass().getResource("/playIcon.png"));
+			Image pauseImage = ImageIO.read(this.getClass().getResource("/pauseIcon.png"));
 			
 			JButton playTool = new JButton(new ImageIcon(playImage));
 			JButton pauseTool = new JButton(new ImageIcon(pauseImage));
@@ -382,7 +383,7 @@ public class MainView implements SessionObject, Serializable{
 	
 	private void buildTopToolBarEraseAllButton() {
 		try {
-			Image eraseAllImage = ImageIO.read(this.getClass().getResource("/eraseAllIcon.bmp"));
+			Image eraseAllImage = ImageIO.read(this.getClass().getResource("/eraseAllIcon.png"));
 			
 			JButton eraseAllTool = new JButton(new ImageIcon(eraseAllImage));
 			
@@ -421,7 +422,7 @@ public class MainView implements SessionObject, Serializable{
 	
 	private void buildTopToolBarColorPickerButton() {
 		try {
-			Image colorPickerImage = ImageIO.read(this.getClass().getResource("/colorPickerIcon.bmp"));
+			Image colorPickerImage = ImageIO.read(this.getClass().getResource("/colorPickerIcon.png"));
 			
 			JButton colorPickerTool = new JButton(new ImageIcon(colorPickerImage));
 			

@@ -172,7 +172,26 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 					parent.updateTimelineFromMouse(e);
 				}
 			});
+			
+			JMenuItem copyFramesFromCurrentLayerMenuItem = new JMenuItem(new AbstractAction("Copy frame from current time and layer") {
+				@Override
+				public void actionPerformed(ActionEvent ae) {
+					getSession().copyFramesFromCurrentLayerAndCurrentTime();
+					parent.updateTimelineFromMouse(e);
+				}
+			});
+			
+			JMenuItem pasteFramesOntoCurrentLayerMenuItem = new JMenuItem(new AbstractAction("Paste frame") {
+				@Override
+				public void actionPerformed(ActionEvent ae) {
+					getSession().pasteFramesToCurrentLayerAndCurrentTime();
+					parent.updateTimelineFromMouse(e);
+				}
+			});
+			
 			menu.add(recolorLayerMenuItem);
+			menu.add(copyFramesFromCurrentLayerMenuItem);
+			menu.add(pasteFramesOntoCurrentLayerMenuItem);
 		}
 		
 		menu.show(e.getComponent(), e.getX(), e.getY());

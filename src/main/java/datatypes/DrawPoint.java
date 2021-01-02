@@ -23,7 +23,7 @@ public class DrawPoint implements Serializable {
 		this.color = color;
 	}
 	
-	public DrawPoint createCopy() {
+	public DrawPoint deepCopy() {
 		Point newPoint = new Point(this.point.x, this.point.y);
 		EnumFactory.PaintSetting newSetting;
 		switch(this.setting) {

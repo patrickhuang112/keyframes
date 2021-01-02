@@ -21,6 +21,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import datatypes.DrawInstruction;
 import datatypes.DrawPoint;
 import datatypes.Layer;
 import datatypes.SessionObject;
@@ -68,7 +69,7 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 	
 	public void clearAll() {
 		currentDraggedPoints = null;
-		getSession().setCurrentLayerFrameAtCurrentTime(new ArrayList<>());
+		getSession().setCurrentLayerFrameAtCurrentTime(new DrawInstruction());
 		repaint();
 	}
 	public static void drawAndErasePoint(Graphics2D g2d, DrawPoint p) {
@@ -129,7 +130,7 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
  			for(int i = layers.size() - 1; i >= 0; i--) {
  				Layer layer = layers.get(i);
  				int time = getSession().getCurrentTimepoint();
- 				ArrayList<ArrayList<DrawPoint>> pointsList = layer.getPointCollectionAtTime(time);
+ 				DrawInstruction pointsList = layer.getPointCollectionAtTime(time);
  				if (pointsList != null) {
  					for(ArrayList<DrawPoint> points : pointsList) {
  	 	 				if(points.size() == 1) {

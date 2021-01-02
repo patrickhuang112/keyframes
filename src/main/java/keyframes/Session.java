@@ -17,6 +17,7 @@ import javax.swing.JSlider;
 import javax.swing.SwingWorker;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import datatypes.DrawInstruction;
 import datatypes.DrawPoint;
 import datatypes.KeyFrames;
 import datatypes.Layer;
@@ -66,7 +67,7 @@ public class Session implements Serializable {
 		KeyFrames drawFrames = 
 			new KeyFrames();
 		
-		drawFrames.put(0, new ArrayList<>());
+		drawFrames.put(0, new DrawInstruction());
 		Layer newLayer = new Layer(0, drawFrames);
 		newLayer.setSelected(true);
 		drawLayers.add(newLayer);
@@ -109,9 +110,11 @@ public class Session implements Serializable {
 	
 	private int longestTimepoint = longestTimeInSeconds * framesPerSecond;
 	// Current frames copied to clipboard
-	// Hashmap key: the number of the layer
-	// Hashmap entry: the frames associated with that layer
-	private KeyFrames clipboardFrames = null;
+	// SHould be an ArrayList of array list of draw points
+	
+	//WHY IS IT LIKE THIS INSTEAD OF JUST A SINGLE LAYER? 
+	//
+	private DrawInstruction clipboardFrames = null;
 	
 	
 	//-------------------------------------------------------------------------------------------------
@@ -150,7 +153,7 @@ public class Session implements Serializable {
 			gr.fillRect(0,0, drawWidth, drawHeight);
 			for(int i = drawLayers.size() - 1; i >= 0; i--) {
 				Layer layer = drawLayers.get(i);
-				ArrayList<ArrayList<DrawPoint>> pointsList = layer.getPointCollectionAtTime(t);
+				DrawInstruction pointsList = layer.getPointCollectionAtTime(t);
 				if (pointsList != null) {
 					for(ArrayList<DrawPoint> points : pointsList) {
 	 	 				if(points.size() == 1) {
@@ -492,30 +495,24 @@ public class Session implements Serializable {
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	//Copy stuff
-	private ArrayList<ArrayList<DrawPoint>> deepCopyFrames(ArrayList<ArrayList<DrawPoint>> originalFrame) {
-		ArrayList<ArrayList<DrawPoint>> res = new ArrayList<>();
-		for(ArrayList<DrawPoint> curInstruct : originalFrame) {
-			ArrayList<DrawPoint> newInstruct = new ArrayList<>();
-			for(DrawPoint curPoint : curInstruct) {
-				DrawPoint newPoint = curPoint.createCopy();
-				newInstruct.add(newPoint);
-			}
-			res.add(newInstruct);
+	
+	public void copyFramesFromSpecifiedLayerAndCurrentTime(int layerNum) {
+		clipboardFrames = getSpecifiedLayerFrameAtCurrentTime(layerNum);
+	}
+	
+	public void pasteFramesToSpecifiedLayerAndCurrentTime(int layerNum) {
+		if (clipboardFrames != null) {
+			setSpecifiedLayerFrameAtCurrentTime(clipboardFrames, layerNum);
+			refreshUI();
 		}
-		return res;
 	}
 	
 	public void copyFramesFromCurrentLayerAndCurrentTime() {
-		clipboardFrames = new KeyFrames();
-		clipboardFrames.put(getCurrentLayerNum(), getCurrentLayerFrameAtCurrentTime());
+		copyFramesFromSpecifiedLayerAndCurrentTime(getCurrentLayerNum());
 	}
 	
 	public void pasteFramesToCurrentLayerAndCurrentTime() {
-		if (clipboardFrames.containsKey(getCurrentLayerNum())) {
-			setCurrentLayerFrameAtCurrentTime(deepCopyFrames(clipboardFrames.get(getCurrentLayerNum())));
-			refreshUI();
-		}
+		pasteFramesToSpecifiedLayerAndCurrentTime(getCurrentLayerNum());
 	}	
 	
 	//-------------------------------------------------------------------------------------------------
@@ -550,6 +547,10 @@ public class Session implements Serializable {
 		return this.drawLayers.get(this.currentLayerNum);
 	}
 	
+	private Layer getSpecifiedLayer(int layerNum) {
+		return this.drawLayers.get(layerNum);
+	}
+	
 	// ADD LAYERS
 	public void addNewLayer() {
 		KeyFrames newDrawFrames = new KeyFrames();
@@ -573,41 +574,57 @@ public class Session implements Serializable {
 	
 	//DRAWABLE GET/SET FRAMEs
 	// Set the frame at a certain time point for the current layer frame
-	public void setCurrentLayerFrameAtTime(Integer timePoint, ArrayList<ArrayList<DrawPoint>> drawing) {
-		Layer curLayer = getCurrentLayer();
-		curLayer.getFrames().put(timePoint, drawing);
+	public void setLayerFrameAtTime(int layerNum, Integer timePoint, DrawInstruction drawing) {
+		Layer specifiedLayer = getSpecifiedLayer(layerNum);
+		specifiedLayer.getFrames().put(timePoint, drawing);
+	}
+	
+	public void setCurrentLayerFrameAtTime(Integer timePoint, DrawInstruction drawing) {
+		setLayerFrameAtTime(getCurrentLayerNum(), timePoint, drawing);
 	}
 	
 	// Returns an empty arraylist of draw instructions if there isn't anything currently at this time on
 	// the current layer
-	public ArrayList<ArrayList<DrawPoint>> getCurrentLayerFrameAtTime(Integer timePoint) {
-		Layer curLayer = getCurrentLayer();
-		HashMap<Integer,ArrayList<ArrayList<DrawPoint>>> drawFrames = curLayer.getFrames();
+	public DrawInstruction getLayerFrameAtTime(Integer layerNum, Integer timePoint) {
+		Layer specifiedLayer = getSpecifiedLayer(layerNum);
+		HashMap<Integer,DrawInstruction> drawFrames = specifiedLayer.getFrames();
 		if(drawFrames.containsKey(timePoint)) {
 			return drawFrames.get(timePoint);
 		} else {
-			setCurrentLayerFrameAtTime(timePoint, new ArrayList<>());
+			setCurrentLayerFrameAtTime(timePoint, new DrawInstruction());
 			return drawFrames.get(timePoint);
 		}
 	}
 	
-	public void setCurrentLayerFrameAtCurrentTime(ArrayList<ArrayList<DrawPoint>> drawing) {
-		setCurrentLayerFrameAtTime(currentTimepoint, drawing);
+	public DrawInstruction getCurrentLayerFrameAtTime(Integer timePoint) {
+		return getLayerFrameAtTime(getCurrentLayerNum(), timePoint);
 	}
 	
-	public ArrayList<ArrayList<DrawPoint>> getCurrentLayerFrameAtCurrentTime() {
-		return getCurrentLayerFrameAtTime(currentTimepoint);
+	public DrawInstruction getSpecifiedLayerFrameAtCurrentTime(Integer layerNum) {
+		return getLayerFrameAtTime(layerNum, getCurrentTimepoint());
+	}
+	
+	public void setSpecifiedLayerFrameAtCurrentTime(DrawInstruction drawing, int layerNum) {
+		setLayerFrameAtTime(layerNum, getCurrentTimepoint(), drawing);
+	}
+	
+	public void setCurrentLayerFrameAtCurrentTime(DrawInstruction drawing) {
+		setLayerFrameAtTime(getCurrentLayerNum(), getCurrentTimepoint(), drawing);
+	}
+	
+	public DrawInstruction getCurrentLayerFrameAtCurrentTime() {
+		return getCurrentLayerFrameAtTime(getCurrentTimepoint());
 	}
 	
 	public void addToCurrentLayerFrameAtCurrentTime(ArrayList<DrawPoint> newPoints) {
-		ArrayList<ArrayList<DrawPoint>> dps = getCurrentLayerFrameAtCurrentTime();
+		DrawInstruction dps = getCurrentLayerFrameAtCurrentTime();
 		dps.add(newPoints);
 	}
 	
 	public void eraseAllLayersAtCurrentFrame() {
 		for (Layer layer : drawLayers) {
 			KeyFrames frames = layer.getFrames();
-			frames.put(getCurrentTimepoint(), new ArrayList<>());
+			frames.put(getCurrentTimepoint(), new DrawInstruction());
 		}
 		refreshUI();
 	}
