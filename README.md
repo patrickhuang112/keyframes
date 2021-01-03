@@ -16,34 +16,22 @@ gradlew.bat run
 ```
 Linux/Mac
 ```
-./gradelw run
+./gradlew run
 ```
 
 If you would like clickable scripts instead, then follow these steps to first create and then run the scripts:
 Windows:
 ```
 .\gradlew.bat installDist
-```
-Linux/Mac
-```
-./gradelw installDist
-```
-From here, you can once again run these scripts from the command line or navigate through your operating system's file explorer and double click these scripts.
-<br>
-To run the script from the command line:
-Windows:
-```
 .\build\install\keyframes\bin\keyframes.bat
 ```
 Linux/Mac
 ```
+./gradlew installDist
 ./build/install/keyframes/bin/keyframes
 ```
-
-After building, you should have a built jar. Navigate to the folder with the built jar and execute the following command.
-```
-java -jar build/libs/keyframes-1.0-SNAPSHOT.jar
-```
+You can once again run these scripts by double clicking them in your operating system's file explorer.
+<br>
 
 ### Current Features:
 <ul>
