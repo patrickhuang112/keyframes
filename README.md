@@ -8,8 +8,7 @@ A Java Swing desktop application focusing on replicating animation features of A
 created in Keyframes.
 
 ## How to run 
-<ol>
-<li>
+
 Run the application directly from the command line with Gradle using the application plugin.
 Windows:
 ```
@@ -19,8 +18,7 @@ Linux/Mac
 ```
 ./gradelw run
 ```
-</li>
-<li>
+
 If you would like clickable scripts instead, then follow these steps to first create and then run the scripts:
 Windows:
 ```
@@ -41,9 +39,6 @@ Linux/Mac
 ```
 ./build/install/keyframes/bin/keyframes
 ```
-</li>
-</ol>
-
 
 After building, you should have a built jar. Navigate to the folder with the built jar and execute the following command.
 ```
