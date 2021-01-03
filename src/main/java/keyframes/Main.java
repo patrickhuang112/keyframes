@@ -39,6 +39,7 @@ public class Main {
 		System.out.println("App Started...");
 	}
 	
+	
 	private static void initializeLookAndFeel() {
 		try {
 			FlatDarkLaf.install();
@@ -47,4 +48,5 @@ public class Main {
 		       // handle exception
 	    }
 	}
+	
 }

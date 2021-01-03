@@ -7,19 +7,47 @@
 A Java Swing desktop application focusing on replicating animation features of Adobe After Effects. The above GIF was
 created in Keyframes.
 
-## How to build 
+## How to run 
+<ol>
+<li>
+Run the application directly from the command line with Gradle using the application plugin.
 Windows:
 ```
-./gradlew.bat build 
+gradlew.bat run 
 ```
 Linux/Mac
 ```
-./gradelw build
+./gradelw run
 ```
-## How to run
+</li>
+<li>
+If you would like clickable scripts instead, then follow these steps to first create and then run the scripts:
+Windows:
+```
+.\gradlew.bat installDist
+```
+Linux/Mac
+```
+./gradelw installDist
+```
+From here, you can once again run these scripts from the command line or navigate through your operating system's file explorer and double click these scripts.
+<br>
+To run the script from the command line:
+Windows:
+```
+.\build\install\keyframes\bin\keyframes.bat
+```
+Linux/Mac
+```
+./build/install/keyframes/bin/keyframes
+```
+</li>
+</ol>
+
+
 After building, you should have a built jar. Navigate to the folder with the built jar and execute the following command.
 ```
-java -jar build/libs/keyframes-1.0-SNAPSHOT
+java -jar build/libs/keyframes-1.0-SNAPSHOT.jar
 ```
 
 ### Current Features:
