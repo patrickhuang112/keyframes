@@ -182,7 +182,9 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 				@Override
 				public void actionPerformed(ActionEvent ae) {
 					Color newColor = JColorChooser.showDialog(null, "Choose a color", layer.getColor());
-					layer.setColor(newColor);
+					if (newColor != null) {
+						layer.setColor(newColor);
+					}
 					// We do this here to update the color of the layer straightaway
 					// Kind of messy butwhatever
 					parent.updateTimelineFromMouse(e);

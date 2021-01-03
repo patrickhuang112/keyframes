@@ -7,6 +7,8 @@ import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -15,13 +17,17 @@ import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import datatypes.DrawInstruction;
+import datatypes.DrawFrame;
 import datatypes.DrawPoint;
 import datatypes.Layer;
 import datatypes.SessionObject;
@@ -47,12 +53,45 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 		addMouseMotionListener(this);
 		getSession().setDrawPanel(this);
 		
+		this.addComponentListener(new ComponentListener() {
+
+			@Override
+			public void componentResized(ComponentEvent e) {
+				getSession().updateDrawFrameDimensions();
+			}
+
+			@Override
+			public void componentMoved(ComponentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void componentShown(ComponentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void componentHidden(ComponentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			
+		});
+		
 		// Using an invoke later because for some reason just doing it first here won't cause the panel to repaint
-		// initially
+		// initially. Same with getting the dimensions
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				getSession().setDrawablePanelBackgroundColor(getSession().defaultDrawPanelBackgroundColor);
+				Color backgroundColor = getSession().defaultDrawPanelBackgroundColor;
+				getSession().setDrawablePanelBackgroundColor(backgroundColor);
+				getSession().setEraserColor(backgroundColor);
+				// Once we now have access to the draw panel, we should also update all the draw frames in
+				// the layers with the new dimensions
+				getSession().updateDrawFrameDimensions();
 			}
 			
 		});
@@ -69,7 +108,7 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 	
 	public void clearAll() {
 		currentDraggedPoints = null;
-		getSession().setCurrentLayerFrameAtCurrentTime(new DrawInstruction());
+		getSession().setCurrentLayerFrameAtCurrentTime(new DrawFrame(getImageWidth(), getImageHeight()));
 		repaint();
 	}
 	public static void drawAndErasePoint(Graphics2D g2d, DrawPoint p) {
@@ -102,6 +141,55 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 		g2d.draw(gp);
 	}
 	
+	private void floodFillCurrentLayer(Point p) {
+		floodFillSpecifiedLayer(p, getSession().getCurrentLayerNum());
+	}
+	
+	private void floodFillSpecifiedLayer(Point p, int layerNum) {
+		int[] dxs = new int[] {-1,0,1,0};
+		int[] dys = new int[] {0,-1,0,1};
+  		Color newColor = getSession().getBrushColor();
+		DrawFrame df = getSession().getSpecifiedLayerFrameAtCurrentTime(layerNum);
+		Color oldColor = df.getColorAtPoint(p.x, p.y);
+		if (newColor.equals(oldColor)) {
+			return;
+		}
+		Queue<Point> q = new LinkedList<Point>();
+		int width = getImageWidth();
+		int height = getImageHeight();
+		boolean[][] visited = new boolean[height][width];
+		for(int r = 0; r < height; r++) {
+			for(int c = 0; c < width; c++) {
+				visited[r][c] = false;
+			}
+		}
+		q.add(p);
+		int j = 0;
+		while (!q.isEmpty() ) {
+			
+			Point np = q.remove();
+			visited[np.y][np.x] = true;
+			df.setColorAtPixelArrayPoint(newColor, np.x, np.y);
+			
+			
+			for (int i = 0; i < dxs.length; i++) {
+				int nx = np.x + dxs[i];
+				int ny = np.y + dys[i];
+				Point newp = new Point(nx, ny);
+				if(nx >= 0 && nx < width && ny >= 0 && ny < height && !visited[ny][nx] 
+						   && df.getColorAtPoint(nx, ny).equals(oldColor)) {
+					visited[ny][nx] = true;
+					q.add(newp);
+				}
+			}
+			j++;
+			
+		}
+		System.out.println(j);
+		//df.updateDrawFrameFromPixelArray();
+
+	}
+	
 	@Override
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
@@ -112,46 +200,33 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 		// which means now calling this is just getting the most up to date point collection, I'm not actually
 		// overwriting (which it may seem like I'm doing at first)
 		// pointCollection = parent.getSession().getCurrentLayerFrameAtCurrentTime();
-		BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), 
-				BufferedImage.TYPE_INT_RGB);
-		Graphics2D imgG = img.createGraphics();
-		imgG.setPaint(parent.getSession().getDrawablePanelBackgroundColor());
-		imgG.fillRect(0,0, this.getWidth(), this.getHeight());
+		//BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+		//Graphics2D imgG = img.createGraphics();
+		//g2d.setPaint(parent.getSession().getDrawablePanelBackgroundColor());
+		//g2d.fillRect(0,0, this.getWidth(), this.getHeight());
 		
-		// WHy do i create two graphics here?
-		// I create two graphics because imgG is for when rendering, i needed the Buffered image,
-		// so this is why I draw to two different graphics
-		// g2d is for the screen, imgG is for rendering later.
-		Graphics2D[] allGraphics = new Graphics2D[] {g2d, imgG};
- 		for(Graphics2D gr : allGraphics) {
- 			ArrayList<Layer> layers = getSession().getLayers();
- 			// Start from the bottom layer, thats the first one we want to draw, and draw higher layers
- 			// on top of bottom layers
- 			for(int i = layers.size() - 1; i >= 0; i--) {
- 				Layer layer = layers.get(i);
- 				int time = getSession().getCurrentTimepoint();
- 				DrawInstruction pointsList = layer.getPointCollectionAtTime(time);
- 				if (pointsList != null) {
- 					for(ArrayList<DrawPoint> points : pointsList) {
- 	 	 				if(points.size() == 1) {
- 	 	 					DrawablePanel.drawAndErasePoint(gr, points.get(0));
- 	 	 				} else {
- 	 	 					DrawablePanel.drawAndErasePath(gr, points);
- 	 	 				}
- 	 	 			}
- 				}			
- 	 			
- 	 			// The currently dragged stuff
- 	 			if(getSession().getCurrentLayerNum() == i && currentDraggedPoints != null) {
- 	 				DrawablePanel.drawAndErasePath(gr, currentDraggedPoints);
- 	 			}
- 			}
+
+		ArrayList<Layer> layers = getSession().getLayers();
+		// Start from the bottom layer, thats the first one we want to draw, and draw higher layers
+		// on top of bottom layers
+		for(int i = layers.size() - 1; i >= 0; i--) {
+			Layer layer = layers.get(i);
+			int time = getSession().getCurrentTimepoint();
+			DrawFrame layerImg = layer.getPointCollectionAtTime(time);
+			if (layerImg != null) {
+				g2d.drawImage(layerImg,0,0,this);
+			}			
  			
- 		}
-		updateSession(img);
+ 			// The currently dragged stuff
+ 			if(getSession().getCurrentLayerNum() == i && currentDraggedPoints != null) {
+ 				DrawablePanel.drawAndErasePath(g2d, currentDraggedPoints);
+ 			}
+		}
+ 			
+		updateSession();
 	}
 
-	private void updateSession(BufferedImage img) {
+	private void updateSession() {
 		getSession().refreshUI();
 	}
 	
@@ -194,18 +269,21 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 			int drawSize;
 			Point point = e.getPoint();
 			Color pointColor;
-			
-			ArrayList<DrawPoint> singlePointCollection = new ArrayList<>();
 			setting = parent.getSession().getPaintSetting();
-			drawSize = setting == EnumFactory.PaintSetting.DRAW 
-					? parent.getSession().getBrushSize()
-					: parent.getSession().getEraserSize();
-			pointColor = setting == EnumFactory.PaintSetting.DRAW 
-					? parent.getSession().getBrushColor()
-					: parent.getSession().getEraserColor();	
 			
-			singlePointCollection.add(new DrawPoint(point, drawSize, setting, pointColor));
-			getSession().addToCurrentLayerFrameAtCurrentTime(singlePointCollection);
+			if (setting == EnumFactory.PaintSetting.FILLSINGLE) {
+				floodFillCurrentLayer(point);
+			} else if (setting == EnumFactory.PaintSetting.DRAW || setting == EnumFactory.PaintSetting.ERASE) {
+				ArrayList<DrawPoint> singlePointCollection = new ArrayList<>();
+				drawSize = setting == EnumFactory.PaintSetting.DRAW 
+						? parent.getSession().getBrushSize()
+						: parent.getSession().getEraserSize();
+				pointColor = setting == EnumFactory.PaintSetting.DRAW 
+						? parent.getSession().getBrushColor()
+						: parent.getSession().getEraserColor();	
+				singlePointCollection.add(new DrawPoint(point, drawSize, setting, pointColor));
+				getSession().addToCurrentLayerFrameAtCurrentTime(singlePointCollection);
+			}
 			repaint();
 		}
 	}

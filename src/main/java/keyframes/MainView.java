@@ -98,9 +98,9 @@ public class MainView implements SessionObject, Serializable{
 
 	public void buildUI() {
 		mainWindow.setBackground(Color.blue);
-		setKeyMaps();
-		buildTopBar();
 		buildDrawableAndTimeline();
+		buildTopBar();
+		setKeyMaps();
 		parent.revalidate();
 		parent.repaint();
 		
@@ -251,7 +251,10 @@ public class MainView implements SessionObject, Serializable{
 			public void actionPerformed(ActionEvent e) {
 				Color current = getSession().getDrawablePanelBackgroundColor();
 				Color newColor = JColorChooser.showDialog(null, "Choose a new background color", current);
-				getSession().setDrawablePanelBackgroundColor(newColor);
+				if (newColor != null) {
+					getSession().setDrawablePanelBackgroundColor(newColor);
+					getSession().setEraserColor(newColor);
+				}
 			}
 		});
 		
@@ -433,13 +436,36 @@ public class MainView implements SessionObject, Serializable{
 				public void mouseClicked(MouseEvent e) {
 					Color current = getSession().getBrushColor();
 					Color newColor = JColorChooser.showDialog(null, "Choose a color", current);
-					getSession().setBrushColor(newColor);
+					if (newColor != null) {
+						getSession().setBrushColor(newColor);
+					}
 				}
 			});
 			
 			topToolBar.add(colorPickerTool);
 		} catch(Exception e) {
 			System.out.println("ColorPicker Icon creation failed");
+		}
+	}
+	
+	private void buildTopToolBarFillButton() {
+		try {
+			Image fillImage = ImageIO.read(this.getClass().getResource("/fillIcon.png"));
+			
+			JButton fillTool = new JButton(new ImageIcon(fillImage));
+			
+			fillTool.setVisible(true);
+			fillTool.setPreferredSize(new Dimension(30,30));
+			fillTool.addMouseListener(new MouseAdapter( ) {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					getSession().setPaintSetting(EnumFactory.PaintSetting.FILLSINGLE);
+				}
+			});
+			
+			topToolBar.add(fillTool);
+		} catch(Exception e) {
+			System.out.println("Fill Icon creation failed");
 		}
 	}
 	
@@ -450,6 +476,7 @@ public class MainView implements SessionObject, Serializable{
 			buildTopToolBarEraseAllButton();
 			buildTopToolBarPlayAndPauseButtons();
 			buildTopToolBarColorPickerButton();
+			buildTopToolBarFillButton();
 		} catch (Exception e) {
 			System.out.println("Icon creation failed");
 		}

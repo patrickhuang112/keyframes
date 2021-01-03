@@ -15,6 +15,10 @@ public class EnumFactory implements Serializable{
 	public enum PaintSetting {
 		NONE,
 		DRAW,
-		ERASE
+		ERASE,
+		//Floodfill with respect to a single layer
+		FILLSINGLE,
+		//FOodfill with respect to pixels from all layers
+		FILLALL
 	}
 }

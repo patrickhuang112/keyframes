@@ -161,7 +161,7 @@ public class Layer extends JPanel implements Serializable {
 		this.layerNum = num;
 	}
 	
-	public DrawInstruction getPointCollectionAtTime(Integer time) {
+	public DrawFrame getPointCollectionAtTime(Integer time) {
 		return frames.get(time);
 	}
 	

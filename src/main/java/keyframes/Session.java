@@ -17,7 +17,7 @@ import javax.swing.JSlider;
 import javax.swing.SwingWorker;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-import datatypes.DrawInstruction;
+import datatypes.DrawFrame;
 import datatypes.DrawPoint;
 import datatypes.KeyFrames;
 import datatypes.Layer;
@@ -40,6 +40,8 @@ public class Session implements Serializable {
 	public final int lengthMin = 0;
 	public final int lengthMax = 20;
 	public final Color defaultDrawPanelBackgroundColor = Color.gray;
+	private final int defaultDrawPanelWidth = 1000;
+	private final int defaultDrawPanelHeight = 500;
 	public int minTimepoint = 0;
 
 	public Session(SessionSave ss) {
@@ -67,7 +69,8 @@ public class Session implements Serializable {
 		KeyFrames drawFrames = 
 			new KeyFrames();
 		
-		drawFrames.put(0, new DrawInstruction());
+		drawFrames.put(0, new DrawFrame(defaultDrawPanelWidth, defaultDrawPanelHeight));
+		
 		Layer newLayer = new Layer(0, drawFrames);
 		newLayer.setSelected(true);
 		drawLayers.add(newLayer);
@@ -80,6 +83,7 @@ public class Session implements Serializable {
 		longestTimepoint = longestTimeInSeconds * framesPerSecond;
 	}
 	
+	 
 	
 	private Integer currentLayerNum = 0;
 	private String savePath = null;
@@ -89,9 +93,8 @@ public class Session implements Serializable {
 	private TimelineLayersPanel timelineLayersPanel = null;
 	private TimelineSlider timelineSlider = null;
 	
-	
 	private Color brushColor = Color.red;
-	private Color eraserColor = Color.white;
+	private Color eraserColor;
 	private int brushSize;
 	private int eraserSize;
 	private EnumFactory.PaintSetting paintSetting = EnumFactory.PaintSetting.DRAW;
@@ -114,7 +117,7 @@ public class Session implements Serializable {
 	
 	//WHY IS IT LIKE THIS INSTEAD OF JUST A SINGLE LAYER? 
 	//
-	private DrawInstruction clipboardFrames = null;
+	private DrawFrame clipboardFrames = null;
 	
 	
 	//-------------------------------------------------------------------------------------------------
@@ -153,16 +156,8 @@ public class Session implements Serializable {
 			gr.fillRect(0,0, drawWidth, drawHeight);
 			for(int i = drawLayers.size() - 1; i >= 0; i--) {
 				Layer layer = drawLayers.get(i);
-				DrawInstruction pointsList = layer.getPointCollectionAtTime(t);
-				if (pointsList != null) {
-					for(ArrayList<DrawPoint> points : pointsList) {
-	 	 				if(points.size() == 1) {
-	 	 					DrawablePanel.drawAndErasePoint(gr, points.get(0));
-	 	 				} else {
-	 	 					DrawablePanel.drawAndErasePath(gr, points);
-	 	 				}
-	 	 			}
-				}			
+				DrawFrame df = layer.getPointCollectionAtTime(t);
+				gr.drawImage(df, 0, 0, null);
 			}
 			drawImages.put(t, img);
 		}
@@ -231,14 +226,6 @@ public class Session implements Serializable {
 	
 	//-------------------------------------------------------------------------------------------------	
 	// These are for rendering stuff (what size was our drawings)
-	
-	public int getDrawablePaneWidth() {
-		return drawPanel.getWidth();
-	}
-	
-	public int getDrawablePaneHeight() {
-		return drawPanel.getHeight();
-	}
 	
 	public void updateProgressBar(int progress) {
 		progressBar.updateProgressBar(progress);
@@ -543,7 +530,7 @@ public class Session implements Serializable {
 		this.currentLayerNum = num;
 	}
 	
-	private Layer getCurrentLayer () {
+	private Layer getCurrentLayer() {
 		return this.drawLayers.get(this.currentLayerNum);
 	}
 	
@@ -574,57 +561,59 @@ public class Session implements Serializable {
 	
 	//DRAWABLE GET/SET FRAMEs
 	// Set the frame at a certain time point for the current layer frame
-	public void setLayerFrameAtTime(int layerNum, Integer timePoint, DrawInstruction drawing) {
+	public void setLayerFrameAtTime(int layerNum, Integer timePoint, DrawFrame drawing) {
 		Layer specifiedLayer = getSpecifiedLayer(layerNum);
 		specifiedLayer.getFrames().put(timePoint, drawing);
 	}
 	
-	public void setCurrentLayerFrameAtTime(Integer timePoint, DrawInstruction drawing) {
+	public void setCurrentLayerFrameAtTime(Integer timePoint, DrawFrame drawing) {
 		setLayerFrameAtTime(getCurrentLayerNum(), timePoint, drawing);
 	}
 	
 	// Returns an empty arraylist of draw instructions if there isn't anything currently at this time on
 	// the current layer
-	public DrawInstruction getLayerFrameAtTime(Integer layerNum, Integer timePoint) {
+	public DrawFrame getLayerFrameAtTime(Integer layerNum, Integer timePoint) {
 		Layer specifiedLayer = getSpecifiedLayer(layerNum);
-		HashMap<Integer,DrawInstruction> drawFrames = specifiedLayer.getFrames();
+		HashMap<Integer,DrawFrame> drawFrames = specifiedLayer.getFrames();
 		if(drawFrames.containsKey(timePoint)) {
 			return drawFrames.get(timePoint);
 		} else {
-			setCurrentLayerFrameAtTime(timePoint, new DrawInstruction());
+			setCurrentLayerFrameAtTime(timePoint, new DrawFrame(defaultDrawPanelWidth, defaultDrawPanelHeight));
 			return drawFrames.get(timePoint);
 		}
 	}
 	
-	public DrawInstruction getCurrentLayerFrameAtTime(Integer timePoint) {
+	public DrawFrame getCurrentLayerFrameAtTime(Integer timePoint) {
 		return getLayerFrameAtTime(getCurrentLayerNum(), timePoint);
 	}
 	
-	public DrawInstruction getSpecifiedLayerFrameAtCurrentTime(Integer layerNum) {
+	public DrawFrame getSpecifiedLayerFrameAtCurrentTime(Integer layerNum) {
 		return getLayerFrameAtTime(layerNum, getCurrentTimepoint());
 	}
 	
-	public void setSpecifiedLayerFrameAtCurrentTime(DrawInstruction drawing, int layerNum) {
+	public void setSpecifiedLayerFrameAtCurrentTime(DrawFrame drawing, int layerNum) {
 		setLayerFrameAtTime(layerNum, getCurrentTimepoint(), drawing);
 	}
 	
-	public void setCurrentLayerFrameAtCurrentTime(DrawInstruction drawing) {
+	public void setCurrentLayerFrameAtCurrentTime(DrawFrame drawing) {
 		setLayerFrameAtTime(getCurrentLayerNum(), getCurrentTimepoint(), drawing);
 	}
 	
-	public DrawInstruction getCurrentLayerFrameAtCurrentTime() {
+	public DrawFrame getCurrentLayerFrameAtCurrentTime() {
 		return getCurrentLayerFrameAtTime(getCurrentTimepoint());
 	}
 	
 	public void addToCurrentLayerFrameAtCurrentTime(ArrayList<DrawPoint> newPoints) {
-		DrawInstruction dps = getCurrentLayerFrameAtCurrentTime();
-		dps.add(newPoints);
+		DrawFrame dps = getCurrentLayerFrameAtCurrentTime();
+		Graphics2D g2d = dps.createGraphics();
+		DrawablePanel.drawAndErasePath(g2d, newPoints);
+		dps.refreshPixelArray();
 	}
 	
 	public void eraseAllLayersAtCurrentFrame() {
 		for (Layer layer : drawLayers) {
 			KeyFrames frames = layer.getFrames();
-			frames.put(getCurrentTimepoint(), new DrawInstruction());
+			frames.put(getCurrentTimepoint(), new DrawFrame(defaultDrawPanelWidth, defaultDrawPanelHeight));
 		}
 		refreshUI();
 	}
@@ -634,6 +623,29 @@ public class Session implements Serializable {
 	
 	public Integer getSpacingBetweenTicks() {
 		return spaceBetweenTicks;
+	}
+	
+	public int getDrawablePaneWidth() {
+		return drawPanel.getImageWidth();
+	}
+	
+	public int getDrawablePaneHeight() {
+		return drawPanel.getImageHeight();
+	}
+	
+	// This is called whenever the draw panel is resized or when it is first created
+	public void updateDrawFrameDimensions() {
+		for (Layer layer : getLayers()) {
+			KeyFrames kf = layer.getFrames();
+			for (Integer t : kf.keySet()) {
+				DrawFrame df = kf.get(t);
+				int newWidth = getDrawablePaneWidth();
+				int newHeight = getDrawablePaneHeight();
+				DrawFrame newDf = DrawFrame.createResizedCopy(df, newWidth, newHeight);
+				kf.put(t, newDf);
+			}
+		}
+
 	}
 	
 	//These two basically just create a new composition..., are they really even needed
