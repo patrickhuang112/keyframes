@@ -20,6 +20,7 @@ Linux/Mac
 ```
 
 If you would like clickable scripts instead, then follow these steps to first create and then run the scripts:
+<br>
 Windows:
 ```
 .\gradlew.bat installDist
