@@ -10,6 +10,8 @@ created in Keyframes.
 ## How to run 
 
 Run the application directly from the command line with Gradle using the application plugin.
+<br>
+<br>
 Windows:
 ```
 gradlew.bat run 
@@ -20,6 +22,7 @@ Linux/Mac
 ```
 
 If you would like clickable scripts instead, then follow these steps to first create and then run the scripts:
+<br>
 <br>
 Windows:
 ```
