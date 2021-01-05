@@ -4,7 +4,7 @@
 /.settings/
 /.gradle/
 /images/
-*.ser
+*.kfpf
 
 # Ignore Gradle project-specific cache directory
 .gradle
