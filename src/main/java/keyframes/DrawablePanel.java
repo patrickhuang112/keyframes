@@ -63,19 +63,16 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 			@Override
 			public void componentMoved(ComponentEvent e) {
 				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void componentShown(ComponentEvent e) {
 				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void componentHidden(ComponentEvent e) {
 				// TODO Auto-generated method stub
-				
 			}
 
 			

@@ -68,9 +68,14 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		if(addToParent) { 
 			this.parent.getMainComponent().add(mainTimelinePanel, BorderLayout.PAGE_END);
 		}
+		
+		int dpw = MagicValues.drawablePanelDefaultPreferredWidth;
+		int dph = MagicValues.drawablePanelDefaultPreferredHeight;
+		int dmw = MagicValues.drawablePanelDefaultPreferredWidth;
+		int dmh = MagicValues.drawablePanelDefaultPreferredHeight;
 		// Default heights of the timeline on the bottom
-		setPreferredSize(new Dimension(0,200));
-		setMinimumSize(new Dimension(0, 200));
+		setPreferredSize(new Dimension(dpw,dph));
+		setMinimumSize(new Dimension(dmw, dmh));
 		
 	}
 	
@@ -161,29 +166,35 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					updateTimelineFromMouse(e);
+					updateTimelineCurrentTimepointFromMouse(e);
 				}
 			}
 		});
 		timelineSlider.addMouseMotionListener(new MouseAdapter() {
 			@Override 
 			public void mouseDragged(MouseEvent e) {
-				updateTimelineFromMouse(e);
+				if(SwingUtilities.isLeftMouseButton(e)) {
+					updateTimelineCurrentTimepointFromMouse(e);
+				}
 			}
 		});
 	}
 	
 	public void buildUI() {
+
+		int w = MagicValues.timelineMainTimelinePanelPreferredWidth;
+		int h = MagicValues.timelineMainTimelinePanelPreferredHeight;
+		
 		mainTimelinePanel.setBackground(Color.gray);
-		//CHANGELATER
-		mainTimelinePanel.setPreferredSize(new Dimension(0,200));
+		mainTimelinePanel.setPreferredSize(new Dimension(w,h));
 		mainTimelinePanel.setLayout(new BorderLayout());
 		buildSlider();
 		buildLayers();
 		
 	}
 	
-	public void updateTimelineFromMouse(MouseEvent e) {
+	// Updates the wedge and the black line from regular mouse clicks
+	public void updateTimelineCurrentTimepointFromMouse(MouseEvent e) {
 		TimelineSliderUI ui = timelineSlider.getUI();
 	    int value = ui.valueForXPosition(e.getX());
 	    getSession().updateTimelineFromValue(value);

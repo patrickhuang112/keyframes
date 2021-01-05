@@ -30,9 +30,16 @@ public class Drawable implements UIComponent, Serializable {
 		if(addToParent) {
 			parent.getMainComponent().add(drawPanel, BorderLayout.CENTER);
 		}
+		
+		int defaultMinW = MagicValues.drawablePanelDefaultMinWidth;
+		int defaultMinH = MagicValues.drawablePanelDefaultMinHeight;
+		int defaultPrefW = MagicValues.drawablePanelDefaultPreferredWidth;
+		int defaultPrefH = MagicValues.drawablePanelDefaultPreferredHeight;
+		
+		
 		// Set default heights
-		drawPanel.setMinimumSize(new Dimension(0, 200));
-		drawPanel.setPreferredSize(new Dimension(0, 500));
+		drawPanel.setMinimumSize(new Dimension(defaultMinW, defaultMinH));
+		drawPanel.setPreferredSize(new Dimension(defaultPrefW, defaultPrefH));
 	}
 	
 	public void buildUI() {

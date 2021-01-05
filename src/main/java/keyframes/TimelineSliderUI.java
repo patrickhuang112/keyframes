@@ -55,11 +55,11 @@ public class TimelineSliderUI extends BasicSliderUI {
 		gp.moveTo(midx, bottomy);
 		
 		g2d.setPaint(Color.black);
-		s = new BasicStroke(5, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+		s = new BasicStroke(MagicValues.timelineSliderUIDefaultTimeIndicatorLineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2d.setStroke(s);
 		
 		// 50 is an arbitrary number just to make sure it draws on the screen properly
-		gp.lineTo(midx, bottomy+50);
+		gp.lineTo(midx, bottomy + MagicValues.timelineSliderUIDefaultTimeIndicatorLineYLength);
 		
 		g2d.draw(gp);
 	}

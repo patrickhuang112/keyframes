@@ -40,8 +40,6 @@ public class Session implements Serializable {
 	public final int lengthMin = 0;
 	public final int lengthMax = 20;
 	public final Color defaultDrawPanelBackgroundColor = Color.gray;
-	private final int defaultDrawPanelWidth = 1000;
-	private final int defaultDrawPanelHeight = 500;
 	public int minTimepoint = 0;
 
 	public Session(SessionSave ss) {
@@ -69,7 +67,10 @@ public class Session implements Serializable {
 		KeyFrames drawFrames = 
 			new KeyFrames();
 		
-		drawFrames.put(0, new DrawFrame(defaultDrawPanelWidth, defaultDrawPanelHeight));
+		int dw = MagicValues.drawablePanelDefaultPreferredWidth;
+		int dh = MagicValues.drawablePanelDefaultPreferredHeight;
+		
+		drawFrames.put(0, new DrawFrame(dw, dh));
 		
 		Layer newLayer = new Layer(0, drawFrames);
 		newLayer.setSelected(true);
@@ -578,7 +579,10 @@ public class Session implements Serializable {
 		if(drawFrames.containsKey(timePoint)) {
 			return drawFrames.get(timePoint);
 		} else {
-			setCurrentLayerFrameAtTime(timePoint, new DrawFrame(defaultDrawPanelWidth, defaultDrawPanelHeight));
+			int dw = MagicValues.drawablePanelDefaultPreferredWidth;
+			int dh = MagicValues.drawablePanelDefaultPreferredHeight;
+			
+			setCurrentLayerFrameAtTime(timePoint, new DrawFrame(dw, dh));
 			return drawFrames.get(timePoint);
 		}
 	}
@@ -611,9 +615,11 @@ public class Session implements Serializable {
 	}
 	
 	public void eraseAllLayersAtCurrentFrame() {
+		int dw = MagicValues.drawablePanelDefaultPreferredWidth;
+		int dh = MagicValues.drawablePanelDefaultPreferredHeight;
 		for (Layer layer : drawLayers) {
 			KeyFrames frames = layer.getFrames();
-			frames.put(getCurrentTimepoint(), new DrawFrame(defaultDrawPanelWidth, defaultDrawPanelHeight));
+			frames.put(getCurrentTimepoint(), new DrawFrame(dw, dh));
 		}
 		refreshUI();
 	}

@@ -18,7 +18,7 @@ public class DrawFrame extends BufferedImage {
 	private int width;
 	private int height;
 	// R,G,B,A
-	final int numChannels = 4;
+	private final int numChannels = 4;
 	
 	public DrawFrame(int width, int height) {
 		this(width, height, BufferedImage.TYPE_4BYTE_ABGR);

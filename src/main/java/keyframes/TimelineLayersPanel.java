@@ -39,9 +39,9 @@ import datatypes.UIComponent;
 public class TimelineLayersPanel extends JScrollPane implements SessionObject, Serializable{
 	
 	// Set this manually cause I couldn't get other things to work
-	private double sliderBarx = 5;
+	private double sliderBarx = MagicValues.timelineLayersPanelDefaultTimeIndicatorLineX;
 	private Timeline parent;
-	private final int offset = 5;
+	private final int offset = MagicValues.timelineLayersPanelDefaultTimeIndicatorLineOffset;
 	private JViewport viewport;
 	private JPanel layersParentPane;
 	
@@ -83,7 +83,7 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 			
 			@Override
 			public void mousePressed(MouseEvent e) {
-				parent.updateTimelineFromMouse(e);
+				
 				Layer layer = selectLayer(e);
 				if (SwingUtilities.isLeftMouseButton(e) && layer != null) {
 					layerBeingDragged = layer;
@@ -99,10 +99,8 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 				                	if (layerBeingDragged != null) {
 				                		layerBeingDragged.setGhost(true);
 				                	}
-				                	
 				                }
-				                //300 kind of aribitrary, just thought it looked okay
-				            }, 100);
+				            }, MagicValues.timelineLayersPanelDefaultWaitTimeBeforeGhostActivatesAfterClick);
 				}
 			}
 			
@@ -139,12 +137,7 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 							break;
 						}
 					}
-					
 				}
-				// This includes the timeline redraw refresh (so the timeline visual will be updated) 
-				// so have this at the end after all the stuff above
-				
-				parent.updateTimelineFromMouse(e);
 			}
 		});
 	}
@@ -177,7 +170,6 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 		Layer layer = selectLayer(e);
 		if (layer != null) {
 			// We do this first here, JUST so the selected black box shows around the layer
-			parent.updateTimelineFromMouse(e);
 			JMenuItem recolorLayerMenuItem = new JMenuItem(new AbstractAction("Change layer color") {
 				@Override
 				public void actionPerformed(ActionEvent ae) {
@@ -187,7 +179,6 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 					}
 					// We do this here to update the color of the layer straightaway
 					// Kind of messy butwhatever
-					parent.updateTimelineFromMouse(e);
 				}
 			});
 			
@@ -195,7 +186,6 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 				@Override
 				public void actionPerformed(ActionEvent ae) {
 					getSession().copyFramesFromCurrentLayerAndCurrentTime();
-					parent.updateTimelineFromMouse(e);
 				}
 			});
 			
@@ -203,7 +193,6 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 				@Override
 				public void actionPerformed(ActionEvent ae) {
 					getSession().pasteFramesToCurrentLayerAndCurrentTime();
-					parent.updateTimelineFromMouse(e);
 				}
 			});
 			
@@ -217,7 +206,7 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 	
 	public void updateTimelineFromMouseClick(MouseEvent e) {
 		selectLayer(e);
-		parent.updateTimelineFromMouse(e);
+		parent.updateTimelineCurrentTimepointFromMouse(e);
 		
 	}
 	
@@ -267,14 +256,14 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 		BasicStroke s = null;
 		
 		// Big values just to make sure it draws over the whole panel, look for a cleaner solution some other time
-		gp.moveTo(sliderBarx, this.getY()-1000);
+		gp.moveTo(sliderBarx, this.getY() - MagicValues.timelineLayersPanelDefaultTimeIndicatorLineYRadius);
 		
 		g2d.setPaint(Color.black);
 		s = new BasicStroke(5, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2d.setStroke(s);
 		
 		// Big values just to make sure it draws over the whole panel, look for a cleaner solution some other time
-		gp.lineTo(sliderBarx, this.getY()+1000);
+		gp.lineTo(sliderBarx, this.getY() + MagicValues.timelineLayersPanelDefaultTimeIndicatorLineYRadius);
 		
 		g2d.draw(gp);
 			

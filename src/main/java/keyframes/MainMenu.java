@@ -43,10 +43,15 @@ public class MainMenu implements Serializable {
 	
 	public void buildUI() {
 		
+		int lpw = MagicValues.mainMenuLeftPanelDefaultPreferredWidth;
+		int lph = MagicValues.mainMenuLeftPanelDefaultPreferredHeight;
+		int rpw = MagicValues.mainMenuLeftPanelDefaultPreferredWidth;
+		int rph = MagicValues.mainMenuLeftPanelDefaultPreferredHeight;
+		
 		JPanel leftPanel = new JPanel();
-		leftPanel.setPreferredSize(new Dimension(400,400));
+		leftPanel.setPreferredSize(new Dimension(lpw,lph));
 		JPanel rightPanel = new JPanel();
-		rightPanel.setPreferredSize(new Dimension(400,400));
+		rightPanel.setPreferredSize(new Dimension(rpw,rph));
 		parent.add(leftPanel, BorderLayout.LINE_START);
 		parent.add(rightPanel, BorderLayout.LINE_END);
 		
@@ -65,11 +70,16 @@ public class MainMenu implements Serializable {
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		
-		gbc.insets = new Insets(10,10,10,10);
+		int iSize = MagicValues.mainMenuInsetsDefaultSize;
+		int bW = MagicValues.mainMenuButtonsDefaultWidth;
+		int bH = MagicValues.mainMenuButtonsDefaultHeight;
+		
+		
+		gbc.insets = new Insets(iSize, iSize, iSize, iSize);
 		
 		JButton newProjectButton = new JButton("New Project");
 		newProjectButton.setEnabled(true);
-		newProjectButton.setPreferredSize(new Dimension(200, 80));
+		newProjectButton.setPreferredSize(new Dimension(bW, bH));
 		newProjectButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				parent.getContentPane().removeAll();
@@ -84,7 +94,7 @@ public class MainMenu implements Serializable {
 
 		JButton loadProjectButton = new JButton("Load Project");
 		loadProjectButton.setEnabled(true);
-		loadProjectButton.setPreferredSize(new Dimension(200, 80));
+		loadProjectButton.setPreferredSize(new Dimension(bW, bH));
 		loadProjectButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -97,7 +107,7 @@ public class MainMenu implements Serializable {
 		
 		JButton settingsButton = new JButton("Settings");
 		settingsButton.setEnabled(true);
-		settingsButton.setPreferredSize(new Dimension(200, 80));
+		settingsButton.setPreferredSize(new Dimension(bW, bH));
 		settingsButton.addActionListener(new ActionListener() {
 
 			@Override

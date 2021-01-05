@@ -6,6 +6,11 @@ import java.util.HashMap;
 // This is just so I don't have to type out HashMap.... every time I want to reference this
 public class KeyFrames extends HashMap<Integer, DrawFrame> {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6886525495832130360L;
+
 	public KeyFrames() {
 		super();
 	}

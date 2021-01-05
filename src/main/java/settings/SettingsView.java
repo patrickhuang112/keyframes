@@ -19,8 +19,10 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.plaf.basic.BasicSliderUI;
 
 import factories.SliderFactory;
 import keyframes.MainMenu;
@@ -86,11 +88,7 @@ public class SettingsView {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				settings.setBrushSize(brushSizeSlider.getValue());
-				settings.setEraserSize(eraserSizeSlider.getValue());
-				settings.setFps(fpsSlider.getValue());
-				settings.setCompLength(compositionLengthSlider.getValue());
-				System.out.println("Settings updated!");
+				applySettings();
 			}
 		});
 		applyButton.setVisible(true);
@@ -118,6 +116,7 @@ public class SettingsView {
 		
 		fpsSlider = SliderFactory.createBasicSettingsSlider(settings.getFps(), 
 				settings.fpsMin, settings.fpsMax);
+		
 		
 		compositionLengthSlider = SliderFactory.createBasicFiveTickSlider(settings.getCompLength(), 
 				settings.lengthMin, settings.lengthMax);
@@ -161,10 +160,46 @@ public class SettingsView {
 		JLabel compText = new JLabel("Composition Length");
 		settingsPanel.add(compText, gbc);
 		
+		
 		gbc.gridx = 1;
 		gbc.weightx = .5;
 		settingsPanel.add(compositionLengthSlider, gbc);
 		
 		parent.add(settingsPanel, BorderLayout.CENTER);
 	}
+	
+	private void applySettings() {
+		int brushSizeVal = brushSizeSlider.getValue();
+		int eraserSizeVal = eraserSizeSlider.getValue();
+		int fpsVal = fpsSlider.getValue();
+		int compLengthVal = compositionLengthSlider.getValue();
+		
+		if (brushSizeVal == 0) {
+			brushSizeVal++;
+			brushSizeSlider.setValue(brushSizeVal);
+		}
+		if (eraserSizeVal == 0) {
+			eraserSizeVal++;
+			eraserSizeSlider.setValue(eraserSizeVal);
+		}
+		if (fpsVal == 0) {
+			fpsVal++;
+			fpsSlider.setValue(fpsVal);
+		}
+		if (compLengthVal == 0) {
+			compLengthVal++;
+			compositionLengthSlider.setValue(compLengthVal);
+		}
+		
+		settings.setBrushSize(brushSizeVal);
+		settings.setEraserSize(eraserSizeVal);
+		settings.setFps(fpsVal);
+		settings.setCompLength(compLengthVal);
+		refreshUI();
+	}
+	
+	private void refreshUI() {
+		// Empty for now
+	}
+	
 }

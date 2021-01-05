@@ -163,9 +163,13 @@ public class MainView implements SessionObject, Serializable{
 	}
 	
 	private void buildTopBar() {
+		
+		int tw = MagicValues.mainViewTopBarDefaultWidth;
+		int th = MagicValues.mainViewTopBarDefaultHeight;
+		
 		topBar = new JPanel();
 		topBar.setLayout(new BorderLayout());
-		topBar.setPreferredSize(new Dimension(0,60));
+		topBar.setPreferredSize(new Dimension(tw,th));
 		topBar.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mainWindow.add(topBar, BorderLayout.PAGE_START);
 		buildTopMenuBar();
@@ -174,8 +178,11 @@ public class MainView implements SessionObject, Serializable{
 	
 	private void buildTopMenuBar() {
 		
+		int w = MagicValues.mainViewTopMenuBarDefaultWidth;
+		int h = MagicValues.mainViewTopMenuBarDefaultHeight;
+		
 		topMenuBar = new JMenuBar();
-		topMenuBar.setPreferredSize(new Dimension(0,30));
+		topMenuBar.setPreferredSize(new Dimension(w,h));
 		
 		// FILE MENU
 		fileMenu = new JMenu("File");
@@ -282,8 +289,12 @@ public class MainView implements SessionObject, Serializable{
 	}
 	
 	private void buildTopToolBar() {
+		
+		int tbw = MagicValues.mainViewTopToolBarDefaultWidth;
+		int tbh = MagicValues.mainViewTopToolBarDefaultHeight;
+		
 		topToolBar = new JToolBar(JToolBar.HORIZONTAL);
-		topToolBar.setPreferredSize(new Dimension(300,30));
+		topToolBar.setPreferredSize(new Dimension(tbw,tbh));
 		topToolBar.setFloatable(false);
 		
 		buildTopToolBarButtons();
@@ -293,7 +304,7 @@ public class MainView implements SessionObject, Serializable{
 	
 	private void buildProgressBar() {
 		
-		renderingProgressBar = new JProgressBar(0,getSession().getLongestTimepoint());
+		renderingProgressBar = new JProgressBar(getSession().minTimepoint, getSession().getLongestTimepoint());
 		String label = "Rendering Progress: ";
 		progressBar = new ProgressBar(renderingProgressBar, label);
 		getSession().setProgressBar(progressBar);
@@ -301,13 +312,18 @@ public class MainView implements SessionObject, Serializable{
 		topToolBarContainer.add(progressBar);
 	}
 	
-	private void buildTopToolBarEraserButton() {
+
+	private void buildTopToolBarButtons() {
+		
+		int iW = MagicValues.mainViewIconsDefaultWidth;
+		int iH = MagicValues.mainViewIconsDefaultHeight;
+		
 		try {
 			Image eraserImage = ImageIO.read(this.getClass().getResource("/eraseIcon.png"));
 			JButton eraseTool = new JButton(new ImageIcon(eraserImage));
 			
 			eraseTool.setVisible(true);
-			eraseTool.setPreferredSize(new Dimension(20,20));
+			eraseTool.setPreferredSize(new Dimension(iW,iH));
 			eraseTool.addMouseListener(new MouseAdapter( ) {
 				@Override
 				public void mouseClicked(MouseEvent e) {
@@ -321,19 +337,12 @@ public class MainView implements SessionObject, Serializable{
 			});
 			
 			topToolBar.add(eraseTool);
-		} catch (Exception e) {
-			System.out.println("Erase Icon creation failed");
-		}
 		
-	}
-	
-	private void buildTopToolBarBrushButton() {
-		try {
 			Image drawImage = ImageIO.read(this.getClass().getResource("/drawIcon.png"));
 			JButton brushTool = new JButton(new ImageIcon(drawImage));
 			
 			brushTool.setVisible(true);
-			brushTool.setPreferredSize(new Dimension(30,30));
+			brushTool.setPreferredSize(new Dimension(iW,iH));
 			brushTool.addMouseListener(new MouseAdapter( ) {
 				@Override
 				public void mouseClicked(MouseEvent e) {
@@ -347,13 +356,9 @@ public class MainView implements SessionObject, Serializable{
 			});
 			
 			topToolBar.add(brushTool);
-		} catch(Exception e) {
-			System.out.println("Brush Icon creation failed");
-		}
-	}
-	
-	private void buildTopToolBarPlayAndPauseButtons() {
-		try {
+		
+			
+		
 			Image playImage = ImageIO.read(this.getClass().getResource("/playIcon.png"));
 			Image pauseImage = ImageIO.read(this.getClass().getResource("/pauseIcon.png"));
 			
@@ -361,37 +366,37 @@ public class MainView implements SessionObject, Serializable{
 			JButton pauseTool = new JButton(new ImageIcon(pauseImage));
 			
 			playTool.setVisible(true);
-			playTool.setPreferredSize(new Dimension(30,30));
+			playTool.setPreferredSize(new Dimension(iW,iH));
 			playTool.addMouseListener(new MouseAdapter( ) {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					getSession().playMovie();
+					if(SwingUtilities.isLeftMouseButton(e)) {
+						getSession().playMovie();
+					}
 				}
 			});
 			
 			pauseTool.setVisible(true);
-			pauseTool.setPreferredSize(new Dimension(30,30));
+			pauseTool.setPreferredSize(new Dimension(iW,iH));
 			pauseTool.addMouseListener(new MouseAdapter( ) {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					getSession().pauseMovie();
+					if(SwingUtilities.isLeftMouseButton(e)) {
+						getSession().pauseMovie();
+					}
 				}
 			});
 			topToolBar.add(playTool);
 			topToolBar.add(pauseTool);
-		} catch(Exception e) {
-			System.out.println("Play/Pause Icon creation failed");
-		}
-	}
+		
 	
-	private void buildTopToolBarEraseAllButton() {
-		try {
+		
 			Image eraseAllImage = ImageIO.read(this.getClass().getResource("/eraseAllIcon.png"));
 			
 			JButton eraseAllTool = new JButton(new ImageIcon(eraseAllImage));
 			
 			eraseAllTool.setVisible(true);
-			eraseAllTool.setPreferredSize(new Dimension(30,30));
+			eraseAllTool.setPreferredSize(new Dimension(iW,iH));
 			eraseAllTool.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
@@ -418,66 +423,47 @@ public class MainView implements SessionObject, Serializable{
 			});
 			
 			topToolBar.add(eraseAllTool);
-		} catch(Exception e) {
-			System.out.println("EraseAll Icon creation failed");
-		}
-	}
+		
+		
 	
-	private void buildTopToolBarColorPickerButton() {
-		try {
 			Image colorPickerImage = ImageIO.read(this.getClass().getResource("/colorPickerIcon.png"));
 			
 			JButton colorPickerTool = new JButton(new ImageIcon(colorPickerImage));
 			
 			colorPickerTool.setVisible(true);
-			colorPickerTool.setPreferredSize(new Dimension(30,30));
+			colorPickerTool.setPreferredSize(new Dimension(iW,iH));
 			colorPickerTool.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					Color current = getSession().getBrushColor();
-					Color newColor = JColorChooser.showDialog(null, "Choose a color", current);
-					if (newColor != null) {
-						getSession().setBrushColor(newColor);
+					if(SwingUtilities.isLeftMouseButton(e)) {
+						Color current = getSession().getBrushColor();
+						Color newColor = JColorChooser.showDialog(null, "Choose a color", current);
+						if (newColor != null) {
+							getSession().setBrushColor(newColor);
+						}
 					}
 				}
 			});
 			
 			topToolBar.add(colorPickerTool);
-		} catch(Exception e) {
-			System.out.println("ColorPicker Icon creation failed");
-		}
-	}
-	
-	private void buildTopToolBarFillButton() {
-		try {
+			
 			Image fillImage = ImageIO.read(this.getClass().getResource("/fillIcon.png"));
 			
 			JButton fillTool = new JButton(new ImageIcon(fillImage));
 			
 			fillTool.setVisible(true);
-			fillTool.setPreferredSize(new Dimension(30,30));
+			fillTool.setPreferredSize(new Dimension(iW,iH));
 			fillTool.addMouseListener(new MouseAdapter( ) {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					getSession().setPaintSetting(EnumFactory.PaintSetting.FILLSINGLE);
+					if(SwingUtilities.isLeftMouseButton(e)) {
+						getSession().setPaintSetting(EnumFactory.PaintSetting.FILLSINGLE);
+					}
 				}
 			});
 			
 			topToolBar.add(fillTool);
 		} catch(Exception e) {
-			System.out.println("Fill Icon creation failed");
-		}
-	}
-	
-	private void buildTopToolBarButtons() {
-		try {
-			buildTopToolBarBrushButton();
-			buildTopToolBarEraserButton();
-			buildTopToolBarEraseAllButton();
-			buildTopToolBarPlayAndPauseButtons();
-			buildTopToolBarColorPickerButton();
-			buildTopToolBarFillButton();
-		} catch (Exception e) {
 			System.out.println("Icon creation failed");
 		}
 	}

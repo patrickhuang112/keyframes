@@ -29,6 +29,9 @@ import settings.Settings;
 
 
 public class Utils {
+	
+	//KeyFrame Project File
+	public static final String fileExtension = ".kfpf";
 
 	public static Settings getSettings() {
 		Settings settings;
@@ -81,7 +84,7 @@ public class Utils {
 			
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
-				if(Utils.getExtension(file).equals("ser")) {
+				if(Utils.getExtension(file).equals(Utils.fileExtension)) {
 					FileInputStream fileIn = new FileInputStream(file);
 			        ObjectInputStream in = new ObjectInputStream(fileIn);
 			        SessionSave ss = (SessionSave) in.readObject();
@@ -113,7 +116,7 @@ public class Utils {
 			
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
-				String savePath = file.getAbsolutePath() + ".ser";
+				String savePath = file.getAbsolutePath() + Utils.fileExtension;
 				session.setSavePath(savePath);
 				SessionSave ss = new SessionSave(session);
 				FileOutputStream fos = new FileOutputStream(savePath);
@@ -196,7 +199,7 @@ public class Utils {
 					                    session.setProgressBarVisible(false);
 					                    session.resetProgressBar();
 					                }
-					            }, 3000);
+					            }, MagicValues.utilsRenderDefaultTimeBeforeProgressBarDisappearsAfterRender);
 						
 					} else {
 						System.out.println("Rendering video aborted");
@@ -237,7 +240,8 @@ public class Utils {
 						HashMap<Integer, BufferedImage> images = session.getImages();
 						ImageOutputStream output = new FileImageOutputStream(newFile);
 						
-						int timeBetweenFrames = 1000 / fps;
+						int millisecondsInSecond = 1000;
+						int timeBetweenFrames = millisecondsInSecond / fps;
 						
 						//Don't change unless I change how buffered images are made.1
 						int imgType = BufferedImage.TYPE_INT_RGB;
@@ -268,7 +272,7 @@ public class Utils {
 					                    session.setProgressBarVisible(false);
 					                    session.resetProgressBar();
 					                }
-					            }, 3000);
+					            }, MagicValues.utilsRenderDefaultTimeBeforeProgressBarDisappearsAfterRender);
 					} else {
 						System.out.println("Rendering gif aborted");
 					}
