@@ -2,6 +2,8 @@ package keyframes;
 
 public class MagicValues {
 	
+	public static final int windowMinimumWidth = 1600;
+	public static final int windowMinimumHeight = 900;
 	// These are 0 just cause they span the whole screen currently
 	public static final int drawablePanelDefaultMinWidth = 0;
 	public static final int drawablePanelDefaultPreferredWidth = 1800;

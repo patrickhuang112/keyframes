@@ -13,6 +13,8 @@ import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 
 // A Draw instruction is the buffered image drawn on the screen.
+
+// A lot of commented out stuff is for if I ever want to use the pixelArray stuff again.
 public class DrawFrame extends BufferedImage {
 	private int[][] pixelArray;
 	private int width;
@@ -28,12 +30,32 @@ public class DrawFrame extends BufferedImage {
 		super(width, height, type);
 		this.width = width;
 		this.height = height;
-		findPixelArray();
+		//findPixelArray();
 	}
 	
+	/*
 	public void refreshPixelArray() {
-		findPixelArray();
+		byte[] pixels = new byte[width * height * 4]; 
+		System.out.println(width);
+		System.out.println(height);
+		int i = 0;
+		for(int ro = 0; ro < height; ro++) {
+			for (int c = 0; c < width; c++) {
+				int abgr = pixelArray[ro][c];
+				byte a = (byte)((abgr >> 24) & (0xFF)); 
+				byte b = (byte)((abgr >> 16) & (0xFF));
+				byte g = (byte)((abgr >> 8) & (0xFF));
+				byte r = (byte)((abgr >> 0) & (0xFF));
+				pixels[i] = a;
+				pixels[i+1] = b;
+				pixels[i+2] = g;
+				pixels[i+3] = r;
+				i++;
+			}
+		}
+		this.getRaster().setDataElements(0, 0, width, height, pixels);
 	}
+	*/
 	
 	private void findPixelArray() {
 		pixelArray = new int[height][width];
@@ -86,13 +108,14 @@ public class DrawFrame extends BufferedImage {
 		return newDf;
 	}
 	
-	public int getRGBA(int x, int y) {
-		return pixelArray[y][x];
+	public int getABGR(int x, int y) {
+		return getRGB(x, y);
+		//return pixelArray[y][x];
 	}
 	
-	public int getRGBA(Point p) {
+	public int getABGR(Point p) {
 		return getRGB(p.x, p.y);
-		//return getRGBA(p.x,p.y);
+		//return getABGR(p.x,p.y);
 	}
 	
 	public Color getColorAtPoint(int x, int y) {
@@ -106,27 +129,18 @@ public class DrawFrame extends BufferedImage {
 	}
 	
 	public void setColorAtPixelArrayPoint(Color color, int x, int y) {
-		pixelArray[y][x] = color.getRGB();
+		/*
+		int a = color.getAlpha();
+		int b = color.getBlue();
+		int g = color.getGreen();
+		int r = color.getRed();
+		int abgr = (a << 24) + (b << 16) + (g << 8) + r;
+		pixelArray[y][x] = abgr;
+		*/
 		this.setRGB(x, y, color.getRGB());
 	}
 	
 	public void setColorAtPixelArrayPoint(Color color, Point p) {
 		setColorAtPixelArrayPoint(color, p.x,p.y);
 	}
-	
-	/*
-	public DrawInstruction deepCopy() {
-		DrawInstruction newDps = new DrawInstruction();
-		for (int i = 0; i < this.size(); i++) {
-			ArrayList<DrawPoint>dpss = this.get(i);
-			ArrayList<DrawPoint> newDpss = new ArrayList<DrawPoint>();
-			for (DrawPoint dp : dpss) {
-				DrawPoint newDp = dp.deepCopy();
-				newDpss.add(newDp);
-			}
-			newDps.add(newDpss);
-		}
-		return newDps;
-	}
-	*/
 }

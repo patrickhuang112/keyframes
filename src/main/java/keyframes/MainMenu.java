@@ -28,6 +28,8 @@ import settings.SettingsView;
 
 public class MainMenu implements Serializable {
 	
+	//CURRENTLY NOT IN USE
+	/*
 	private static final long serialVersionUID = -3854588841281613072L;
 
 	private JPanel menuPanel;
@@ -125,5 +127,5 @@ public class MainMenu implements Serializable {
 		menuPanel.add(settingsButton, gbc);
 
 	}
-
+	*/
 }

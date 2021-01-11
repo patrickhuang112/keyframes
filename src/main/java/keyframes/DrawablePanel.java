@@ -161,9 +161,7 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 			}
 		}
 		q.add(p);
-		int j = 0;
 		while (!q.isEmpty() ) {
-			
 			Point np = q.remove();
 			visited[np.y][np.x] = true;
 			df.setColorAtPixelArrayPoint(newColor, np.x, np.y);
@@ -179,12 +177,7 @@ public class DrawablePanel extends JPanel implements SessionObject, MouseMotionL
 					q.add(newp);
 				}
 			}
-			j++;
-			
 		}
-		System.out.println(j);
-		//df.updateDrawFrameFromPixelArray();
-
 	}
 	
 	@Override

@@ -29,7 +29,8 @@ import keyframes.MainMenu;
 
 public class SettingsView {
 
-	
+	// CURRENTLY NOT IN USE AT ALL.
+	/* 
 	private JFrame parent;
 	private Settings settings;
 
@@ -201,5 +202,5 @@ public class SettingsView {
 	private void refreshUI() {
 		// Empty for now
 	}
-	
+	*/
 }

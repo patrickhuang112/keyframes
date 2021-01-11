@@ -611,7 +611,7 @@ public class Session implements Serializable {
 		DrawFrame dps = getCurrentLayerFrameAtCurrentTime();
 		Graphics2D g2d = dps.createGraphics();
 		DrawablePanel.drawAndErasePath(g2d, newPoints);
-		dps.refreshPixelArray();
+		//dps.refreshPixelArray();
 	}
 	
 	public void eraseAllLayersAtCurrentFrame() {

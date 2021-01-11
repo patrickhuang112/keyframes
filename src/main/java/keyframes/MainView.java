@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -34,6 +35,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -53,6 +55,8 @@ import datatypes.ProgressBar;
 import datatypes.SessionObject;
 import factories.EnumFactory;
 import factories.SliderFactory;
+import settings.Settings;
+import settings.SettingsDialog;
 
 
 public class MainView implements SessionObject, Serializable{
@@ -81,6 +85,7 @@ public class MainView implements SessionObject, Serializable{
 	private JMenuItem saveProjectAsMenuItem;
 	private JMenuItem renderMP4AsMenuItem;
 	private JMenuItem renderGIFAsMenuItem;
+	private JMenuItem settingsMenuItem;
 	
 	private JMenuItem editFpsMenuItem;
 	private JMenuItem editTimeMenuItem;
@@ -226,6 +231,15 @@ public class MainView implements SessionObject, Serializable{
 				Utils.renderGif(e, getSession(), renderGIFAsMenuItem, getSession().getFramesPerSecond());
 			}
 		});
+		
+		settingsMenuItem = new JMenuItem(new AbstractAction("Settings") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SettingsDialog settingsDialog = new SettingsDialog(parent, "Settings", Utils.getSettings());
+				settingsDialog.buildUI();
+			}
+		});
+		
 			
 		fileMenu.add(newProjectMenuItem);
 		fileMenu.add(openProjectMenuItem);
@@ -233,6 +247,7 @@ public class MainView implements SessionObject, Serializable{
 		fileMenu.add(saveProjectAsMenuItem);
 		fileMenu.add(renderMP4AsMenuItem);
 		fileMenu.add(renderGIFAsMenuItem);
+		fileMenu.add(settingsMenuItem);
 		
 		topMenuBar.add(fileMenu);
 		

@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 
 import javax.swing.JFrame;
 import javax.swing.LookAndFeel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -28,14 +29,21 @@ public class Main {
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setTitle("Keyframes");
 		window.setVisible(true);
-		window.setBackground(Color.RED);
-		
-		window.setMinimumSize(new Dimension(1600,900));
+		window.setMinimumSize(new Dimension(MagicValues.windowMinimumWidth, MagicValues.windowMinimumHeight));
 		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		
 		Settings settings = Utils.getSettings();
-		MainMenu menu = new MainMenu(window, settings);
-		menu.buildUI();
+		MainView mv = new MainView(window, new Session(settings));
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				mv.buildUI();
+				// Once we now have access to the draw panel, we should also update all the draw frames in
+				// the layers with the new dimensions
+				//getSession().updateDrawFrameDimensions();
+			}
+			
+		});
 		System.out.println("App Started...");
 	}
 	
