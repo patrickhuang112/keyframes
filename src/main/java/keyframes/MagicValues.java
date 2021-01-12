@@ -49,4 +49,6 @@ public class MagicValues {
 	
 	public static final int utilsRenderDefaultTimeBeforeProgressBarDisappearsAfterRender = 3000;
 	
+	public static final int settingsDialogDefaultWidth = 500;
+	public static final int settingsDialogDefaultHeight = 400;
 }

@@ -53,10 +53,13 @@ import javax.swing.plaf.basic.BasicSliderUI;
 
 import datatypes.ProgressBar;
 import datatypes.SessionObject;
+import datatypes.dialog.CompositionLengthDialog;
+import datatypes.dialog.DialogFactory;
+import datatypes.dialog.FPSDialog;
+import datatypes.dialog.SettingsDialog;
 import factories.EnumFactory;
-import factories.SliderFactory;
+import datatypes.slider.SliderFactory;
 import settings.Settings;
-import settings.SettingsDialog;
 
 
 public class MainView implements SessionObject, Serializable{
@@ -235,8 +238,7 @@ public class MainView implements SessionObject, Serializable{
 		settingsMenuItem = new JMenuItem(new AbstractAction("Settings") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				SettingsDialog settingsDialog = new SettingsDialog(parent, "Settings", Utils.getSettings());
-				settingsDialog.buildUI();
+				DialogFactory.createSettingsDialog(parent, "Settings", Utils.getSettings());
 			}
 		});
 		
@@ -253,30 +255,24 @@ public class MainView implements SessionObject, Serializable{
 		
 		// EDIT MENU
 		editMenu = new JMenu("Edit");
-		
 		editFpsMenuItem = new JMenuItem(new AbstractAction("Edit Frames Per Second") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				SliderFactory.createFPSDialogSlider(mainWindow, getSession());
+				DialogFactory.createFPSDialog(mainWindow, getSession());
 			}
 		});
 		
 		editTimeMenuItem = new JMenuItem(new AbstractAction("Edit Composition Endpoint") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				SliderFactory.createCompositionEndpointDialogSlider(mainWindow, getSession());
+				DialogFactory.createCompositionLengthDialog(mainWindow, getSession());
 			}
 		});
 		
 		editBackgroundColorItem = new JMenuItem(new AbstractAction("Edit Background Color") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Color current = getSession().getDrawablePanelBackgroundColor();
-				Color newColor = JColorChooser.showDialog(null, "Choose a new background color", current);
-				if (newColor != null) {
-					getSession().setDrawablePanelBackgroundColor(newColor);
-					getSession().setEraserColor(newColor);
-				}
+				DialogFactory.createBackgroundColorDialog(getSession());
 			}
 		});
 		
@@ -346,7 +342,7 @@ public class MainView implements SessionObject, Serializable{
 						session.setPaintSetting(EnumFactory.PaintSetting.ERASE);
 					}
 					else if(SwingUtilities.isRightMouseButton(e)) {
-						SliderFactory.createEraserSizeDialogSlider(mainWindow, session);
+						DialogFactory.createEraserSizeDialog(mainWindow, session);
 					}
 				}
 			});
@@ -365,7 +361,7 @@ public class MainView implements SessionObject, Serializable{
 						getSession().setPaintSetting(EnumFactory.PaintSetting.DRAW);
 					}
 					else if(SwingUtilities.isRightMouseButton(e)) {
-						SliderFactory.createBrushSizeDialogSlider(mainWindow, getSession());
+						DialogFactory.createBrushSizeDialog(mainWindow, getSession());
 					}
 				}
 			});

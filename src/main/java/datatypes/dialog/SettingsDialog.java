@@ -1,4 +1,4 @@
-package settings;
+package datatypes.dialog;
 
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -11,37 +11,41 @@ import java.io.ObjectOutputStream;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 
-import factories.SliderFactory;
+import datatypes.slider.SliderFactory;
+import keyframes.MagicValues;
+import settings.Settings;
 
 public class SettingsDialog extends JDialog {
 	
 	private Settings settings;
 	
-	public SettingsDialog(Frame parent, String title, Settings settings) {
-		super(parent, title, true);
+	SettingsDialog(JFrame frame, String title, Settings settings) {
+		super(frame, title, true);
 		this.settings = settings;
+		buildUI();
 	}
 	
-	public void buildUI() {
+	private void buildUI() {
 		setLayout( new GridBagLayout() );  
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(10,10,10,10);
 		
-		JSlider brushSizeSlider = SliderFactory.createBasicSettingsSlider(settings.getBrushSize(), 
-				settings.brushMin, settings.brushMax);
+		JSlider brushSizeSlider = SliderFactory.createBasicTenTickSlider( 
+				settings.brushMin, settings.brushMax, settings.getBrushSize()).getSwingComponent();
 		
-		JSlider eraserSizeSlider = SliderFactory.createBasicSettingsSlider(settings.getEraserSize(), 
-				settings.eraserMin, settings.eraserMax);
+		JSlider eraserSizeSlider = SliderFactory.createBasicTenTickSlider(
+				settings.eraserMin, settings.eraserMax, settings.getEraserSize()).getSwingComponent();
 		
-		JSlider fpsSlider = SliderFactory.createBasicSettingsSlider(settings.getFps(), 
-				settings.fpsMin, settings.fpsMax);
+		JSlider fpsSlider = SliderFactory.createBasicFiveTickSlider( 
+				settings.fpsMin, settings.fpsMax, settings.getFps()).getSwingComponent();
 		
-		JSlider compositionLengthSlider = SliderFactory.createBasicFiveTickSlider(settings.getCompLength(), 
-				settings.lengthMin, settings.lengthMax);
+		JSlider compositionLengthSlider = SliderFactory.createBasicFiveTickSlider( 
+				settings.lengthMin, settings.lengthMax, settings.getCompLength()).getSwingComponent();
 		
 		
 		gbc.gridy = 0;
@@ -153,7 +157,7 @@ public class SettingsDialog extends JDialog {
         gbc.weightx = .5;
         add(applyButton, gbc);
         
-        setSize(500,400);    
+        setSize(MagicValues.settingsDialogDefaultWidth, MagicValues.settingsDialogDefaultHeight);    
         setVisible(true);  
 	}
 }

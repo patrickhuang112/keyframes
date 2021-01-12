@@ -37,7 +37,7 @@ import datatypes.KeyFrames;
 import datatypes.Layer;
 import datatypes.UIComponent;
 import factories.EnumFactory;
-import factories.SliderFactory;
+import datatypes.slider.SliderFactory;
 
 public class Timeline extends JComponent implements UIComponent, Serializable{
 	
