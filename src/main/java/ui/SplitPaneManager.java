@@ -1,4 +1,4 @@
-package keyframes;
+package ui;
 
 import java.awt.Dimension;
 import java.io.Serializable;
@@ -8,6 +8,7 @@ import javax.swing.JSplitPane;
 
 import datatypes.SessionObject;
 import datatypes.UIComponent;
+import keyframes.Session;
 
 public class SplitPaneManager implements UIComponent, Serializable {
 

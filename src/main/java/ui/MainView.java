@@ -1,4 +1,4 @@
-package keyframes;
+package ui;
 
 
 import java.awt.BorderLayout;
@@ -49,17 +49,25 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.basic.BasicSliderUI;
+
+import com.formdev.flatlaf.FlatDarkLaf;
 
 import datatypes.ProgressBar;
 import datatypes.SessionObject;
-import datatypes.dialog.CompositionLengthDialog;
-import datatypes.dialog.DialogFactory;
-import datatypes.dialog.FPSDialog;
-import datatypes.dialog.SettingsDialog;
 import factories.EnumFactory;
-import datatypes.slider.SliderFactory;
+import keyframes.MagicValues;
+import keyframes.Session;
+import keyframes.Utils;
 import settings.Settings;
+import ui.button.ButtonFactory;
+import ui.dialog.CompositionLengthDialog;
+import ui.dialog.DialogFactory;
+import ui.dialog.FPSDialog;
+import ui.dialog.SettingsDialog;
+import ui.slider.SliderFactory;
 
 
 public class MainView implements SessionObject, Serializable{
@@ -68,8 +76,8 @@ public class MainView implements SessionObject, Serializable{
 
 	private Session session;
 	
-	private JFrame parent;
-	private JPanel mainWindow;
+	private JFrame window;
+	private JPanel mainPanel;
 	
 	private JPanel topBar;
 	private JMenuBar topMenuBar;
@@ -97,35 +105,66 @@ public class MainView implements SessionObject, Serializable{
 	private JProgressBar renderingProgressBar;
 	private ProgressBar progressBar;
 	
-	public MainView(JFrame parent, Session session) {
-		this.session = session;
-		this.parent = parent;
-		mainWindow = new JPanel(new BorderLayout());
-		this.parent.add(mainWindow, BorderLayout.CENTER);
+	private static MainView instance;
+	
+	public static MainView getInstance() {
+		if (instance == null) {
+			MainView.instance = new MainView();
+		}
+		return MainView.instance;
+	}
+	
+	public static void createNewInstance() {
+		MainView.instance = new MainView();
 	}
 
-	public void buildUI() {
-		mainWindow.setBackground(Color.blue);
+	
+	//Only package visible
+	SplitPaneManager getSplitPaneManager() {
+		return drawableAndTimelinePane;
+	}
+	
+	private MainView() {
+		window = new JFrame();
+		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		window.setTitle("Keyframes");
+		window.setVisible(true);
+		window.setMinimumSize(new Dimension(MagicValues.windowMinimumWidth, MagicValues.windowMinimumHeight));
+		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		
+		mainPanel = new JPanel(new BorderLayout());
+		window.add(mainPanel, BorderLayout.CENTER);
+		
+		Settings settings = Utils.getSettings();
+		session = new Session(settings);
+		
+		buildUI();
+	}
+
+	
+	
+	private void buildUI() {
+		mainPanel.setBackground(Color.blue);
 		buildDrawableAndTimeline();
 		buildTopBar();
 		setKeyMaps();
-		parent.revalidate();
-		parent.repaint();
+		window.revalidate();
+		window.repaint();
 		
 	}
 	
-	public void setKeyMaps() {
+	private void setKeyMaps() {
 		// Copy frames from current layer
-		mainWindow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control C"), "copied");
-		mainWindow.getActionMap().put("copied", new AbstractAction() {
+		mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control C"), "copied");
+		mainPanel.getActionMap().put("copied", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				getSession().copyFramesFromCurrentLayerAndCurrentTime();
 			}
 		});
 		// Paste copied frames into current layer
-		mainWindow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control V"), "pasted");
-		mainWindow.getActionMap().put("pasted", new AbstractAction() {
+		mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control V"), "pasted");
+		mainPanel.getActionMap().put("pasted", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				getSession().pasteFramesToCurrentLayerAndCurrentTime();
@@ -133,16 +172,16 @@ public class MainView implements SessionObject, Serializable{
 		});
 		
 		// Play and pause movie
-		mainWindow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("SPACE"), "movieplaypause");
-		mainWindow.getActionMap().put("movieplaypause", new AbstractAction() {
+		mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("SPACE"), "movieplaypause");
+		mainPanel.getActionMap().put("movieplaypause", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				getSession().playOrPauseMovie();
 			}
 		});
 		
-		mainWindow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control S"), "save");
-		mainWindow.getActionMap().put("save", new AbstractAction() {
+		mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control S"), "save");
+		mainPanel.getActionMap().put("save", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Utils.saveFile(e, session, saveProjectMenuItem);
@@ -167,7 +206,7 @@ public class MainView implements SessionObject, Serializable{
 		
 		
 	
-		mainWindow.add(drawableAndTimelinePane.getMainComponent());
+		mainPanel.add(drawableAndTimelinePane.getMainComponent());
 	}
 	
 	private void buildTopBar() {
@@ -179,7 +218,7 @@ public class MainView implements SessionObject, Serializable{
 		topBar.setLayout(new BorderLayout());
 		topBar.setPreferredSize(new Dimension(tw,th));
 		topBar.setAlignmentX(Component.LEFT_ALIGNMENT);
-		mainWindow.add(topBar, BorderLayout.PAGE_START);
+		mainPanel.add(topBar, BorderLayout.PAGE_START);
 		buildTopMenuBar();
 		buildTopToolBarContainer();
 	}
@@ -197,12 +236,12 @@ public class MainView implements SessionObject, Serializable{
 		newProjectMenuItem = new JMenuItem(new AbstractAction("New Project") {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
-				Utils.newFile(getSession(), parent);
+				Utils.newFile(getSession(), window);
 			}
 		});
 		openProjectMenuItem = new JMenuItem(new AbstractAction("Open Project") {
 			public void actionPerformed(ActionEvent e) {
-				Utils.openFile(e, getSession(), openProjectMenuItem, parent);
+				Utils.openFile(e, getSession(), openProjectMenuItem, window);
 			}
 		});
 		
@@ -238,7 +277,7 @@ public class MainView implements SessionObject, Serializable{
 		settingsMenuItem = new JMenuItem(new AbstractAction("Settings") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				DialogFactory.createSettingsDialog(parent, "Settings", Utils.getSettings());
+				DialogFactory.createSettingsDialog(window, "Settings", Utils.getSettings());
 			}
 		});
 		
@@ -258,14 +297,14 @@ public class MainView implements SessionObject, Serializable{
 		editFpsMenuItem = new JMenuItem(new AbstractAction("Edit Frames Per Second") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				DialogFactory.createFPSDialog(mainWindow, getSession());
+				DialogFactory.createFPSDialog(mainPanel, getSession());
 			}
 		});
 		
 		editTimeMenuItem = new JMenuItem(new AbstractAction("Edit Composition Endpoint") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				DialogFactory.createCompositionLengthDialog(mainWindow, getSession());
+				DialogFactory.createCompositionLengthDialog(mainPanel, getSession());
 			}
 		});
 		
@@ -325,157 +364,17 @@ public class MainView implements SessionObject, Serializable{
 	
 
 	private void buildTopToolBarButtons() {
-		
-		int iW = MagicValues.mainViewIconsDefaultWidth;
-		int iH = MagicValues.mainViewIconsDefaultHeight;
-		
+
 		try {
-			Image eraserImage = ImageIO.read(this.getClass().getResource("/eraseIcon.png"));
-			JButton eraseTool = new JButton(new ImageIcon(eraserImage));
-			
-			eraseTool.setVisible(true);
-			eraseTool.setPreferredSize(new Dimension(iW,iH));
-			eraseTool.addMouseListener(new MouseAdapter( ) {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					if(SwingUtilities.isLeftMouseButton(e)) {
-						session.setPaintSetting(EnumFactory.PaintSetting.ERASE);
-					}
-					else if(SwingUtilities.isRightMouseButton(e)) {
-						DialogFactory.createEraserSizeDialog(mainWindow, session);
-					}
-				}
-			});
-			
-			topToolBar.add(eraseTool);
-		
-			Image drawImage = ImageIO.read(this.getClass().getResource("/drawIcon.png"));
-			JButton brushTool = new JButton(new ImageIcon(drawImage));
-			
-			brushTool.setVisible(true);
-			brushTool.setPreferredSize(new Dimension(iW,iH));
-			brushTool.addMouseListener(new MouseAdapter( ) {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					if(SwingUtilities.isLeftMouseButton(e)) {
-						getSession().setPaintSetting(EnumFactory.PaintSetting.DRAW);
-					}
-					else if(SwingUtilities.isRightMouseButton(e)) {
-						DialogFactory.createBrushSizeDialog(mainWindow, getSession());
-					}
-				}
-			});
-			
-			topToolBar.add(brushTool);
-		
-			
-		
-			Image playImage = ImageIO.read(this.getClass().getResource("/playIcon.png"));
-			Image pauseImage = ImageIO.read(this.getClass().getResource("/pauseIcon.png"));
-			
-			JButton playTool = new JButton(new ImageIcon(playImage));
-			JButton pauseTool = new JButton(new ImageIcon(pauseImage));
-			
-			playTool.setVisible(true);
-			playTool.setPreferredSize(new Dimension(iW,iH));
-			playTool.addMouseListener(new MouseAdapter( ) {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					if(SwingUtilities.isLeftMouseButton(e)) {
-						getSession().playMovie();
-					}
-				}
-			});
-			
-			pauseTool.setVisible(true);
-			pauseTool.setPreferredSize(new Dimension(iW,iH));
-			pauseTool.addMouseListener(new MouseAdapter( ) {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					if(SwingUtilities.isLeftMouseButton(e)) {
-						getSession().pauseMovie();
-					}
-				}
-			});
-			topToolBar.add(playTool);
-			topToolBar.add(pauseTool);
-		
-	
-		
-			Image eraseAllImage = ImageIO.read(this.getClass().getResource("/eraseAllIcon.png"));
-			
-			JButton eraseAllTool = new JButton(new ImageIcon(eraseAllImage));
-			
-			eraseAllTool.setVisible(true);
-			eraseAllTool.setPreferredSize(new Dimension(iW,iH));
-			eraseAllTool.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					if(SwingUtilities.isLeftMouseButton(e)) {
-						DrawablePanel drawPane = (DrawablePanel)drawableAndTimelinePane.getTopOrLeft().getMainComponent();
-						drawPane.clearAll();
-					}
-					else if(SwingUtilities.isRightMouseButton(e)) {
-						JPopupMenu menu = new JPopupMenu();
-						JMenuItem eraseAllLayersAtCurrentTimeMenuItem 
-							= new JMenuItem(new AbstractAction("Erase all layer frames at current time") {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								getSession().eraseAllLayersAtCurrentFrame();
-							}
-						});
-						menu.add(eraseAllLayersAtCurrentTimeMenuItem);
-						
-						//Very arbitrary right now just to make it look good
-						int offset = 5;
-						menu.show(e.getComponent(), e.getX() + offset, e.getY() + offset);
-					}
-				}
-			});
-			
-			topToolBar.add(eraseAllTool);
-		
-		
-	
-			Image colorPickerImage = ImageIO.read(this.getClass().getResource("/colorPickerIcon.png"));
-			
-			JButton colorPickerTool = new JButton(new ImageIcon(colorPickerImage));
-			
-			colorPickerTool.setVisible(true);
-			colorPickerTool.setPreferredSize(new Dimension(iW,iH));
-			colorPickerTool.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					if(SwingUtilities.isLeftMouseButton(e)) {
-						Color current = getSession().getBrushColor();
-						Color newColor = JColorChooser.showDialog(null, "Choose a color", current);
-						if (newColor != null) {
-							getSession().setBrushColor(newColor);
-						}
-					}
-				}
-			});
-			
-			topToolBar.add(colorPickerTool);
-			
-			Image fillImage = ImageIO.read(this.getClass().getResource("/fillIcon.png"));
-			
-			JButton fillTool = new JButton(new ImageIcon(fillImage));
-			
-			fillTool.setVisible(true);
-			fillTool.setPreferredSize(new Dimension(iW,iH));
-			fillTool.addMouseListener(new MouseAdapter( ) {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					if(SwingUtilities.isLeftMouseButton(e)) {
-						getSession().setPaintSetting(EnumFactory.PaintSetting.FILLSINGLE);
-					}
-				}
-			});
-			
-			topToolBar.add(fillTool);
+			topToolBar.add(ButtonFactory.createBrushButton(mainPanel, session).getSwingComponent());
+			topToolBar.add(ButtonFactory.createEraseButton(mainPanel, session).getSwingComponent());
+			topToolBar.add(ButtonFactory.createEraseAllButton(session).getSwingComponent());
+			topToolBar.add(ButtonFactory.createPlayButton(session).getSwingComponent());
+			topToolBar.add(ButtonFactory.createPauseButton(session).getSwingComponent());
+			topToolBar.add(ButtonFactory.createColorPickerButton(session).getSwingComponent());
+			topToolBar.add(ButtonFactory.createFillButton(session).getSwingComponent());
 		} catch(Exception e) {
-			System.out.println("Icon creation failed");
+			System.out.println("Button icon creation failed");
 		}
 	}
 	

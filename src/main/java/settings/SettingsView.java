@@ -24,8 +24,8 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-import datatypes.slider.SliderFactory;
 import keyframes.MainMenu;
+import ui.slider.SliderFactory;
 
 public class SettingsView {
 

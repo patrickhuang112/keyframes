@@ -1,4 +1,4 @@
-package keyframes;
+package ui;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -37,7 +37,8 @@ import datatypes.KeyFrames;
 import datatypes.Layer;
 import datatypes.UIComponent;
 import factories.EnumFactory;
-import datatypes.slider.SliderFactory;
+import keyframes.MagicValues;
+import ui.slider.SliderFactory;
 
 public class Timeline extends JComponent implements UIComponent, Serializable{
 	

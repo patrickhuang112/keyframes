@@ -1,4 +1,4 @@
-package keyframes;
+package ui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -17,6 +17,8 @@ import java.util.Hashtable;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.plaf.basic.BasicSliderUI;
+
+import keyframes.Session;
 
 
 

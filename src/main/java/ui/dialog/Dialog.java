@@ -1,4 +1,4 @@
-package datatypes.dialog;
+package ui.dialog;
 
 import javax.swing.JDialog;
 

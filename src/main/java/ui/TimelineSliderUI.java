@@ -1,4 +1,4 @@
-package keyframes;
+package ui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -16,6 +16,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.plaf.basic.BasicSliderUI;
+
+import keyframes.MagicValues;
 
 public class TimelineSliderUI extends BasicSliderUI {
 	

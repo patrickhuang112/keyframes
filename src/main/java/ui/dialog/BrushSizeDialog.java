@@ -1,12 +1,12 @@
-package datatypes.dialog;
+package ui.dialog;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JSlider;
 
-import datatypes.slider.SliderFactory;
 import keyframes.Session;
+import ui.slider.SliderFactory;
 
 public class BrushSizeDialog implements Dialog {
 

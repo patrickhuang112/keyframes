@@ -1,4 +1,4 @@
-package datatypes.dialog;
+package ui.dialog;
 
 import java.awt.Color;
 

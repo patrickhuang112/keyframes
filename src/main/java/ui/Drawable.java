@@ -1,4 +1,4 @@
-package keyframes;
+package ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -13,6 +13,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import datatypes.UIComponent;
+import keyframes.MagicValues;
+import keyframes.Session;
 
 public class Drawable implements UIComponent, Serializable {
 	

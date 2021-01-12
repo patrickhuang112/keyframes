@@ -25,6 +25,10 @@ import datatypes.LayerBoundingBox;
 import datatypes.ProgressBar;
 import factories.EnumFactory;
 import settings.Settings;
+import ui.DrawablePanel;
+import ui.TimelineLayersPanel;
+import ui.TimelineSlider;
+import ui.TimelineSliderUI;
 
 public class Session implements Serializable {
 	

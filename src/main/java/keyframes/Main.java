@@ -15,6 +15,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import settings.Settings;
+import ui.MainView;
 
 import com.formdev.flatlaf.*;
 
@@ -25,28 +26,17 @@ public class Main {
 		
 		initializeLookAndFeel();
 		
-		JFrame window = new JFrame();
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setTitle("Keyframes");
-		window.setVisible(true);
-		window.setMinimumSize(new Dimension(MagicValues.windowMinimumWidth, MagicValues.windowMinimumHeight));
-		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		
 		Settings settings = Utils.getSettings();
-		MainView mv = new MainView(window, new Session(settings));
+		MainView mv = MainView.getInstance();
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				mv.buildUI();
-				// Once we now have access to the draw panel, we should also update all the draw frames in
-				// the layers with the new dimensions
-				//getSession().updateDrawFrameDimensions();
+				
 			}
 			
 		});
 		System.out.println("App Started...");
 	}
-	
 	
 	private static void initializeLookAndFeel() {
 		try {
@@ -56,5 +46,4 @@ public class Main {
 		       // handle exception
 	    }
 	}
-	
 }

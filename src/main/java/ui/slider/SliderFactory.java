@@ -1,4 +1,4 @@
-package datatypes.slider;
+package ui.slider;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;

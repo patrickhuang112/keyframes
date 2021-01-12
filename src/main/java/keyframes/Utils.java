@@ -26,6 +26,7 @@ import org.jcodec.api.awt.AWTSequenceEncoder;
 
 import external.GifSequenceWriter;
 import settings.Settings;
+import ui.MainView;
 
 
 public class Utils {
@@ -66,9 +67,7 @@ public class Utils {
 		// DO STUFF WITH OLD SESSION (NOT IMPLEMENTED YET)
 		
 		frame.getContentPane().removeAll();
-		Session newSession = new Session();
-		MainView mv = new MainView(frame, newSession);
-		mv.buildUI();
+		MainView.createNewInstance();
 		
 		System.out.println("New project created");
 	}

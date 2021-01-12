@@ -1,4 +1,4 @@
-package datatypes.dialog;
+package ui.dialog;
 
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -15,11 +15,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 
-import datatypes.slider.SliderFactory;
 import keyframes.MagicValues;
 import settings.Settings;
+import ui.slider.SliderFactory;
 
-public class SettingsDialog extends JDialog {
+public class SettingsDialog extends JDialog implements Dialog {
 	
 	private Settings settings;
 	
@@ -159,5 +159,11 @@ public class SettingsDialog extends JDialog {
         
         setSize(MagicValues.settingsDialogDefaultWidth, MagicValues.settingsDialogDefaultHeight);    
         setVisible(true);  
+	}
+
+	@Override
+	public JDialog getSwingComponent() {
+		// TODO Auto-generated method stub
+		return this;
 	}
 }

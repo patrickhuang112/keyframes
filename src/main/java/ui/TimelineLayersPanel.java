@@ -1,4 +1,4 @@
-package keyframes;
+package ui;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -35,6 +35,7 @@ import javax.swing.SwingUtilities;
 import datatypes.Layer;
 import datatypes.SessionObject;
 import datatypes.UIComponent;
+import keyframes.MagicValues;
 
 public class TimelineLayersPanel extends JScrollPane implements SessionObject, Serializable{
 	

@@ -1,4 +1,4 @@
-package keyframes;
+package ui;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
