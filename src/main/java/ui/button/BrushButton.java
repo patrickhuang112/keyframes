@@ -13,12 +13,13 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 import factories.EnumFactory;
+import keyframes.Controller;
 import keyframes.Session;
 import ui.dialog.DialogFactory;
 
 public class BrushButton extends JButton implements Button {
 
-	BrushButton(JComponent parent, Session session) throws IOException {
+	BrushButton() throws IOException {
 		super();
 		Image drawImage = ImageIO.read(this.getClass().getResource("/drawIcon.png"));
 		setIcon(new ImageIcon(drawImage));
@@ -29,10 +30,10 @@ public class BrushButton extends JButton implements Button {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					session.setPaintSetting(EnumFactory.PaintSetting.DRAW);
+					Controller.getController().setPaintSetting(EnumFactory.PaintSetting.DRAW);
 				}
 				else if(SwingUtilities.isRightMouseButton(e)) {
-					DialogFactory.createBrushSizeDialog(parent, session);
+					DialogFactory.createBrushSizeDialog();
 				}
 			}
 		});

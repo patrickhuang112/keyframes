@@ -1,4 +1,4 @@
-package ui;
+package ui.timeline.layerspanel;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -34,18 +34,19 @@ import javax.swing.SwingUtilities;
 
 import datatypes.Layer;
 import datatypes.SessionObject;
-import datatypes.UIComponent;
 import keyframes.MagicValues;
+import keyframes.Session;
+import ui.UIComponent;
+import ui.timeline.Timeline;
 
-public class TimelineLayersPanel extends JScrollPane implements SessionObject, Serializable{
+public class StandardTimelineLayersPanel extends JScrollPane implements TimelineLayersPanel, Serializable{
 	
 	// Set this manually cause I couldn't get other things to work
 	private double sliderBarx = MagicValues.timelineLayersPanelDefaultTimeIndicatorLineX;
-	private Timeline parent;
 	private final int offset = MagicValues.timelineLayersPanelDefaultTimeIndicatorLineOffset;
 	private JViewport viewport;
 	private JPanel layersParentPane;
-	
+	private Session session;
 	private ArrayList<Color> defaultColors = new ArrayList<>();
 	
 	private Layer layerBeingDragged = null;
@@ -53,9 +54,8 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 	
 	
 	
-	public TimelineLayersPanel(Timeline parent) {
+	StandardTimelineLayersPanel() {
 		super();
-		this.parent = parent;
 		this.viewport = this.getViewport();
 		this.layersParentPane = new JPanel();
 		initializeDefaultColors();
@@ -207,13 +207,13 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 	
 	public void updateTimelineFromMouseClick(MouseEvent e) {
 		selectLayer(e);
-		parent.updateTimelineCurrentTimepointFromMouse(e);
+		parent.updateTimelineFromMouse(e);
 		
 	}
 	
 	// This is where we also update the layer nums of all the layers.
 	public void updateTimelineLayersPanelLayerNumbers() {
-		ArrayList<Layer> layers = parent.getSession().getLayers();
+		ArrayList<Layer> layers = session.getLayers();
 		layersParentPane.removeAll();
 		for (int i = 0; i < layers.size(); i++) {
 			Layer layer = layers.get(i);
@@ -271,7 +271,12 @@ public class TimelineLayersPanel extends JScrollPane implements SessionObject, S
 	}
 
 	public Session getSession() {
-		return parent.getSession();
+		return session;
+	}
+
+	@Override
+	public JScrollPane getSwingComponent() {
+		return this;
 	}
 	
 }

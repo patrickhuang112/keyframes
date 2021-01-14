@@ -20,7 +20,7 @@ import ui.dialog.DialogFactory;
 
 public class ColorPickerButton extends JButton implements Button {
 
-	ColorPickerButton(Session session) throws IOException {
+	ColorPickerButton() throws IOException {
 		Image icon = ImageIO.read(this.getClass().getResource("/colorPickerIcon.png"));
 		setIcon(new ImageIcon(icon));
 		
@@ -29,7 +29,7 @@ public class ColorPickerButton extends JButton implements Button {
 		addMouseListener(new MouseAdapter( ) {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				DialogFactory.createBrushAndFillColorDialog(session);
+				DialogFactory.createBrushAndFillColorDialog();
 			}
 		});
 	}

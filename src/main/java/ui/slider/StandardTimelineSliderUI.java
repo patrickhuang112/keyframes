@@ -1,4 +1,4 @@
-package ui;
+package ui.slider;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -19,11 +19,11 @@ import javax.swing.plaf.basic.BasicSliderUI;
 
 import keyframes.MagicValues;
 
-public class TimelineSliderUI extends BasicSliderUI {
+public class StandardTimelineSliderUI extends BasicSliderUI {
 	
 	private Hashtable<Integer, JLabel> timelineLabelsDict = new Hashtable<Integer, JLabel>();
 	
-	public TimelineSliderUI(JSlider slider) {
+	public StandardTimelineSliderUI(JSlider slider) {
 		super(slider);
 		slider.setEnabled(false);
 	}
@@ -34,7 +34,7 @@ public class TimelineSliderUI extends BasicSliderUI {
 	}
 	
 	// NEEDED FOR LAYERS UI
-	public int getSpacingBetweenTicks () {
+	public int getSpacingBetweenTicks() {
 		return xPositionForValue(1) - valueForXPosition(0);
 	}
 	

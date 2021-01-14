@@ -1,4 +1,4 @@
-package datatypes;
+package ui.progressbar;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -9,7 +9,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
-public class ProgressBar extends JPanel {
+import keyframes.Controller;
+import keyframes.Session;
+
+public class LeftLabelProgressBar extends JPanel implements ProgressBar {
 	
 	private static final long serialVersionUID = -2566279214244797217L;
 	
@@ -25,15 +28,17 @@ public class ProgressBar extends JPanel {
 	//0 = HORIZONTAL
 	//1 = VERTICAL
 	
-	public ProgressBar(JProgressBar bar, String label) {
-		this(bar, label, BoxLayout.X_AXIS);
+	LeftLabelProgressBar(String label) {
+		this( label, BoxLayout.X_AXIS);
 	}
 	
-	public ProgressBar(JProgressBar bar, String label, int orientation) {
+	private LeftLabelProgressBar(String label, int orientation) {
 		super();
-		this.bar = bar;
+		this.bar = new JProgressBar(Controller.getController().getShortestTimepoint() , 
+									Controller.getController().getLongestTimepoint());
 		this.label = new JLabel(label);
-		this.setLayout(new BoxLayout(this, orientation));
+		
+		setLayout(new BoxLayout(this, orientation));
 		rightMargin = Box.createRigidArea(new Dimension(rightMarginSpacing,0));
 		
 		bar.setPreferredSize(new Dimension(300,20));
@@ -64,10 +69,6 @@ public class ProgressBar extends JPanel {
 	public void resetProgressBar() {
 		bar.setValue(0);
 		label.setText(defaultText);
-	}
-	
-	public void setLabel(String label) {
-		this.label.setText(label);
 	}
 	
 	public String getLabel() {
@@ -104,5 +105,10 @@ public class ProgressBar extends JPanel {
 	
 	public boolean getVisibility () {
 		return isVisible;
+	}
+
+	@Override
+	public JPanel getSwingComponent() {
+		return this;
 	}
 }

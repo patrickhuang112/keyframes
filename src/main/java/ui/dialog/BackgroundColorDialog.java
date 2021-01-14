@@ -5,18 +5,17 @@ import java.awt.Color;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 
+import keyframes.Controller;
 import keyframes.Session;
 
 public class BackgroundColorDialog implements Dialog {
 
-	JDialog dialog;
-	
-	BackgroundColorDialog(Session session) {
-		Color current = session.getDrawablePanelBackgroundColor();
+	BackgroundColorDialog() {
+		Color current = Controller.getController().getDrawablePanelBackgroundColor();
 		Color newColor = JColorChooser.showDialog(null, "Choose a new background color", current);
 		if (newColor != null) {
-			session.setDrawablePanelBackgroundColor(newColor);
-			session.setEraserColor(newColor);
+			Controller.getController().setDrawablePanelBackgroundColor(newColor);
+			Controller.getController().setEraserColor(newColor);
 		}
 	}
 	

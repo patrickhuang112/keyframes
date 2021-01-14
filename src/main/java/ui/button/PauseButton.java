@@ -12,12 +12,13 @@ import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
 import factories.EnumFactory;
+import keyframes.Controller;
 import keyframes.Session;
 import ui.dialog.DialogFactory;
 
 public class PauseButton extends JButton implements Button {
 
-	PauseButton(Session session) throws IOException {
+	PauseButton() throws IOException {
 		Image pauseImage = ImageIO.read(this.getClass().getResource("/pauseIcon.png"));
 		setIcon(new ImageIcon(pauseImage));
 		
@@ -27,7 +28,7 @@ public class PauseButton extends JButton implements Button {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					session.pauseMovie();
+					Controller.getController().pauseMovie();
 				}
 			}
 		});

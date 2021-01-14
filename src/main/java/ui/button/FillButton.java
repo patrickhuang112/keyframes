@@ -12,12 +12,13 @@ import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
 import factories.EnumFactory;
+import keyframes.Controller;
 import keyframes.Session;
 import ui.dialog.DialogFactory;
 
 public class FillButton extends JButton implements Button {
 
-	FillButton(Session session) throws IOException {
+	FillButton() throws IOException {
 		super();
 		Image icon = ImageIO.read(this.getClass().getResource("/fillIcon.png"));
 		setIcon(new ImageIcon(icon));
@@ -28,7 +29,7 @@ public class FillButton extends JButton implements Button {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					session.setPaintSetting(EnumFactory.PaintSetting.FILLSINGLE);
+					Controller.getController().setPaintSetting(EnumFactory.PaintSetting.FILLSINGLE);
 				}
 			}
 		});

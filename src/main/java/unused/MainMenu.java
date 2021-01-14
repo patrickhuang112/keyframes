@@ -1,4 +1,4 @@
-package keyframes;
+package unused;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -24,7 +24,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import settings.Settings;
-import settings.SettingsView;
 
 public class MainMenu implements Serializable {
 	

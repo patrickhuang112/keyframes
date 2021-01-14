@@ -32,9 +32,6 @@ public class MagicValues {
 	public static final int timelineDefaultMinWidth = 0;
 	public static final int timelineDefaultMinHeight = 200;
 	
-	public static final int timelineMainTimelinePanelPreferredWidth = 0;
-	public static final int timelineMainTimelinePanelPreferredHeight = 200;
-	
 	public static final int layerDefaultMaxWidth = 1534;
 	public static final int layerDefaultMaxHeight = 40;
 	public static final int layerUIDefaultWidth = 0;
@@ -51,4 +48,7 @@ public class MagicValues {
 	
 	public static final int settingsDialogDefaultWidth = 500;
 	public static final int settingsDialogDefaultHeight = 400;
+	
+	
+	
 }

@@ -16,15 +16,15 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import factories.EnumFactory;
+import keyframes.Controller;
 import keyframes.Session;
-import ui.DrawablePanel;
 import ui.dialog.DialogFactory;
 
 public class EraseAllButton extends JButton implements Button {
 
 	private static int menuPopupOffset = 5;
 	
-	EraseAllButton(Session session) throws IOException {
+	EraseAllButton() throws IOException {
 		Image eraserImage = ImageIO.read(this.getClass().getResource("/eraseAllIcon.png"));
 		setIcon(new ImageIcon(eraserImage));
 		
@@ -48,7 +48,7 @@ public class EraseAllButton extends JButton implements Button {
 						= new JMenuItem(new AbstractAction("Erase all layer frames at current time") {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							session.eraseAllLayersAtCurrentFrame();
+							Controller.getController().eraseAllLayersAtCurrentFrame();
 						}
 					});
 					menu.add(eraseAllLayersAtCurrentTimeMenuItem);

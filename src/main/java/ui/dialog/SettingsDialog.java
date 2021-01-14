@@ -21,10 +21,12 @@ import ui.slider.SliderFactory;
 
 public class SettingsDialog extends JDialog implements Dialog {
 	
+	private static final long serialVersionUID = 1L;
 	private Settings settings;
+	private static JFrame nullFrame;
 	
-	SettingsDialog(JFrame frame, String title, Settings settings) {
-		super(frame, title, true);
+	SettingsDialog(String title, Settings settings) {
+		super(SettingsDialog.nullFrame, title, true);
 		this.settings = settings;
 		buildUI();
 	}
@@ -35,16 +37,16 @@ public class SettingsDialog extends JDialog implements Dialog {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(10,10,10,10);
 		
-		JSlider brushSizeSlider = SliderFactory.createBasicTenTickSlider( 
+		JSlider brushSizeSlider = SliderFactory.createStandardTenTickSlider( 
 				settings.brushMin, settings.brushMax, settings.getBrushSize()).getSwingComponent();
 		
-		JSlider eraserSizeSlider = SliderFactory.createBasicTenTickSlider(
+		JSlider eraserSizeSlider = SliderFactory.createStandardTenTickSlider(
 				settings.eraserMin, settings.eraserMax, settings.getEraserSize()).getSwingComponent();
 		
-		JSlider fpsSlider = SliderFactory.createBasicFiveTickSlider( 
+		JSlider fpsSlider = SliderFactory.createStandardFiveTickSlider( 
 				settings.fpsMin, settings.fpsMax, settings.getFps()).getSwingComponent();
 		
-		JSlider compositionLengthSlider = SliderFactory.createBasicFiveTickSlider( 
+		JSlider compositionLengthSlider = SliderFactory.createStandardFiveTickSlider( 
 				settings.lengthMin, settings.lengthMax, settings.getCompLength()).getSwingComponent();
 		
 		

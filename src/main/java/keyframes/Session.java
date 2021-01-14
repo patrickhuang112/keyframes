@@ -22,31 +22,41 @@ import datatypes.DrawPoint;
 import datatypes.KeyFrames;
 import datatypes.Layer;
 import datatypes.LayerBoundingBox;
-import datatypes.ProgressBar;
+import ui.progressbar.ProgressBar;
+import ui.slider.StandardTimelineSlider;
+import ui.slider.StandardTimelineSliderUI;
+import ui.slider.TimelineSlider;
+import ui.timeline.TimelineLayersPanel;
 import factories.EnumFactory;
 import settings.Settings;
-import ui.DrawablePanel;
-import ui.TimelineLayersPanel;
-import ui.TimelineSlider;
-import ui.TimelineSliderUI;
+import ui.canvas.KFCanvas;
 
 public class Session implements Serializable {
 	
 	
 	private static final long serialVersionUID = 3817282456552806335L;
 	
-	public final int brushMin = 0;
-	public final int brushMax = 30;
-	public final int eraserMin = 0;
-	public final int eraserMax = 30;
-	public final int fpsMin = 0;
-	public final int fpsMax = 30;
-	public final int lengthMin = 0;
-	public final int lengthMax = 20;
-	public final Color defaultDrawPanelBackgroundColor = Color.gray;
+	public static final int brushMin = 0;
+	public static final int brushMax = 30;
+	public static final int eraserMin = 0;
+	public static final int eraserMax = 30;
+	public static final int fpsMin = 0;
+	public static final int fpsMax = 30;
+	public static final int lengthMin = 0;
+	public static final int lengthMax = 20;
+	public static final Color defaultDrawPanelBackgroundColor = Color.gray;
 	public int minTimepoint = 0;
 
-	public Session(SessionSave ss) {
+	
+	static Session createSessionFromSettings(Settings settings) {
+		return new Session(settings);
+	}
+	
+	static Session createSessionFromSessionSave(SessionSave ss) {
+		return new Session(ss);
+	}
+	
+	private Session(SessionSave ss) {
 		this();
 		this.drawLayers = ss.drawLayers;
 		this.framesPerSecond = ss.framesPerSecond;
@@ -56,7 +66,7 @@ public class Session implements Serializable {
 		this.savePath = ss.savePath;
 	}
 	
-	public Session(Settings settings) {
+	private Session(Settings settings) {
 		this();
 		brushSize = settings.getBrushSize();
 		eraserSize = settings.getEraserSize();
@@ -65,7 +75,7 @@ public class Session implements Serializable {
 		longestTimepoint = longestTimeInSeconds * framesPerSecond;
 	}
 	
-	public Session() {
+	private Session() {
 		super();
 		// Initialize new HashMap of times and frames for default layer
 		KeyFrames drawFrames = 
@@ -94,8 +104,8 @@ public class Session implements Serializable {
 	private String savePath = null;
 	private boolean isPlaying = false;
 	private ProgressBar progressBar = null;
-	private DrawablePanel drawPanel = null;
-	private TimelineLayersPanel timelineLayersPanel = null;
+	private KFCanvas canvas = null;
+	private StandardTimelineLayersPanel timelineLayersPanel = null;
 	private TimelineSlider timelineSlider = null;
 	
 	private Color brushColor = Color.red;
@@ -149,8 +159,8 @@ public class Session implements Serializable {
 		// Start from the bottom layer, thats the first one we want to draw, and draw higher layers
 		// on top of bottom layers
 		
-		int drawWidth = drawPanel.getImageWidth();
-		int drawHeight = drawPanel.getImageHeight();
+		int drawWidth = canvas.getCanvasWidth();
+		int drawHeight = canvas.getCanvasHeight();
 		Color backgroundColor = getDrawablePanelBackgroundColor();
 		
 		for(int t = 0; t <= getLongestTimepoint(); t++) {
@@ -174,12 +184,12 @@ public class Session implements Serializable {
 	//Draw settings
 	
 	public void setDrawablePanelBackgroundColor (Color color) {
-		drawPanel.setBackground(color);
+		canvas.setBackgroundColor(color);
 		refreshUI();
 	}
 	
 	public Color getDrawablePanelBackgroundColor () {
-		return drawPanel.getBackground();
+		return canvas.getBackgroundColor();
 	}
 	
 	public Color getBrushColor() {
@@ -252,14 +262,14 @@ public class Session implements Serializable {
 	// spacing between ticks variable for the first time here as well
 	public void setTimelineSlider(TimelineSlider ts) {
 		this.timelineSlider = ts;
-		this.spaceBetweenTicks = timelineSlider.getUI().getSpacingBetweenTicks();
+		this.spaceBetweenTicks = timelineSlider.getSpacingBetweenTicks();
 	}
 	
-	public void setDrawPanel(DrawablePanel dp) {
-		this.drawPanel = dp;
+	public void setCanvas(KFCanvas dp) {
+		this.canvas = dp;
 	}
 	
-	public void setLayersPanel(TimelineLayersPanel pane) {
+	public void setLayersPanel(StandardTimelineLayersPanel pane) {
 		this.timelineLayersPanel = pane;
 	}
 	
@@ -269,6 +279,10 @@ public class Session implements Serializable {
 	
 	//-------------------------------------------------------------------------------------------------
 	//Composition settings (FPS, timepoints)
+	
+	public int getShortestTimepoint() {
+		return this.minTimepoint;
+	}
 	
 	public int getLongestTimepoint() {
 		return this.longestTimepoint;
@@ -287,7 +301,7 @@ public class Session implements Serializable {
 		if(time >= minTimepoint && time <= longestTimepoint) {
 			this.currentTimepoint = time;
 		}
-		timelineSlider.setValue(time);
+		timelineSlider.updateSlider(time);
 	}
 	
 	public int getCurrentTimepoint() {
@@ -316,6 +330,7 @@ public class Session implements Serializable {
 		
 		//FPS
 		private void updateTimeline(int oldFps, int newFps) {
+			/*
 			int newTimepoint = calculateNewTimelinePointerPositionFromOldFps(oldFps, newFps, currentTimepoint);
 			timelineSlider.setMaximum(longestTimeInSeconds * newFps);
 			timelineSlider.setMajorTickSpacing(newFps);
@@ -335,6 +350,7 @@ public class Session implements Serializable {
 
 			setCurrentTimepoint(newTimepoint);
 			refreshUI();
+			*/
 		}
 		
 		public void setFramesPerSecond(int fps) {
@@ -437,14 +453,12 @@ public class Session implements Serializable {
 	
 	// REFRESH and REDRAW DRAW PANEL (usually when we update our drawpanel in someway)
 	private void refreshDrawPanel(){
-		drawPanel.repaint();
-		drawPanel.revalidate();
+		canvas.refresh();
 	}
 	
 	private void refreshTimelineUI() {
 		// UPDATES the line on the layers panel
-		TimelineSliderUI ui = timelineSlider.getUI();
-		double sliderBarx = ui.getThumbMidX();
+		double sliderBarx = timelineSlider.getThumbMidX();
 	    timelineLayersPanel.setSliderBarx(sliderBarx);
 	    
 	    //Updates the layers order on the layers panel
@@ -614,7 +628,7 @@ public class Session implements Serializable {
 	public void addToCurrentLayerFrameAtCurrentTime(ArrayList<DrawPoint> newPoints) {
 		DrawFrame dps = getCurrentLayerFrameAtCurrentTime();
 		Graphics2D g2d = dps.createGraphics();
-		DrawablePanel.drawAndErasePath(g2d, newPoints);
+		//DrawablePanel.drawAndErasePath(g2d, newPoints);
 		//dps.refreshPixelArray();
 	}
 	
@@ -636,11 +650,11 @@ public class Session implements Serializable {
 	}
 	
 	public int getDrawablePaneWidth() {
-		return drawPanel.getImageWidth();
+		return canvas.getCanvasWidth();
 	}
 	
 	public int getDrawablePaneHeight() {
-		return drawPanel.getImageHeight();
+		return canvas.getCanvasHeight();
 	}
 	
 	// This is called whenever the draw panel is resized or when it is first created

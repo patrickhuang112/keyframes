@@ -12,12 +12,13 @@ import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
 import factories.EnumFactory;
+import keyframes.Controller;
 import keyframes.Session;
 import ui.dialog.DialogFactory;
 
 public class PlayButton extends JButton implements Button {
 
-	PlayButton(Session session) throws IOException {
+	PlayButton() throws IOException {
 		Image playImage = ImageIO.read(this.getClass().getResource("/playIcon.png"));
 		setIcon(new ImageIcon(playImage));
 		
@@ -27,7 +28,7 @@ public class PlayButton extends JButton implements Button {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					session.playMovie();
+					Controller.getController().playMovie();
 				}
 			}
 		});

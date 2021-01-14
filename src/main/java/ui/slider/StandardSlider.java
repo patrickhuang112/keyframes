@@ -4,11 +4,11 @@ import javax.swing.JSlider;
 
 import factories.MouseAdapterFactory;
 
-public class BasicSlider extends JSlider implements Slider{
+public class StandardSlider extends JSlider implements Slider{
 	
 	private static final long serialVersionUID = 3472121957836700369L;
 
-	BasicSlider(int start, int end, int value) {
+	StandardSlider(int start, int end, int value) {
 		super(JSlider.HORIZONTAL, start, end, value);
 		setMajorTickSpacing(10);
 		setMinorTickSpacing(1);

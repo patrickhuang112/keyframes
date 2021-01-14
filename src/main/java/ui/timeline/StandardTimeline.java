@@ -1,4 +1,4 @@
-package ui;
+package ui.timeline;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -35,77 +35,58 @@ import datatypes.DrawPoint;
 import datatypes.Interval;
 import datatypes.KeyFrames;
 import datatypes.Layer;
-import datatypes.UIComponent;
 import factories.EnumFactory;
+import keyframes.Controller;
 import keyframes.MagicValues;
+import keyframes.Session;
+import ui.UIComponent;
 import ui.slider.SliderFactory;
+import ui.slider.StandardTimelineSlider;
+import ui.slider.StandardTimelineSliderUI;
+import ui.slider.TimelineSlider;
+import ui.timeline.layerspanel.StandardTimelineLayersPanel;
+import ui.timeline.layerspanel.TimelineLayersPanel;
 
-public class Timeline extends JComponent implements UIComponent, Serializable{
+public class StandardTimeline extends JPanel implements Serializable, Timeline{
 	
 	private static final long serialVersionUID = -4549310200115960539L;
-	private UIComponent parent;
-	private JPanel mainTimelinePanel;
 	private TimelineSlider timelineSlider;
-	private TimelineLayersPanel layersPane;
+	private JSlider timelineSliderComp;
+	private StandardTimelineLayersPanel layersPane;
+	private Session session;
 	
-	
-	@Override
-	public void addChild(UIComponent child) {
-		mainTimelinePanel.add(child.getMainComponent());
-	}
-	
-	@Override
-	public JComponent getMainComponent() {
-		return mainTimelinePanel;
-	}
-	
-	public Timeline(UIComponent parent) {
-		this(parent, true);
-	}
-	
-	public Timeline(UIComponent parent, boolean addToParent) {
-		this.parent = parent;
-		mainTimelinePanel = new JPanel();
-		if(addToParent) { 
-			this.parent.getMainComponent().add(mainTimelinePanel, BorderLayout.PAGE_END);
-		}
-		
-		int dpw = MagicValues.drawablePanelDefaultPreferredWidth;
-		int dph = MagicValues.drawablePanelDefaultPreferredHeight;
-		int dmw = MagicValues.drawablePanelDefaultPreferredWidth;
-		int dmh = MagicValues.drawablePanelDefaultPreferredHeight;
+	public StandardTimeline () {
+		super();
+		int dpw = MagicValues.timelineDefaultPreferredWidth;
+		int dph = MagicValues.timelineDefaultPreferredHeight;
+		int dmw = MagicValues.timelineDefaultMinWidth;
+		int dmh = MagicValues.timelineDefaultMinHeight;
 		// Default heights of the timeline on the bottom
+		
+		setBackground(Color.gray);
+		setLayout(new BorderLayout());
 		setPreferredSize(new Dimension(dpw,dph));
 		setMinimumSize(new Dimension(dmw, dmh));
-		
 	}
 	
 	private void buildSlider() {
 		//In seconds
-		int endSec = getSession().getLongestTimeInSeconds();
-		int endPoint= getSession().getLongestTimepoint();
+		int endSec = Controller.getController().getLongestTimeInSeconds();
+		int endPoint= Controller.getController().getLongestTimepoint();
 		//In current tick (not necessarily seconds)
-		int cur = getSession().getCurrentTimepoint();
-		int fps = getSession().getFramesPerSecond();
+		int cur = Controller.getController().getCurrentTimepoint();
+		int fps = Controller.getController().getFramesPerSecond();
 		
 		
-		timelineSlider = new TimelineSlider(JSlider.HORIZONTAL, 
-				//STARTPOINT
-				0, 
-				//ENDPOINT
-				endPoint,
-				//INTIALPOINT
-				cur, 
-				//SESSION OBJ
-				getSession());
+		timelineSliderComp = SliderFactory.createStandardTimelineSlider(0, endPoint, cur).getSwingComponent();
 		
-		timelineSlider.setMajorTickSpacing(fps);
-		timelineSlider.setMinorTickSpacing(1);
-		timelineSlider.setPaintTicks(true);
-		timelineSlider.setPaintLabels(true);
-		timelineSlider.setSnapToTicks(true);
+		timelineSliderComp.setMajorTickSpacing(fps);
+		timelineSliderComp.setMinorTickSpacing(1);
+		timelineSliderComp.setPaintTicks(true);
+		timelineSliderComp.setPaintLabels(true);
+		timelineSliderComp.setSnapToTicks(true);
 		
-		getSession().setTimelineSlider(timelineSlider);
+		Controller.getController().setTimelineSlider(timelineSlider);
 		
 		Hashtable<Integer, JLabel> labelDict = new Hashtable<Integer, JLabel>();
 		for(Integer i = 0; i < endSec; i++) {
@@ -114,17 +95,16 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 		
 		//ADD THE ENDPOINT LABEL
 		labelDict.put(endPoint, new JLabel(((Integer)endSec).toString()));
-		timelineSlider.setLabelTable(labelDict);
+		timelineSliderComp.setLabelTable(labelDict);
 		
 		configureTimelineSliderListeners();
 		
-		mainTimelinePanel.add(timelineSlider, BorderLayout.NORTH);
+		mainTimelinePanel.add(timelineSliderComp, BorderLayout.NORTH);
 	}
 	
 	private void buildLayers() {
-		layersPane = new TimelineLayersPanel(this);
-		getSession().setLayersPanel(layersPane);
-		ArrayList<Layer> layers = getSession().getLayers();
+		layersPane = new StandardTimelineLayersPanel(this);
+		ArrayList<Layer> layers = Controller.getController().getLayers();
 		for (Layer layer : layers) {
 			//buildIndividualLayerTimeline(layer);
 		}
@@ -135,7 +115,7 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 	private void buildIndividualLayerTimeline(Layer layer) {
 		KeyFrames frames = layer.getFrames();
 		// THe last tick on the timeline slider
-		int longestTimepoint = getSession().getLongestTimepoint();
+		int longestTimepoint = Controller.getController().getLongestTimepoint();
 		
 		
 		ArrayList<Interval> layerIntervals = new ArrayList<>();
@@ -163,19 +143,19 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 	
 	private void configureTimelineSliderListeners() {
 		// MOUSE WITH SLIDER FUNCTIONALITY
-		timelineSlider.addMouseListener(new MouseAdapter() {
+		timelineSliderComp.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					updateTimelineCurrentTimepointFromMouse(e);
+					updateTimelineFromMouse(e);
 				}
 			}
 		});
-		timelineSlider.addMouseMotionListener(new MouseAdapter() {
+		timelineSliderComp.addMouseMotionListener(new MouseAdapter() {
 			@Override 
 			public void mouseDragged(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					updateTimelineCurrentTimepointFromMouse(e);
+					updateTimelineFromMouse(e);
 				}
 			}
 		});
@@ -183,28 +163,23 @@ public class Timeline extends JComponent implements UIComponent, Serializable{
 	
 	public void buildUI() {
 
-		int w = MagicValues.timelineMainTimelinePanelPreferredWidth;
-		int h = MagicValues.timelineMainTimelinePanelPreferredHeight;
 		
-		mainTimelinePanel.setBackground(Color.gray);
-		mainTimelinePanel.setPreferredSize(new Dimension(w,h));
-		mainTimelinePanel.setLayout(new BorderLayout());
 		buildSlider();
 		buildLayers();
 		
 	}
 	
-	// Updates the wedge and the black line from regular mouse clicks
-	public void updateTimelineCurrentTimepointFromMouse(MouseEvent e) {
-		TimelineSliderUI ui = timelineSlider.getUI();
-	    int value = ui.valueForXPosition(e.getX());
-	    getSession().updateTimelineFromValue(value);
-	    timelineSlider.requestFocus();
-	}
-	
-	
 	@Override
-	public Session getSession() {
-		return parent.getSession();
+	public JPanel getSwingComponent() {
+		return this;
 	}
+
+	@Override
+	public void updateTimelineFromMouse(MouseEvent e) {
+	    int value = timelineSlider.valueAtX(e.getX());
+	    Controller.getController().updateTimelineFromValue(value);
+	    timelineSliderComp.requestFocus();
+	}
+
+	
 }

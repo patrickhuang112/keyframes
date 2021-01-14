@@ -8,31 +8,31 @@ import keyframes.Session;
 
 public class ButtonFactory {
 
-	public static Button createBrushButton(JComponent parent, Session session) throws IOException {
-		return new BrushButton(parent, session);	
+	public static Button createBrushButton() throws IOException {
+		return new BrushButton();	
 	}
 	
-	public static Button createEraseButton(JComponent parent, Session session) throws IOException {
-		return new EraseButton(parent, session);	
+	public static Button createEraseButton() throws IOException {
+		return new EraseButton();	
 	}
 	
-	public static Button createPlayButton(Session session) throws IOException {
-		return new PlayButton(session);	
+	public static Button createPlayButton() throws IOException {
+		return new PlayButton();	
 	}
 	
-	public static Button createPauseButton(Session session) throws IOException {
-		return new PauseButton(session);	
+	public static Button createPauseButton() throws IOException {
+		return new PauseButton();	
 	}
 	
-	public static Button createEraseAllButton(Session session) throws IOException {
-		return new EraseAllButton(session);	
+	public static Button createEraseAllButton() throws IOException {
+		return new EraseAllButton();	
 	}
 	
-	public static Button createColorPickerButton(Session session) throws IOException {
-		return new ColorPickerButton(session);	
+	public static Button createColorPickerButton() throws IOException {
+		return new ColorPickerButton();	
 	}
 	
-	public static Button createFillButton(Session session) throws IOException {
-		return new FillButton(session);	
+	public static Button createFillButton() throws IOException {
+		return new FillButton();	
 	}
 }

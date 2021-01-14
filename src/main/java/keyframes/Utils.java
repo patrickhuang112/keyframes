@@ -72,14 +72,14 @@ public class Utils {
 		System.out.println("New project created");
 	}
 	
-	public static void openFile(ActionEvent e, Session oldSession, JComponent parent, JFrame frame) {
+	public static void openFile(Session oldSession, JFrame frame) {
 		// DO STUFF WITH OLD SESSION (NOT IMPLEMENTED YET)
 		
 		
 		try {
 			System.out.println("Loading project...");
 			final JFileChooser fc = new JFileChooser();
-			int returnVal = fc.showOpenDialog(parent);
+			int returnVal = fc.showOpenDialog(frame);
 			
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
@@ -91,8 +91,7 @@ public class Utils {
 			        fileIn.close();
 			        Session newSession = new Session(ss);
 			        frame.getContentPane().removeAll();
-					MainView mv = new MainView(frame, newSession);
-					mv.buildUI();
+					MainView.createNewInstance();
 				} else {
 					System.out.println("Incompatible file");
 				}
@@ -106,12 +105,12 @@ public class Utils {
 		System.out.println("Loaded project");
 	}
 	
-	public static void saveAsFile(ActionEvent e, Session session, JComponent parent) {
+	public static void saveAsFile(Session session, JFrame frame) {
 		try {
 			System.out.println("Loading project...");
 			final JFileChooser fc = new JFileChooser();
 			fc.setDialogTitle("Save session");
-			int returnVal = fc.showSaveDialog(parent);
+			int returnVal = fc.showSaveDialog(frame);
 			
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
@@ -138,10 +137,10 @@ public class Utils {
 		}
 	}
 	
-	public static void saveFile(ActionEvent ae, Session session, JComponent parent) {
+	public static void saveFile(Session session, JFrame frame) {
 		
 		if(session.getSavePath() == null) {
-			Utils.saveAsFile(ae, session, parent);
+			Utils.saveAsFile(session, frame);
 		} else {
 			try {
 				SessionSave ss = new SessionSave(session);
@@ -161,7 +160,7 @@ public class Utils {
 		}
 	}
 	
-	public static void renderFile(ActionEvent e, Session session, JComponent parent, int fps) {
+	public static void renderMP4(Session session, JFrame frame, int fps) {
 		SwingWorker sw = new SwingWorker() {
 			@Override
 			protected Object doInBackground() throws Exception {
@@ -169,7 +168,7 @@ public class Utils {
 					System.out.println("Rendering video...");
 					final JFileChooser fc = new JFileChooser();
 					fc.setDialogTitle("Render video");
-					int returnVal = fc.showSaveDialog(parent);
+					int returnVal = fc.showSaveDialog(frame);
 					
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
 						File file = fc.getSelectedFile();
@@ -220,7 +219,7 @@ public class Utils {
 			
 	}
 	
-	public static void renderGif(ActionEvent e, Session session, JComponent parent, int fps) {
+	public static void renderGIF(Session session, JFrame frame, int fps) {
 		SwingWorker sw = new SwingWorker() {
 			@Override
 			protected Object doInBackground() throws Exception {
@@ -228,7 +227,7 @@ public class Utils {
 					System.out.println("Rendering gif...");
 					final JFileChooser fc = new JFileChooser();
 					fc.setDialogTitle("Render gif");
-					int returnVal = fc.showSaveDialog(parent);
+					int returnVal = fc.showSaveDialog(frame);
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
 						File file = fc.getSelectedFile();
 						String filePath = file.getAbsolutePath() + ".gif";

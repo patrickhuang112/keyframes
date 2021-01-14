@@ -5,6 +5,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JSlider;
 
+import keyframes.Controller;
 import keyframes.Session;
 import ui.slider.SliderFactory;
 
@@ -12,15 +13,15 @@ public class BrushSizeDialog implements Dialog {
 
 	private JDialog dialog;
 	
-	BrushSizeDialog(JComponent parent, Session session, int start, int end, int value) {
+	BrushSizeDialog(int start, int end, int value) {
 		JOptionPane brushSizeSelector = new JOptionPane();
-		JSlider brushSizeSlider = SliderFactory.createBasicTenTickSlider(start, end, value).getSwingComponent();
+		JSlider brushSizeSlider = SliderFactory.createStandardTenTickSlider(start, end, value).getSwingComponent();
 		
 		brushSizeSelector.setMessage(new Object[] { "Select a Brush Size: ", brushSizeSlider});
 		brushSizeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
 		brushSizeSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
 		//Centered on the mainWindow
-		dialog = brushSizeSelector.createDialog(parent, "Brush Size");
+		dialog = brushSizeSelector.createDialog("Brush Size");
 	    dialog.setVisible(true);
 	    
 	    if(brushSizeSelector.getValue() != null) {
@@ -30,7 +31,7 @@ public class BrushSizeDialog implements Dialog {
 	    		if (val == 0) {
 	    			val++;
 	    		}
-	    		session.setBrushSize(val);
+	    		Controller.getController().setBrushSize(val);
 	    	} 
 	    }
 	}

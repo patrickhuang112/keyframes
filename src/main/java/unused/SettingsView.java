@@ -1,4 +1,4 @@
-package settings;
+package unused;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -24,7 +24,6 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-import keyframes.MainMenu;
 import ui.slider.SliderFactory;
 
 public class SettingsView {

@@ -3,6 +3,7 @@ package ui.dialog;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import keyframes.Controller;
 import keyframes.Session;
 import settings.Settings;
 
@@ -10,35 +11,35 @@ import settings.Settings;
 // FOR all dialogs created from this factory, they will instantly be visible after creation.
 public class DialogFactory {
 	
-	public static Dialog createCompositionLengthDialog (JComponent parent, Session session) {
-		return new CompositionLengthDialog(parent, session, session.lengthMin, session.lengthMax,
-											session.getLongestTimeInSeconds());
+	public static Dialog createCompositionLengthDialog () {
+		return new CompositionLengthDialog(Session.lengthMin, Session.lengthMax,
+											Controller.getController().getLongestTimeInSeconds());
 	}
 	
-	public static Dialog createFPSDialog (JComponent parent, Session session) {
-		return new FPSDialog(parent, session, session.fpsMin, session.fpsMax, 
-											session.getFramesPerSecond());
+	public static Dialog createFPSDialog () {
+		return new FPSDialog(Session.fpsMin, Session.fpsMax, 
+											Controller.getController().getFramesPerSecond());
 	}
 	
-	public static Dialog createEraserSizeDialog (JComponent parent, Session session) {
-		return new EraserSizeDialog(parent, session, session.eraserMin, session.eraserMax, 
-											session.getEraserSize());
+	public static Dialog createEraserSizeDialog () {
+		return new EraserSizeDialog(Session.eraserMin, Session.eraserMax, 
+											Controller.getController().getEraserSize());
 	}
 	
-	public static Dialog createBrushSizeDialog (JComponent parent, Session session) {
-		return new BrushSizeDialog (parent, session, session.brushMin, session.brushMax,
-											session.getBrushSize());
+	public static Dialog createBrushSizeDialog () {
+		return new BrushSizeDialog (Session.brushMin, Session.brushMax,
+											Controller.getController().getBrushSize());
 	}
 	
-	public static Dialog createSettingsDialog (JFrame frame, String windowTitle, Settings settings) {
-		return new SettingsDialog(frame, windowTitle, settings);
+	public static Dialog createSettingsDialog (String windowTitle, Settings settings) {
+		return new SettingsDialog(windowTitle, settings);
 	};
 	
-	public static Dialog createBackgroundColorDialog (Session session) {
-		return new BackgroundColorDialog(session);
+	public static Dialog createBackgroundColorDialog () {
+		return new BackgroundColorDialog();
 	}
 	
-	public static Dialog createBrushAndFillColorDialog (Session session) {
-		return new BrushAndFillColorDialog(session);
+	public static Dialog createBrushAndFillColorDialog () {
+		return new BrushAndFillColorDialog();
 	}
 }

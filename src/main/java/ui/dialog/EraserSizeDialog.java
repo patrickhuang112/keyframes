@@ -5,6 +5,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JSlider;
 
+import keyframes.Controller;
 import keyframes.Session;
 import ui.slider.SliderFactory;
 
@@ -12,16 +13,16 @@ public class EraserSizeDialog implements Dialog{
 	
 	private JDialog dialog;
 	
-	EraserSizeDialog(JComponent parent, Session session, int start, int end, int value) {
+	EraserSizeDialog(int start, int end, int value) {
 		JOptionPane eraserSizeSelector = new JOptionPane();
-		JSlider eraserSizeSlider = SliderFactory.createBasicTenTickSlider(
+		JSlider eraserSizeSlider = SliderFactory.createStandardTenTickSlider(
 				start, end, value).getSwingComponent();
 		
 		eraserSizeSelector.setMessage(new Object[] { "Select an Eraser Size: ", eraserSizeSlider});
 		eraserSizeSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
 		eraserSizeSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
 		//Centered on the mainWindow
-		dialog = eraserSizeSelector.createDialog(parent, "Eraser Size");
+		dialog = eraserSizeSelector.createDialog("Eraser Size");
 		dialog.setVisible(true);
 	    if(eraserSizeSelector.getValue() != null) {
 	    	int res = (int)(eraserSizeSelector.getValue());
@@ -30,7 +31,7 @@ public class EraserSizeDialog implements Dialog{
 	    		if (val == 0) {
 	    			val++;
 	    		}
-	    		session.setEraserSize(val);
+	    		Controller.getController().setEraserSize(val);
 	    	} else {
 	    		System.out.println("Slider cancelled");
 	    	}	

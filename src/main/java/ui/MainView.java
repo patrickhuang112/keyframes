@@ -55,27 +55,33 @@ import javax.swing.plaf.basic.BasicSliderUI;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
-import datatypes.ProgressBar;
+import ui.progressbar.ProgressBar;
 import datatypes.SessionObject;
 import factories.EnumFactory;
+import keyframes.Controller;
 import keyframes.MagicValues;
 import keyframes.Session;
 import keyframes.Utils;
 import settings.Settings;
 import ui.button.ButtonFactory;
+import ui.canvas.KFCanvas;
+import ui.canvas.KFCanvasFactory;
 import ui.dialog.CompositionLengthDialog;
 import ui.dialog.DialogFactory;
 import ui.dialog.FPSDialog;
 import ui.dialog.SettingsDialog;
+import ui.progressbar.ProgressBarFactory;
 import ui.slider.SliderFactory;
+import ui.splitpane.SplitPane;
+import ui.splitpane.SplitPaneFactory;
+import ui.timeline.Timeline;
+import ui.timeline.TimelineFactory;
 
 
-public class MainView implements SessionObject, Serializable{
+public class MainView extends JPanel implements Serializable{
 	
 	private static final long serialVersionUID = -4390147842958702501L;
 
-	private Session session;
-	
 	private JFrame window;
 	private JPanel mainPanel;
 	
@@ -85,7 +91,7 @@ public class MainView implements SessionObject, Serializable{
 	private JPanel topToolBarContainer;
 	private JToolBar topToolBar;
 	
-	private SplitPaneManager drawableAndTimelinePane;
+	private SplitPane splitPane;
 	
 	private JMenu fileMenu;
 	private JMenu editMenu;
@@ -118,31 +124,27 @@ public class MainView implements SessionObject, Serializable{
 		MainView.instance = new MainView();
 	}
 
+	// UI Element Getters
+	public SplitPane getSplitPaneManager() {
+		return splitPane;
+	}
 	
-	//Only package visible
-	SplitPaneManager getSplitPaneManager() {
-		return drawableAndTimelinePane;
+	public ProgressBar getProgressBar() {
+		return progressBar;
 	}
 	
 	private MainView() {
-		window = new JFrame();
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setTitle("Keyframes");
-		window.setVisible(true);
-		window.setMinimumSize(new Dimension(MagicValues.windowMinimumWidth, MagicValues.windowMinimumHeight));
-		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		super();
+		setLayout(new BorderLayout());
+		
 		
 		mainPanel = new JPanel(new BorderLayout());
 		window.add(mainPanel, BorderLayout.CENTER);
 		
 		Settings settings = Utils.getSettings();
-		session = new Session(settings);
-		
 		buildUI();
 	}
 
-	
-	
 	private void buildUI() {
 		mainPanel.setBackground(Color.blue);
 		buildDrawableAndTimeline();
@@ -150,7 +152,6 @@ public class MainView implements SessionObject, Serializable{
 		setKeyMaps();
 		window.revalidate();
 		window.repaint();
-		
 	}
 	
 	private void setKeyMaps() {
@@ -159,7 +160,7 @@ public class MainView implements SessionObject, Serializable{
 		mainPanel.getActionMap().put("copied", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				getSession().copyFramesFromCurrentLayerAndCurrentTime();
+				Controller.getController().copyFramesFromCurrentLayerAndCurrentTime();
 			}
 		});
 		// Paste copied frames into current layer
@@ -167,7 +168,7 @@ public class MainView implements SessionObject, Serializable{
 		mainPanel.getActionMap().put("pasted", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				getSession().pasteFramesToCurrentLayerAndCurrentTime();
+				Controller.getController().pasteFramesToCurrentLayerAndCurrentTime();
 			}
 		});
 		
@@ -176,7 +177,7 @@ public class MainView implements SessionObject, Serializable{
 		mainPanel.getActionMap().put("movieplaypause", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				getSession().playOrPauseMovie();
+				Controller.getController().playOrPauseMovie();
 			}
 		});
 		
@@ -191,33 +192,16 @@ public class MainView implements SessionObject, Serializable{
 	}
 	
 	private void buildDrawableAndTimeline() {
-		
-		drawableAndTimelinePane = new SplitPaneManager(this, true);
-		
-		Timeline mainTimeline = new Timeline(drawableAndTimelinePane, false);
-		mainTimeline.buildUI();
-		
-		Drawable mainDrawable = new Drawable(drawableAndTimelinePane, false);
-		mainDrawable.buildUI();
-		
-		drawableAndTimelinePane.setTopOrLeft(mainDrawable);
-		drawableAndTimelinePane.setBottomOrRight(mainTimeline);
-		
-		
-		
-	
-		mainPanel.add(drawableAndTimelinePane.getMainComponent());
+		KFCanvas canvas = KFCanvasFactory.createStandardKFCanvas();
+		Timeline timeline = TimelineFactory.createStandardTimeline();
+
+		splitPane = SplitPaneFactory.createHorizontalSplitPane(canvas, timeline);
+		mainPanel.add(splitPane.getSwingComponent());
 	}
 	
 	private void buildTopBar() {
 		
-		int tw = MagicValues.mainViewTopBarDefaultWidth;
-		int th = MagicValues.mainViewTopBarDefaultHeight;
 		
-		topBar = new JPanel();
-		topBar.setLayout(new BorderLayout());
-		topBar.setPreferredSize(new Dimension(tw,th));
-		topBar.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mainPanel.add(topBar, BorderLayout.PAGE_START);
 		buildTopMenuBar();
 		buildTopToolBarContainer();
@@ -225,107 +209,11 @@ public class MainView implements SessionObject, Serializable{
 	
 	private void buildTopMenuBar() {
 		
-		int w = MagicValues.mainViewTopMenuBarDefaultWidth;
-		int h = MagicValues.mainViewTopMenuBarDefaultHeight;
-		
-		topMenuBar = new JMenuBar();
-		topMenuBar.setPreferredSize(new Dimension(w,h));
-		
-		// FILE MENU
-		fileMenu = new JMenu("File");
-		newProjectMenuItem = new JMenuItem(new AbstractAction("New Project") {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				Utils.newFile(getSession(), window);
-			}
-		});
-		openProjectMenuItem = new JMenuItem(new AbstractAction("Open Project") {
-			public void actionPerformed(ActionEvent e) {
-				Utils.openFile(e, getSession(), openProjectMenuItem, window);
-			}
-		});
-		
-		saveProjectMenuItem = new JMenuItem(new AbstractAction("Save") {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Utils.saveFile(e, getSession(), saveProjectMenuItem);
-			}
-		});
-		
-		saveProjectAsMenuItem = new JMenuItem(new AbstractAction("Save As..") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Utils.saveAsFile(e, getSession(), saveProjectAsMenuItem);
-			}
-		});
-		
-		renderMP4AsMenuItem = new JMenuItem(new AbstractAction("Render MP4 As..") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Utils.renderFile(e, getSession(), renderMP4AsMenuItem, getSession().getFramesPerSecond());
-			}
-		});
-		
-		renderGIFAsMenuItem = new JMenuItem(new AbstractAction("Render GIF As..") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Utils.renderGif(e, getSession(), renderGIFAsMenuItem, getSession().getFramesPerSecond());
-			}
-		});
-		
-		settingsMenuItem = new JMenuItem(new AbstractAction("Settings") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				DialogFactory.createSettingsDialog(window, "Settings", Utils.getSettings());
-			}
-		});
-		
-			
-		fileMenu.add(newProjectMenuItem);
-		fileMenu.add(openProjectMenuItem);
-		fileMenu.add(saveProjectMenuItem);
-		fileMenu.add(saveProjectAsMenuItem);
-		fileMenu.add(renderMP4AsMenuItem);
-		fileMenu.add(renderGIFAsMenuItem);
-		fileMenu.add(settingsMenuItem);
-		
-		topMenuBar.add(fileMenu);
-		
-		// EDIT MENU
-		editMenu = new JMenu("Edit");
-		editFpsMenuItem = new JMenuItem(new AbstractAction("Edit Frames Per Second") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				DialogFactory.createFPSDialog(mainPanel, getSession());
-			}
-		});
-		
-		editTimeMenuItem = new JMenuItem(new AbstractAction("Edit Composition Endpoint") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				DialogFactory.createCompositionLengthDialog(mainPanel, getSession());
-			}
-		});
-		
-		editBackgroundColorItem = new JMenuItem(new AbstractAction("Edit Background Color") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				DialogFactory.createBackgroundColorDialog(getSession());
-			}
-		});
-		
-		editMenu.add(editFpsMenuItem);
-		editMenu.add(editTimeMenuItem);
-		editMenu.add(editBackgroundColorItem);
-		
-		topMenuBar.add(editMenu);
 		topBar.add(topMenuBar, BorderLayout.PAGE_START);
 	}
 	
 	private void buildTopToolBarContainer() {
-		topToolBarContainer = new JPanel();
-		topToolBarContainer.setLayout(new BoxLayout(topToolBarContainer, BoxLayout.X_AXIS));
+		
 		
 		buildTopToolBar();
 		buildHorizontalGlue();
@@ -354,33 +242,14 @@ public class MainView implements SessionObject, Serializable{
 	
 	private void buildProgressBar() {
 		
-		renderingProgressBar = new JProgressBar(getSession().minTimepoint, getSession().getLongestTimepoint());
-		String label = "Rendering Progress: ";
-		progressBar = new ProgressBar(renderingProgressBar, label);
-		getSession().setProgressBar(progressBar);
-		
-		topToolBarContainer.add(progressBar);
+		ProgressBar pb = ProgressBarFactory.createRenderingProgressBar();
+		topToolBarContainer.add(pb.getSwingComponent());
 	}
 	
 
 	private void buildTopToolBarButtons() {
 
-		try {
-			topToolBar.add(ButtonFactory.createBrushButton(mainPanel, session).getSwingComponent());
-			topToolBar.add(ButtonFactory.createEraseButton(mainPanel, session).getSwingComponent());
-			topToolBar.add(ButtonFactory.createEraseAllButton(session).getSwingComponent());
-			topToolBar.add(ButtonFactory.createPlayButton(session).getSwingComponent());
-			topToolBar.add(ButtonFactory.createPauseButton(session).getSwingComponent());
-			topToolBar.add(ButtonFactory.createColorPickerButton(session).getSwingComponent());
-			topToolBar.add(ButtonFactory.createFillButton(session).getSwingComponent());
-		} catch(Exception e) {
-			System.out.println("Button icon creation failed");
-		}
-	}
-	
-	@Override
-	public Session getSession() {
-		return session;
+		
 	}
 	
 }

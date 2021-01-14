@@ -5,6 +5,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JSlider;
 
+import keyframes.Controller;
 import keyframes.Session;
 import ui.slider.SliderFactory;
 
@@ -12,15 +13,15 @@ public class FPSDialog implements Dialog {
 	
 	private JDialog dialog;
 	
-	FPSDialog(JComponent parent, Session session, int start, int end, int value) {
+	FPSDialog(int start, int end, int value) {
 		JOptionPane fpsSelector = new JOptionPane();
-		JSlider fpsSlider = SliderFactory.createBasicTenTickSlider(start, end, value).getSwingComponent();
+		JSlider fpsSlider = SliderFactory.createStandardTenTickSlider(start, end, value).getSwingComponent();
 		
 		fpsSelector.setMessage(new Object[] { "Adjust Composition Frames Per Second ", fpsSlider});
 		fpsSelector.setMessageType(JOptionPane.QUESTION_MESSAGE);
 		fpsSelector.setOptionType(JOptionPane.OK_CANCEL_OPTION);
 		//Centered on the mainWindow
-		dialog = fpsSelector.createDialog(parent, "Frames Per Second");
+		dialog = fpsSelector.createDialog("Frames Per Second");
 		dialog.setVisible(true);
 	    if(fpsSelector.getValue() != null) {
 	    	int res = (int)(fpsSelector.getValue());
@@ -29,7 +30,7 @@ public class FPSDialog implements Dialog {
 	    		if (val == 0) {
 	    			val++;
 	    		}
-	    		session.setFramesPerSecond(val);
+	    		Controller.getController().setFramesPerSecond(val);
 	    	} 
 	    }
 	}
