@@ -25,16 +25,8 @@ public class Main {
 	public static void main(String[] args) {
 		
 		initializeLookAndFeel();
-		
-		Settings settings = Utils.getSettings();
-		MainView mv = MainView.getInstance();
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				
-			}
-			
-		});
+		Controller.createController();
+		Controller.getController().initialize();
 		System.out.println("App Started...");
 	}
 	

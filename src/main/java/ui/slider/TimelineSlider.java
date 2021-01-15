@@ -2,14 +2,12 @@ package ui.slider;
 
 import javax.swing.JSlider;
 
-public interface TimelineSlider {
+public interface TimelineSlider extends Slider {
 
-	public JSlider getSwingComponent();
-	
 	public int getSpacingBetweenTicks();
 	public double getThumbMidX();
 	public int valueAtX(int x);
 	
 	public void updateSlider(int newValue);
-	
+	public void updateSliderUIFromFPSOrLengthChange(int newFPS, int newLengthInSeconds);
 }

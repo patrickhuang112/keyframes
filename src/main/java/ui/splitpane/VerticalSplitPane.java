@@ -10,7 +10,7 @@ import datatypes.SessionObject;
 import keyframes.Session;
 import ui.UIComponent;
 
-public class HorizontalSplitPane extends JSplitPane implements Serializable, SplitPane {
+public class VerticalSplitPane extends JSplitPane implements Serializable, SplitPane {
 
 	private static final long serialVersionUID = -4937128517824428147L;
 
@@ -19,8 +19,8 @@ public class HorizontalSplitPane extends JSplitPane implements Serializable, Spl
 	private UIComponent topOrLeft;
 	private UIComponent bottomOrRight;
 	
-	HorizontalSplitPane() {
-		super(JSplitPane.HORIZONTAL_SPLIT);
+	VerticalSplitPane() {
+		super(JSplitPane.VERTICAL_SPLIT);
 	}
 	
 	@Override

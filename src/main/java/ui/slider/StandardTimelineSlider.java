@@ -16,8 +16,10 @@ import java.util.Hashtable;
 
 import javax.swing.JLabel;
 import javax.swing.JSlider;
+import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import keyframes.Controller;
 import keyframes.Session;
 
 
@@ -26,12 +28,51 @@ public class StandardTimelineSlider extends JSlider implements TimelineSlider{
 
 	private static final int defaultOrientation = JSlider.HORIZONTAL;
 	
-	public StandardTimelineSlider(int min, int max, int value) {
+	public StandardTimelineSlider(int min, int max, int value, int endSec, int fps) {
 		super(StandardTimelineSlider.defaultOrientation, min, max, value);
 		StandardTimelineSliderUI newUI = new StandardTimelineSliderUI(this);
 		newUI.installUI(this);
 		this.setUI(newUI);
+		
+		setMajorTickSpacing(fps);
+		setMinorTickSpacing(1);
+		setPaintTicks(true);
+		setPaintLabels(true);
+		setSnapToTicks(true);
+		
+		Hashtable<Integer, JLabel> labelDict = new Hashtable<Integer, JLabel>();
+		for(Integer i = 0; i < endSec; i++) {
+			labelDict.put(i * fps, new JLabel(i.toString()));
+		}
+		
+		//ADD THE ENDPOINT LABEL
+		labelDict.put(max, new JLabel(((Integer)endSec).toString()));
+		setLabelTable(labelDict);
+		
+		addMouseListeners();
+		
 	}
+	
+	private void addMouseListeners() {
+		// MOUSE WITH SLIDER FUNCTIONALITY
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(SwingUtilities.isLeftMouseButton(e)) {
+					Controller.getController().updateTimelineFromMouseClick(e);
+				}
+			}
+		});
+		addMouseMotionListener(new MouseAdapter() {
+			@Override 
+			public void mouseDragged(MouseEvent e) {
+				if(SwingUtilities.isLeftMouseButton(e)) {
+					Controller.getController().updateTimelineFromMouseClick(e);
+				}
+			}
+		});
+	}
+	
 	
 	@Override
 	public StandardTimelineSliderUI getUI() {
@@ -61,6 +102,36 @@ public class StandardTimelineSlider extends JSlider implements TimelineSlider{
 	@Override
 	public int valueAtX(int x) {
 		return getUI().valueForXPosition(x);
+	}
+
+	@Override
+	public void updateSliderStart(int newStart) {
+		setMinimum(newStart);
+	}
+
+	@Override
+	public void updateSliderEnd(int newEnd) {
+		setMaximum(newEnd);
+	}
+
+	@Override
+	public void updateSliderUIFromFPSOrLengthChange(int newFPS, int newLengthInSeconds) {
+		updateSliderEnd(newLengthInSeconds * newFPS);
+		setMajorTickSpacing(newFPS);
+		
+		Hashtable<Integer, JLabel> timelineLabelsDict = getUI().getTimelineLabelsDict();
+		timelineLabelsDict.clear();
+		//
+		timelineLabelsDict = new Hashtable<Integer, JLabel>();
+		
+		for(Integer i = 0; i < newLengthInSeconds; i++) {
+			timelineLabelsDict.put(i * newFPS, new JLabel(i.toString()));
+		}
+		//ADD THE ENDPOINT LABEL
+		timelineLabelsDict.put(newLengthInSeconds * newFPS, 
+				new JLabel(((Integer)newLengthInSeconds).toString()));
+		setLabelTable(timelineLabelsDict);
+		
 	}
 
 	

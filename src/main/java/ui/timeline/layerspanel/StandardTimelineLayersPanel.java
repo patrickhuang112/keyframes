@@ -34,6 +34,7 @@ import javax.swing.SwingUtilities;
 
 import datatypes.Layer;
 import datatypes.SessionObject;
+import keyframes.Controller;
 import keyframes.MagicValues;
 import keyframes.Session;
 import ui.UIComponent;
@@ -60,13 +61,11 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 		this.layersParentPane = new JPanel();
 		initializeDefaultColors();
 		
-		layersCopy = getSession().deepCopyLayers();
-		
 		layersParentPane.setLayout(new BoxLayout(layersParentPane, BoxLayout.Y_AXIS));
 		layersParentPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 		viewport.add(layersParentPane);
 		setupLayersParentPaneListeners();
-		updateTimelineLayersPanelLayerNumbers();
+		//updateTimelineLayersPanelLayerNumbers();
 		
 	}
 	
@@ -207,7 +206,7 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 	
 	public void updateTimelineFromMouseClick(MouseEvent e) {
 		selectLayer(e);
-		parent.updateTimelineFromMouse(e);
+		Controller.getController().updateTimelineFromMouseClick(e);
 		
 	}
 	
@@ -237,12 +236,8 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 	}
 	
 	// These two functions literally just for the UI thumb line thing
-	public void setSliderBarx(double x) {
+	private void setSliderBarx(double x) {
 		sliderBarx = x;
-	}
-	
-	public double getSliderBarx() {
-		return sliderBarx;
 	}
 	
 	@Override
@@ -277,6 +272,17 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 	@Override
 	public JScrollPane getSwingComponent() {
 		return this;
+	}
+
+	@Override
+	public void updateLayersPanelUI(double newMarkerX) {
+		setSliderBarx(newMarkerX);
+		    
+	    //Updates the layers order on the layers panel
+	    updateTimelineLayersPanelLayerNumbers();
+	    
+	    repaint();
+		revalidate();
 	}
 	
 }

@@ -82,35 +82,6 @@ public class MainView extends JPanel implements Serializable{
 	
 	private static final long serialVersionUID = -4390147842958702501L;
 
-	private JFrame window;
-	private JPanel mainPanel;
-	
-	private JPanel topBar;
-	private JMenuBar topMenuBar;
-	// Contains topToolBar and progressBar
-	private JPanel topToolBarContainer;
-	private JToolBar topToolBar;
-	
-	private SplitPane splitPane;
-	
-	private JMenu fileMenu;
-	private JMenu editMenu;
-	
-	private JMenuItem newProjectMenuItem;
-	private JMenuItem openProjectMenuItem;
-	private JMenuItem saveProjectMenuItem;
-	private JMenuItem saveProjectAsMenuItem;
-	private JMenuItem renderMP4AsMenuItem;
-	private JMenuItem renderGIFAsMenuItem;
-	private JMenuItem settingsMenuItem;
-	
-	private JMenuItem editFpsMenuItem;
-	private JMenuItem editTimeMenuItem;
-	private JMenuItem editBackgroundColorItem;
-	
-	private JProgressBar renderingProgressBar;
-	private ProgressBar progressBar;
-	
 	private static MainView instance;
 	
 	public static MainView getInstance() {
@@ -123,49 +94,25 @@ public class MainView extends JPanel implements Serializable{
 	public static void createNewInstance() {
 		MainView.instance = new MainView();
 	}
-
-	// UI Element Getters
-	public SplitPane getSplitPaneManager() {
-		return splitPane;
-	}
-	
-	public ProgressBar getProgressBar() {
-		return progressBar;
-	}
 	
 	private MainView() {
 		super();
 		setLayout(new BorderLayout());
-		
-		
-		mainPanel = new JPanel(new BorderLayout());
-		window.add(mainPanel, BorderLayout.CENTER);
-		
-		Settings settings = Utils.getSettings();
-		buildUI();
-	}
-
-	private void buildUI() {
-		mainPanel.setBackground(Color.blue);
-		buildDrawableAndTimeline();
-		buildTopBar();
 		setKeyMaps();
-		window.revalidate();
-		window.repaint();
 	}
 	
 	private void setKeyMaps() {
 		// Copy frames from current layer
-		mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control C"), "copied");
-		mainPanel.getActionMap().put("copied", new AbstractAction() {
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control C"), "copied");
+		getActionMap().put("copied", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Controller.getController().copyFramesFromCurrentLayerAndCurrentTime();
 			}
 		});
 		// Paste copied frames into current layer
-		mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control V"), "pasted");
-		mainPanel.getActionMap().put("pasted", new AbstractAction() {
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control V"), "pasted");
+		getActionMap().put("pasted", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Controller.getController().pasteFramesToCurrentLayerAndCurrentTime();
@@ -173,83 +120,21 @@ public class MainView extends JPanel implements Serializable{
 		});
 		
 		// Play and pause movie
-		mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("SPACE"), "movieplaypause");
-		mainPanel.getActionMap().put("movieplaypause", new AbstractAction() {
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("SPACE"), "movieplaypause");
+		getActionMap().put("movieplaypause", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Controller.getController().playOrPauseMovie();
 			}
 		});
 		
-		mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control S"), "save");
-		mainPanel.getActionMap().put("save", new AbstractAction() {
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control S"), "save");
+		getActionMap().put("save", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Utils.saveFile(e, session, saveProjectMenuItem);
+				Controller.getController().saveProject();
 			}
 		});
 		
 	}
-	
-	private void buildDrawableAndTimeline() {
-		KFCanvas canvas = KFCanvasFactory.createStandardKFCanvas();
-		Timeline timeline = TimelineFactory.createStandardTimeline();
-
-		splitPane = SplitPaneFactory.createHorizontalSplitPane(canvas, timeline);
-		mainPanel.add(splitPane.getSwingComponent());
-	}
-	
-	private void buildTopBar() {
-		
-		
-		mainPanel.add(topBar, BorderLayout.PAGE_START);
-		buildTopMenuBar();
-		buildTopToolBarContainer();
-	}
-	
-	private void buildTopMenuBar() {
-		
-		topBar.add(topMenuBar, BorderLayout.PAGE_START);
-	}
-	
-	private void buildTopToolBarContainer() {
-		
-		
-		buildTopToolBar();
-		buildHorizontalGlue();
-		buildProgressBar();
-		
-		topBar.add(topToolBarContainer, BorderLayout.PAGE_END);
-	}
-	
-	private void buildHorizontalGlue() {
-		topToolBarContainer.add(Box.createHorizontalGlue());
-	}
-	
-	private void buildTopToolBar() {
-		
-		int tbw = MagicValues.mainViewTopToolBarDefaultWidth;
-		int tbh = MagicValues.mainViewTopToolBarDefaultHeight;
-		
-		topToolBar = new JToolBar(JToolBar.HORIZONTAL);
-		topToolBar.setPreferredSize(new Dimension(tbw,tbh));
-		topToolBar.setFloatable(false);
-		
-		buildTopToolBarButtons();
-		topToolBarContainer.add(topToolBar);
-		
-	}
-	
-	private void buildProgressBar() {
-		
-		ProgressBar pb = ProgressBarFactory.createRenderingProgressBar();
-		topToolBarContainer.add(pb.getSwingComponent());
-	}
-	
-
-	private void buildTopToolBarButtons() {
-
-		
-	}
-	
 }

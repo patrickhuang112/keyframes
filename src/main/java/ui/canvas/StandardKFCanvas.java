@@ -157,7 +157,7 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
 
 			@Override
 			public void componentResized(ComponentEvent e) {
-				Controller.getController().updateDrawFrameDimensions();
+				Controller.getController().updateDrawFrameDimensions(getCanvasWidth(), getCanvasHeight());
 			}
 
 			@Override
@@ -188,7 +188,7 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
 				Controller.getController().setEraserColor(backgroundColor);
 				// Once we now have access to the draw panel, we should also update all the draw frames in
 				// the layers with the new dimensions
-				Controller.getController().updateDrawFrameDimensions();
+				Controller.getController().updateDrawFrameDimensions(defaultPrefW, defaultPrefH);
 			}
 			
 		});
@@ -309,17 +309,11 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
  			
  			// The currently dragged stuff
  			if(Controller.getController().getCurrentLayerNum() == i && currentDraggedPoints != null) {
- 				//DrawablePanel.drawAndErasePath(g2d, currentDraggedPoints);
+ 				StandardKFCanvas.drawAndErasePath(g2d, currentDraggedPoints);
  			}
 		}
  			
-		updateSession();
 	}
-
-	private void updateSession() {
-		Controller.getController().refreshUI();
-	}
-	
 
 	@Override
 	public JPanel getSwingComponent() {

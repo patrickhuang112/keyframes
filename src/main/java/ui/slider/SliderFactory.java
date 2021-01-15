@@ -27,8 +27,8 @@ public class SliderFactory {
 		return newSlider;
 	}
 	
-	public static TimelineSlider createStandardTimelineSlider(int start, int end, int value) {
-		return new StandardTimelineSlider(start, end, value);
+	public static TimelineSlider createStandardTimelineSlider(int start, int end, int value, int endSec, int fps) {
+		return new StandardTimelineSlider(start, end, value, endSec, fps);
 	}
 	
 }

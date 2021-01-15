@@ -27,7 +27,6 @@ public class SessionSave implements Serializable {
 		this.savePath = session.getSavePath();
 		this.longestTimeInSeconds = session.getLongestTimeInSeconds();
 		this.framesPerSecond = session.getFramesPerSecond();
-		this.spaceBetweenTicks = session.getSpacingBetweenTicks();
 		this.longestTimepoint = longestTimeInSeconds * framesPerSecond;
 		this.drawLayers = session.getLayers();
 	}

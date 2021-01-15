@@ -63,8 +63,8 @@ public class Utils {
         return ext;
     }
 	
-	public static void newFile(Session oldSession, JFrame frame) {
-		// DO STUFF WITH OLD SESSION (NOT IMPLEMENTED YET)
+	public static void newFile(JFrame frame) {
+		// DO STUFF WITH OLD Controller.getController() (NOT IMPLEMENTED YET)
 		
 		frame.getContentPane().removeAll();
 		MainView.createNewInstance();
@@ -72,10 +72,8 @@ public class Utils {
 		System.out.println("New project created");
 	}
 	
-	public static void openFile(Session oldSession, JFrame frame) {
-		// DO STUFF WITH OLD SESSION (NOT IMPLEMENTED YET)
-		
-		
+	public static void openFile( JFrame frame) {
+		// DO STUFF WITH OLD Controller.getController() (NOT IMPLEMENTED YET)
 		try {
 			System.out.println("Loading project...");
 			final JFileChooser fc = new JFileChooser();
@@ -89,7 +87,7 @@ public class Utils {
 			        SessionSave ss = (SessionSave) in.readObject();
 			        in.close();
 			        fileIn.close();
-			        Session newSession = new Session(ss);
+			        Controller.getController().newSessionFromSessionSave(ss);
 			        frame.getContentPane().removeAll();
 					MainView.createNewInstance();
 				} else {
@@ -105,18 +103,18 @@ public class Utils {
 		System.out.println("Loaded project");
 	}
 	
-	public static void saveAsFile(Session session, JFrame frame) {
+	public static void saveAsFile( JFrame frame) {
 		try {
 			System.out.println("Loading project...");
 			final JFileChooser fc = new JFileChooser();
-			fc.setDialogTitle("Save session");
+			fc.setDialogTitle("Save Controller.getController()");
 			int returnVal = fc.showSaveDialog(frame);
 			
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
 				String savePath = file.getAbsolutePath() + Utils.fileExtension;
-				session.setSavePath(savePath);
-				SessionSave ss = new SessionSave(session);
+				Controller.getController().setSavePath(savePath);
+				SessionSave ss = Controller.getController().createCurrentSessionSave();
 				FileOutputStream fos = new FileOutputStream(savePath);
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 				// write object to file
@@ -133,18 +131,16 @@ public class Utils {
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 			System.out.println("Error saving file");
-			session = new Session();
 		}
 	}
 	
-	public static void saveFile(Session session, JFrame frame) {
+	public static void saveFile(JFrame frame) {
 		
-		if(session.getSavePath() == null) {
-			Utils.saveAsFile(session, frame);
+		if(Controller.getController().getSavePath() == null) {
+			Utils.saveAsFile(frame);
 		} else {
 			try {
-				SessionSave ss = new SessionSave(session);
-				assert(ss.savePath.equals(session.getSavePath()));
+				SessionSave ss = Controller.getController().createCurrentSessionSave();
 				FileOutputStream fos = new FileOutputStream(ss.savePath);
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 				// write object to file
@@ -160,7 +156,7 @@ public class Utils {
 		}
 	}
 	
-	public static void renderMP4(Session session, JFrame frame, int fps) {
+	public static void renderMP4(JFrame frame, int fps) {
 		SwingWorker sw = new SwingWorker() {
 			@Override
 			protected Object doInBackground() throws Exception {
@@ -175,17 +171,17 @@ public class Utils {
 						String filePath = file.getAbsolutePath() + ".mp4";
 						File newFile = new File(filePath);
 						
-						session.setProgressBarVisible(true);
+						Controller.getController().setProgressBarVisible(true);
 						
 						AWTSequenceEncoder enc = AWTSequenceEncoder.createSequenceEncoder(newFile, fps);
-						HashMap<Integer, BufferedImage> images = session.getImages();
+						HashMap<Integer, BufferedImage> images = Controller.getController().getImages();
 						
-						for(int i = 0; i <= session.getLongestTimepoint(); i++) {
+						for(int i = 0; i <= Controller.getController().getLongestTimepoint(); i++) {
 							BufferedImage img = images.get(i);
 							enc.encodeImage(img);
 							
 							//Update progress bar
-							session.updateProgressBar(i);
+							Controller.getController().updateProgressBar(i);
 						}
 						enc.finish();
 						
@@ -194,8 +190,8 @@ public class Utils {
 					            new TimerTask() {
 					                @Override
 					                public void run() {
-					                    session.setProgressBarVisible(false);
-					                    session.resetProgressBar();
+					                	Controller.getController().setProgressBarVisible(false);
+					                	Controller.getController().resetProgressBar();
 					                }
 					            }, MagicValues.utilsRenderDefaultTimeBeforeProgressBarDisappearsAfterRender);
 						
@@ -219,7 +215,7 @@ public class Utils {
 			
 	}
 	
-	public static void renderGIF(Session session, JFrame frame, int fps) {
+	public static void renderGIF(JFrame frame, int fps) {
 		SwingWorker sw = new SwingWorker() {
 			@Override
 			protected Object doInBackground() throws Exception {
@@ -233,9 +229,9 @@ public class Utils {
 						String filePath = file.getAbsolutePath() + ".gif";
 						File newFile = new File(filePath);
 						
-						session.setProgressBarVisible(true);
+						Controller.getController().setProgressBarVisible(true);
 						
-						HashMap<Integer, BufferedImage> images = session.getImages();
+						HashMap<Integer, BufferedImage> images = Controller.getController().getImages();
 						ImageOutputStream output = new FileImageOutputStream(newFile);
 						
 						int millisecondsInSecond = 1000;
@@ -251,12 +247,13 @@ public class Utils {
 								new GifSequenceWriter(output, imgType, timeBetweenFrames, true);
 					      
 					    // write images to the sequence
-						for(int i = 0; i <= session.getLongestTimepoint(); i++) {
+						int end = Controller.getController().getLongestTimepoint();
+						for(int i = 0; i <= end; i++) {
 							BufferedImage img = images.get(i);
 							writer.writeToSequence(img);
 							
 							//Update progress bar
-							session.updateProgressBar(i);
+							Controller.getController().updateProgressBar(i);
 						}
 						
 					    writer.close();
@@ -267,8 +264,8 @@ public class Utils {
 					            new TimerTask() {
 					                @Override
 					                public void run() {
-					                    session.setProgressBarVisible(false);
-					                    session.resetProgressBar();
+					                	Controller.getController().setProgressBarVisible(false);
+					                	Controller.getController().resetProgressBar();
 					                }
 					            }, MagicValues.utilsRenderDefaultTimeBeforeProgressBarDisappearsAfterRender);
 					} else {

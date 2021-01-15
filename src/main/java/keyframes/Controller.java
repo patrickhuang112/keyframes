@@ -4,12 +4,15 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 
 import javax.swing.Box;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JProgressBar;
@@ -94,20 +97,26 @@ public class Controller {
 	private MenuItem editBackgroundColorMenuItem;
 	
 	
-	
+	private DrawFrame clipboardFrames = null;
 	
 	private Controller () {
-		mainView = MainView.getInstance();
-		mainViewTopContainer = PaneFactory.createEmptyPane();
+		//Creates mode first
+		newSessionFromSettings();
+	}
+	
+	//Initialize UI
+	public void initialize() {
 		initializeUI();
 		buildUI();
 	}
 	
-
-	public static Controller getController() {
+	public static void createController() {
 		if (Controller.instance == null) {
 			Controller.instance = new Controller();
 		}
+	}
+	
+	public static Controller getController() {
 		return Controller.instance;
 	}
 	
@@ -118,10 +127,12 @@ public class Controller {
 		buildTimeline();
 		buildTopContainer();
 		timelineCanvasSplitPane.addTopLeftComponent(canvas);
-		timelineCanvasSplitPane.addTopLeftComponent(timeline);
+		timelineCanvasSplitPane.addBottomRightComponent(timeline);
 		mainView.add(timelineCanvasSplitPane.getSwingComponent());
 		mainView.add(mainViewTopContainer.getSwingComponent(), BorderLayout.PAGE_START);
 		frame.add(mainView, BorderLayout.CENTER);
+		frame.revalidate();
+		frame.repaint();
 	}
 	
 	private void buildTimeline() {
@@ -252,25 +263,30 @@ public class Controller {
 		timeline = TimelineFactory.createStandardTimeline();
 		timelineSlider = SliderFactory.createStandardTimelineSlider(session.getShortestTimepoint(), 
 																	session.getLongestTimepoint(), 
-																	session.getCurrentTimepoint());
+																	session.getCurrentTimepoint(),
+																	session.getLongestTimeInSeconds(),
+																	session.getFramesPerSecond());
 		timelineLayersPanel = TimelineLayersPanelFactory.createStandardTimelineLayersPanel();
 	}
 	
-	private void newSessionFromSettings() {
+	public void newSessionFromSettings() {
 		session = Session.createSessionFromSettings(Utils.getSettings());
 	}
 	
-	private void newSessionFromSessionSave(SessionSave ss) {
+	public void newSessionFromSessionSave(SessionSave ss) {
 		session = Session.createSessionFromSessionSave(ss);
 	}
 	
+	public SessionSave createCurrentSessionSave() {
+		return new SessionSave(session);
+	}
 	
 	public String getSavePath() {
-		return savePath;
+		return session.getSavePath();
 	}
 	
 	public void setSavePath(String path) {
-		savePath = path;
+		session.setSavePath(path);
 	}
 	
 	
@@ -297,6 +313,7 @@ public class Controller {
 			Graphics2D gr = img.createGraphics();
 			gr.setPaint(backgroundColor);
 			gr.fillRect(0,0, drawWidth, drawHeight);
+			ArrayList<Layer> drawLayers = getLayers();
 			for(int i = drawLayers.size() - 1; i >= 0; i--) {
 				Layer layer = drawLayers.get(i);
 				DrawFrame df = layer.getPointCollectionAtTime(t);
@@ -312,11 +329,11 @@ public class Controller {
 	//Draw settings
 	
 	public void setDrawablePanelBackgroundColor (Color color) {
-		session.setDrawablePanelBackgroundColor(color);
+		canvas.setBackgroundColor(color);
 	}
 	
 	public Color getDrawablePanelBackgroundColor () {
-		return session.getDrawablePanelBackgroundColor();
+		return canvas.getBackgroundColor();
 	}
 	
 	public Color getBrushColor() {
@@ -377,29 +394,6 @@ public class Controller {
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	// INITIALIZE UI Components in Session
-	// These should only be called at the beginning
-	
-	// This should only be called once when we set up everything, so we can update the 
-	// spacing between ticks variable for the first time here as well
-	public void setTimelineSlider(TimelineSlider ts) {
-		this.timelineSlider = ts;
-		this.spaceBetweenTicks = timelineSlider.getSpacingBetweenTicks();
-	}
-	
-	public void setCanvas(KFCanvas dp) {
-		this.canvas = dp;
-	}
-	
-	public void setLayersPanel(StandardTimelineLayersPanel pane) {
-		this.timelineLayersPanel = pane;
-	}
-	
-	public void setProgressBar(ProgressBar pb) {
-		this.progressBar = pb;
-	}
-	
-	//-------------------------------------------------------------------------------------------------
 	//Composition settings (FPS, timepoints)
 	
 	public int getShortestTimepoint() {
@@ -412,7 +406,12 @@ public class Controller {
 	
 	//TIMELINE CURRENT TIME
 	public void setCurrentTimepoint(int time) {
-		session.setCurrentTimepoint(time);
+		//Model
+		boolean successful = session.setCurrentTimepoint(time); 
+		if (successful) {
+			//View
+			timelineSlider.updateSlider(time);
+		}
 	}
 	
 	public int getCurrentTimepoint() {
@@ -420,111 +419,53 @@ public class Controller {
 	}
 	
 	// Set the longest timepoint for the composition (from the slider)
-		public void setLongestTimeInSeconds(int time) {
-			if(time >= lengthMin && time <= lengthMax) {
-				this.longestTimeInSeconds = time;
-				longestTimepoint = framesPerSecond * longestTimeInSeconds;
-				updateTimeline(framesPerSecond, framesPerSecond);
-				updateAllLayerFramesFromFPS(framesPerSecond, framesPerSecond);
-				refreshProgressBarEndpoint();
-				refreshUI();
-			}
-		}
-		
-		public int getLongestTimeInSeconds() {
-			return this.longestTimeInSeconds;
-		}
-		
-		private void refreshProgressBarEndpoint() {
-			this.progressBar.setProgressBarEndpoint(longestTimepoint);
-		}
-		
-		//FPS
-		private void updateTimeline(int oldFps, int newFps) {
-			/*
-			int newTimepoint = calculateNewTimelinePointerPositionFromOldFps(oldFps, newFps, currentTimepoint);
-			timelineSlider.setMaximum(longestTimeInSeconds * newFps);
-			timelineSlider.setMajorTickSpacing(newFps);
-			timelineSlider.setMinorTickSpacing(1);
-			Hashtable<Integer, JLabel> timelineLabelsDict = timelineSlider.getUI().getTimelineLabelsDict();
-			timelineLabelsDict.clear();
-			//
-			timelineLabelsDict = new Hashtable<Integer, JLabel>();
-			
-			for(Integer i = 0; i < longestTimeInSeconds; i++) {
-				timelineLabelsDict.put(i * newFps, new JLabel(i.toString()));
-			}
-			//ADD THE ENDPOINT LABEL
-			timelineLabelsDict.put(longestTimeInSeconds * newFps, 
-					new JLabel(((Integer)longestTimeInSeconds).toString()));
-			timelineSlider.setLabelTable(timelineLabelsDict);
-
-			setCurrentTimepoint(newTimepoint);
+	public void setLongestTimeInSeconds(int time) {
+		//Model
+		boolean successful = session.setLongestTimeInSeconds(time);
+		if (successful) {
+			//View
+			updateTimelineUIFromChangeInFPSOrTime(session.getFramesPerSecond());
 			refreshUI();
-			*/
 		}
+	}
+	
+	private void updateProgressBarEndpointFromChangeInFPSOrTime() {
+		progressBar.setProgressBarEndpoint(session.getLongestTimepoint());
+	}
+	
+	//FPS
+	private void updateTimelineUIFromChangeInFPSOrTime(int newFPS) {
+		timelineSlider.updateSliderUIFromFPSOrLengthChange(newFPS, session.getLongestTimeInSeconds());
+		updateProgressBarEndpointFromChangeInFPSOrTime();
+	}
+	
+	public int getLongestTimeInSeconds() {
+		return session.getLongestTimeInSeconds();
+	}
+	
+	public void setFramesPerSecond(int fps) {
+		//Model
+		boolean successful = session.setFramesPerSecond(fps);
+		if (successful) {
+			//View
+			updateTimelineUIFromChangeInFPSOrTime(session.getFramesPerSecond());
+			refreshUI();
+		}
+	}
+	
+	public int getFramesPerSecond() {
 		
-		public void setFramesPerSecond(int fps) {
-			if(fps >= fpsMin && fps <= fpsMax) {
-				int oldFps = framesPerSecond;
-				int newFps = fps;
-				
-				updateTimeline(oldFps, newFps);
-				updateAllLayerFramesFromFPS(oldFps, newFps);
-				
-				framesPerSecond = fps;
-				longestTimepoint = fps * longestTimeInSeconds;
-				
-				refreshProgressBarEndpoint();
-				refreshUI();
-			}
-		}
-		
-		public int getFramesPerSecond() {
-			return this.framesPerSecond;
-		}
-		
-		private int calculateNewTimelinePointerPositionFromOldFps(int oldFps, int newFps, int timePoint) {
-			int sec = timePoint / oldFps;
-			double rem = timePoint % oldFps;
-			double frac = rem / ((double)oldFps);
-			int newTimepoint = (sec * newFps) + (int)(frac * (double)(newFps));
-			return newTimepoint;
-		}
-		
-		// A function to update all frames in all layers, where the change is due to FPS change
-		private void updateAllLayerFramesFromFPS(int oldFps, int newFps) {
-			for (Layer layer : drawLayers) {
-				updateLayerFramesFromFPS(oldFps, newFps, layer);
-			}
-		}
-		
-		private void updateLayerFramesFromFPS(int oldFps, int newFps, Layer layer) {
-			KeyFrames newFrames = 
-					new KeyFrames();
-			KeyFrames currentDrawFrames = 
-					layer.getFrames();
-			for(Integer i : currentDrawFrames.keySet()) {
-				int newKey = calculateNewTimelinePointerPositionFromOldFps(oldFps, newFps, i);
-				if(!newFrames.containsKey(newKey) && i <= longestTimepoint) {
-					newFrames.put(newKey, currentDrawFrames.get(i));
-				} 
-			}
-			
-			layer.setFrames(newFrames);
-		}
+		return session.getFramesPerSecond();
+	}
+	
 	
 	//-------------------------------------------------------------------------------------------------
 	//Movie preview stuff
 	
-	private void playOneFrame() {
-		incrementTimepoint();
-		refreshUI();
-	}
 	
 	//Space bar
 	public void playOrPauseMovie() {
-		if (isPlaying) {
+		if (session.isPlaying()) {
 			pauseMovie();
 		} else {
 			playMovie();
@@ -533,17 +474,18 @@ public class Controller {
 	
 	//Play button
 	public void playMovie() {
-		isPlaying = true;
+		session.setPlaying(true);
 		SwingWorker sw = new SwingWorker() {
 			@Override
 			protected Object doInBackground() throws Exception {
-				while(isPlaying) {
+				while(session.isPlaying()) {
 					playOneFrame();
+					// Sleep the thread by a frame
 					long increment = 1000 / getFramesPerSecond();
 					Thread.sleep(increment);
 					System.out.println("Playing movie...");
 				}
-				return "DONE";
+				return null;
 			}
 			
 			@Override
@@ -556,60 +498,40 @@ public class Controller {
 	
 	//Pause button
 	public void pauseMovie() {
-		isPlaying = false;
+		session.setPlaying(false);
+	}
+	
+	private void playOneFrame() {
+		session.incrementTimepoint();
+		refreshUI();
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	//Refresh and update UI components from session
+
+	public void updateTimelineFromMouseClick(MouseEvent e) {
+		int value = timelineSlider.valueAtX(e.getX());
+		setCurrentTimepoint(value);
+	    refreshUI();
+	    timelineSlider.getSwingComponent().requestFocus();
+	}
+	
+	private void refreshUI() {
+		refreshCanvas();
+		refreshTimelineUI();
+	}
 	
 	// REFRESH and REDRAW DRAW PANEL (usually when we update our drawpanel in someway)
-	private void refreshDrawPanel(){
+	private void refreshCanvas(){
 		canvas.refresh();
 	}
 	
 	private void refreshTimelineUI() {
 		// UPDATES the line on the layers panel
 		double sliderBarx = timelineSlider.getThumbMidX();
-	    timelineLayersPanel.setSliderBarx(sliderBarx);
-	    
-	    //Updates the layers order on the layers panel
-	    timelineLayersPanel.updateTimelineLayersPanelLayerNumbers();
-	    
-	    timelineLayersPanel.repaint();
-		timelineLayersPanel.revalidate();
-		
-		
+		timelineLayersPanel.updateLayersPanelUI(sliderBarx);
 	}
 	
-	// For another day when I have boxes that don't fill the whole timeline, leave it for now...
-	/*
-	private void refreshLayers() {
-		for (Layer layer : drawLayers) {
-			ArrayList<LayerBoundingBox> newBoxes = new ArrayList<>();
-			ArrayList<LayerBoundingBox> bboxes = layer.getLayerBoundingBoxes();
-			int newSpacing = timelineSlider.getUI().getSpacingBetweenTicks();
-			for (LayerBoundingBox bbox : bboxes) {
-				Rectangle oldBox = bbox.getBox();
-				int numFrames= bbox.getNumFrames();
-				int newWidth = newSpacing * numFrames;
-				Rectangle newBox = new Rectangle(oldBox.x, oldBox.y, newWidth, oldBox.height);
-				bbox.setBox(newBox);
-			}
-			
-		}
-	}
-	*/
-	
-	public void updateTimelineFromValue(int value) {
-		setCurrentTimepoint(value);
-	    refreshUI();
-	}
-	
-	public void refreshUI() {
-		//refreshLayers();
-		refreshDrawPanel();
-		refreshTimelineUI();
-	}
 	
 	//-------------------------------------------------------------------------------------------------
 	
@@ -637,6 +559,7 @@ public class Controller {
 	
 	public ArrayList<Layer> deepCopyLayers() {
 		ArrayList<Layer> newLayers = new ArrayList<Layer>();
+		ArrayList<Layer> drawLayers = session.getLayers();
 		for (Layer layer : drawLayers) {
 			newLayers.add(layer.deepCopy());
 		}
@@ -645,159 +568,100 @@ public class Controller {
 	
 	// CURRENT LAYER
 	public ArrayList<Layer> getLayers() {
-		return this.drawLayers;
+		return session.getLayers();
 	}
 	
 	// Return what the session thinks is the currently selected layer (num)
 	// Was an Integer (object) but I think it should be an int because there should always be 
 	// a current layer (otherwise what do we draw to?)
 	public int getCurrentLayerNum () {
-		return this.currentLayerNum;
+		return session.getCurrentLayerNum();
 	}
 	
 	// Update the session's track of what is the currently selected layer (num)
 	public void setCurrentLayerNum (Integer num) {
-		this.currentLayerNum = num;
-	}
-	
-	private Layer getCurrentLayer() {
-		return this.drawLayers.get(this.currentLayerNum);
-	}
-	
-	private Layer getSpecifiedLayer(int layerNum) {
-		return this.drawLayers.get(layerNum);
+		session.setCurrentLayerNum(num);
 	}
 	
 	// ADD LAYERS
 	public void addNewLayer() {
-		KeyFrames newDrawFrames = new KeyFrames();
-		int numLayers = drawLayers.size();
-		Layer newLayer = new Layer(numLayers, newDrawFrames);
-		
-		// The new layer should be selected when created
-		for (Layer layer : drawLayers) {
-			if(layer.isSelected()) {
-				layer.setSelected(false);
-			}
-		}
-		newLayer.setSelected(true);
-		this.setCurrentLayerNum(numLayers);
-		
-		drawLayers.add(newLayer);
-		timelineLayersPanel.updateTimelineLayersPanelLayerNumbers();
-		refreshUI();
-	}
-	
-	
-	//DRAWABLE GET/SET FRAMEs
-	// Set the frame at a certain time point for the current layer frame
-	public void setLayerFrameAtTime(int layerNum, Integer timePoint, DrawFrame drawing) {
-		Layer specifiedLayer = getSpecifiedLayer(layerNum);
-		specifiedLayer.getFrames().put(timePoint, drawing);
-	}
-	
-	public void setCurrentLayerFrameAtTime(Integer timePoint, DrawFrame drawing) {
-		setLayerFrameAtTime(getCurrentLayerNum(), timePoint, drawing);
+		//Model
+		session.addNewLayer();
+		//View
+		refreshTimelineUI();
 	}
 	
 	// Returns an empty arraylist of draw instructions if there isn't anything currently at this time on
 	// the current layer
 	public DrawFrame getLayerFrameAtTime(Integer layerNum, Integer timePoint) {
-		Layer specifiedLayer = getSpecifiedLayer(layerNum);
-		HashMap<Integer,DrawFrame> drawFrames = specifiedLayer.getFrames();
-		if(drawFrames.containsKey(timePoint)) {
-			return drawFrames.get(timePoint);
-		} else {
-			int dw = MagicValues.drawablePanelDefaultPreferredWidth;
-			int dh = MagicValues.drawablePanelDefaultPreferredHeight;
-			
-			setCurrentLayerFrameAtTime(timePoint, new DrawFrame(dw, dh));
-			return drawFrames.get(timePoint);
-		}
+		return session.getLayerFrameAtTime(layerNum, timePoint);
 	}
 	
 	public DrawFrame getCurrentLayerFrameAtTime(Integer timePoint) {
-		return getLayerFrameAtTime(getCurrentLayerNum(), timePoint);
+		return session.getCurrentLayerFrameAtTime(timePoint);
 	}
 	
 	public DrawFrame getSpecifiedLayerFrameAtCurrentTime(Integer layerNum) {
-		return getLayerFrameAtTime(layerNum, getCurrentTimepoint());
+		return session.getSpecifiedLayerFrameAtCurrentTime(layerNum);
 	}
 	
 	public void setSpecifiedLayerFrameAtCurrentTime(DrawFrame drawing, int layerNum) {
-		setLayerFrameAtTime(layerNum, getCurrentTimepoint(), drawing);
+		session.setSpecifiedLayerFrameAtCurrentTime(drawing, layerNum);
 	}
 	
 	public void setCurrentLayerFrameAtCurrentTime(DrawFrame drawing) {
-		setLayerFrameAtTime(getCurrentLayerNum(), getCurrentTimepoint(), drawing);
+		session.setCurrentLayerFrameAtCurrentTime(drawing);
 	}
 	
-	public DrawFrame getCurrentLayerFrameAtCurrentTime() {
-		return getCurrentLayerFrameAtTime(getCurrentTimepoint());
-	}
 	
 	public void addToCurrentLayerFrameAtCurrentTime(ArrayList<DrawPoint> newPoints) {
-		DrawFrame dps = getCurrentLayerFrameAtCurrentTime();
-		Graphics2D g2d = dps.createGraphics();
-		//DrawablePanel.drawAndErasePath(g2d, newPoints);
-		//dps.refreshPixelArray();
+		session.addToCurrentLayerFrameAtCurrentTime(newPoints);
 	}
 	
 	public void eraseAllLayersAtCurrentFrame() {
-		int dw = MagicValues.drawablePanelDefaultPreferredWidth;
-		int dh = MagicValues.drawablePanelDefaultPreferredHeight;
-		for (Layer layer : drawLayers) {
-			KeyFrames frames = layer.getFrames();
-			frames.put(getCurrentTimepoint(), new DrawFrame(dw, dh));
-		}
+		session.eraseAllLayersAtCurrentFrame();
 		refreshUI();
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	// Utils
 	public void newProject() {
-		Utils.newFile(session, frame);
+		Utils.newFile(frame);
 	}
 	public void openProject() {
-		Utils.openFile(session, frame);
+		Utils.openFile(frame);
 	}
 	public void saveProject() {
-		Utils.saveFile(session, frame);
+		Utils.saveFile(frame);
 	}
 	public void saveAsProject() {
-		Utils.saveAsFile(session, frame);
+		Utils.saveAsFile(frame);
 	}
 	public void renderMP4() {
-		Utils.renderMP4(session, frame, session.getFramesPerSecond());
+		Utils.renderMP4(frame, session.getFramesPerSecond());
 	}
 	public void renderGIF() {
-		Utils.renderGIF(session, frame, session.getFramesPerSecond());
+		Utils.renderGIF(frame, session.getFramesPerSecond());
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	// Other stuff category
 	
-	public Integer getSpacingBetweenTicks() {
-		return spaceBetweenTicks;
-	}
-	
-	public int getDrawablePaneWidth() {
+	public int getCanvasWidth() {
 		return canvas.getCanvasWidth();
 	}
 	
-	public int getDrawablePaneHeight() {
+	public int getCanvasHeight() {
 		return canvas.getCanvasHeight();
 	}
 	
 	// This is called whenever the draw panel is resized or when it is first created
-	public void updateDrawFrameDimensions() {
+	public void updateDrawFrameDimensions(int w, int h) {
 		for (Layer layer : getLayers()) {
 			KeyFrames kf = layer.getFrames();
 			for (Integer t : kf.keySet()) {
 				DrawFrame df = kf.get(t);
-				int newWidth = getDrawablePaneWidth();
-				int newHeight = getDrawablePaneHeight();
-				DrawFrame newDf = DrawFrame.createResizedCopy(df, newWidth, newHeight);
+				DrawFrame newDf = DrawFrame.createResizedCopy(df, w, h);
 				kf.put(t, newDf);
 			}
 		}
