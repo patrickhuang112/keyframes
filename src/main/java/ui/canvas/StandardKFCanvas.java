@@ -30,9 +30,9 @@ import javax.swing.SwingUtilities;
 
 import datatypes.DrawFrame;
 import datatypes.DrawPoint;
+import datatypes.Enums;
 import datatypes.Layer;
 import datatypes.SessionObject;
-import factories.EnumFactory;
 import keyframes.Controller;
 import keyframes.MagicValues;
 import keyframes.Session;
@@ -65,7 +65,7 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
 			@Override
 			public void mouseDragged(MouseEvent e) { 
 				if(cursorInScreen) {
-					EnumFactory.PaintSetting setting = EnumFactory.PaintSetting.NONE;
+					Enums.PaintSetting setting = Enums.PaintSetting.NONE;
 					int drawSize = -1;
 					Color pointColor;
 					if(currentDraggedPoints == null) {
@@ -75,11 +75,11 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
 						setting = currentDraggedPoints.get(0).setting;
 					}
 					
-					drawSize = setting == EnumFactory.PaintSetting.DRAW 
+					drawSize = setting == Enums.PaintSetting.DRAW 
 										? Controller.getController().getBrushSize() 
 										: Controller.getController().getEraserSize();
 										
-					pointColor = setting == EnumFactory.PaintSetting.DRAW 
+					pointColor = setting == Enums.PaintSetting.DRAW 
 							? Controller.getController().getBrushColor()
 							: Controller.getController().getEraserColor();	
 					
@@ -99,21 +99,21 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(cursorInScreen) {
-					EnumFactory.PaintSetting setting;
+					Enums.PaintSetting setting;
 					int drawSize;
 					Point point = e.getPoint();
 					Color pointColor;
 					setting = Controller.getController().getPaintSetting();
 					
-					if (setting == EnumFactory.PaintSetting.FILLSINGLE) {
+					if (setting == Enums.PaintSetting.FILLSINGLE) {
 						floodFillCurrentLayer(point);
-					} else if (setting == EnumFactory.PaintSetting.DRAW || setting == EnumFactory.PaintSetting.ERASE) {
+					} else if (setting == Enums.PaintSetting.DRAW || setting == Enums.PaintSetting.ERASE) {
 						
 						ArrayList<DrawPoint> singlePointCollection = new ArrayList<>();
-						drawSize = setting == EnumFactory.PaintSetting.DRAW 
+						drawSize = setting == Enums.PaintSetting.DRAW 
 								? Controller.getController().getBrushSize()
 								: Controller.getController().getEraserSize();
-						pointColor = setting == EnumFactory.PaintSetting.DRAW 
+						pointColor = setting == Enums.PaintSetting.DRAW 
 								? Controller.getController().getBrushColor()
 								: Controller.getController().getEraserColor();	
 						singlePointCollection.add(new DrawPoint(point, drawSize, setting, pointColor));

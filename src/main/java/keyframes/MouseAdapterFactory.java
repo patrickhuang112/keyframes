@@ -1,4 +1,4 @@
-package factories;
+package keyframes;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

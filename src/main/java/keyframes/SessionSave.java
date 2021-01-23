@@ -4,9 +4,9 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import datatypes.Enums;
 import datatypes.KeyFrames;
 import datatypes.Layer;
-import factories.EnumFactory;
 
 public class SessionSave implements Serializable {
 

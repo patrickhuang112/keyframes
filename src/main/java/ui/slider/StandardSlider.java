@@ -2,7 +2,7 @@ package ui.slider;
 
 import javax.swing.JSlider;
 
-import factories.MouseAdapterFactory;
+import keyframes.MouseAdapterFactory;
 
 public class StandardSlider extends JSlider implements Slider{
 	

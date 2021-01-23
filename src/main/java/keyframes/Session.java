@@ -19,6 +19,7 @@ import javax.swing.plaf.basic.BasicSliderUI;
 
 import datatypes.DrawFrame;
 import datatypes.DrawPoint;
+import datatypes.Enums;
 import datatypes.KeyFrames;
 import datatypes.Layer;
 import datatypes.LayerBoundingBox;
@@ -26,7 +27,6 @@ import ui.progressbar.ProgressBar;
 import ui.slider.StandardTimelineSlider;
 import ui.slider.StandardTimelineSliderUI;
 import ui.slider.TimelineSlider;
-import factories.EnumFactory;
 import settings.Settings;
 import ui.canvas.KFCanvas;
 
@@ -109,7 +109,7 @@ public class Session implements Serializable {
 	private Color eraserColor;
 	private int brushSize;
 	private int eraserSize;
-	private EnumFactory.PaintSetting paintSetting = EnumFactory.PaintSetting.DRAW;
+	private Enums.PaintSetting paintSetting = Enums.PaintSetting.DRAW;
 	// This contains layer info, and time info
 	private ArrayList<Layer> drawLayers;
 	
@@ -162,11 +162,11 @@ public class Session implements Serializable {
 	}
 	
 	//DRAWABLE PAINT SETTING
-	public void setPaintSetting(EnumFactory.PaintSetting paintSetting) {
+	public void setPaintSetting(Enums.PaintSetting paintSetting) {
 		this.paintSetting = paintSetting;
 	}
 	
-	public EnumFactory.PaintSetting getPaintSetting() {
+	public Enums.PaintSetting getPaintSetting() {
 		return this.paintSetting;
 	}
 	

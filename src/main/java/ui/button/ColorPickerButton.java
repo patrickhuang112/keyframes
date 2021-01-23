@@ -14,7 +14,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
-import factories.EnumFactory;
+import datatypes.Enums;
 import keyframes.Session;
 import ui.dialog.DialogFactory;
 

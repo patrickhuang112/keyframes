@@ -15,7 +15,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import factories.EnumFactory;
+import datatypes.Enums;
 import keyframes.Controller;
 import keyframes.Session;
 import ui.dialog.DialogFactory;

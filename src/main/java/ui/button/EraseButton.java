@@ -12,7 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
-import factories.EnumFactory;
+import datatypes.Enums;
 import keyframes.Controller;
 import keyframes.Session;
 import ui.dialog.DialogFactory;
@@ -29,7 +29,7 @@ public class EraseButton extends JButton implements Button {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					Controller.getController().setPaintSetting(EnumFactory.PaintSetting.ERASE);
+					Controller.getController().setPaintSetting(Enums.PaintSetting.ERASE);
 				}
 				else if(SwingUtilities.isRightMouseButton(e)) {
 					DialogFactory.createEraserSizeDialog();

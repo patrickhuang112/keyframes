@@ -11,7 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
-import factories.EnumFactory;
+import datatypes.Enums;
 import keyframes.Controller;
 import keyframes.Session;
 import ui.dialog.DialogFactory;

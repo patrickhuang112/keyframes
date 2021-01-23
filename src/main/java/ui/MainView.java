@@ -56,8 +56,8 @@ import javax.swing.plaf.basic.BasicSliderUI;
 import com.formdev.flatlaf.FlatDarkLaf;
 
 import ui.progressbar.ProgressBar;
+import datatypes.Enums;
 import datatypes.SessionObject;
-import factories.EnumFactory;
 import keyframes.Controller;
 import keyframes.MagicValues;
 import keyframes.Session;

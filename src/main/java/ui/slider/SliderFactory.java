@@ -5,7 +5,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JSlider;
 
-import factories.MouseAdapterFactory;
+import keyframes.MouseAdapterFactory;
 import keyframes.Session;
 
 public class SliderFactory {

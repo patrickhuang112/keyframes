@@ -4,8 +4,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.io.Serializable;
 
-import factories.EnumFactory;
-import factories.EnumFactory.PaintSetting;
+import datatypes.Enums.PaintSetting;
 
 public class DrawPoint implements Serializable {
 
@@ -14,9 +13,9 @@ public class DrawPoint implements Serializable {
 	public Color color;
 	public Point point;
 	public int size;
-	public EnumFactory.PaintSetting setting;
+	public Enums.PaintSetting setting;
 	
-	public DrawPoint(Point point, int size, EnumFactory.PaintSetting setting, Color color) {
+	public DrawPoint(Point point, int size, Enums.PaintSetting setting, Color color) {
 		this.point = point;
 		this.size = size;
 		this.setting = setting;
@@ -25,11 +24,11 @@ public class DrawPoint implements Serializable {
 	
 	public DrawPoint deepCopy() {
 		Point newPoint = new Point(this.point.x, this.point.y);
-		EnumFactory.PaintSetting newSetting;
+		Enums.PaintSetting newSetting;
 		switch(this.setting) {
-			case DRAW: newSetting = EnumFactory.PaintSetting.DRAW;
-			case ERASE: newSetting = EnumFactory.PaintSetting.ERASE;
-			default: newSetting = EnumFactory.PaintSetting.NONE;
+			case DRAW: newSetting = Enums.PaintSetting.DRAW;
+			case ERASE: newSetting = Enums.PaintSetting.ERASE;
+			default: newSetting = Enums.PaintSetting.NONE;
 		}
 		int newSize = this.size;
 		Color newColor = this.color;

@@ -20,9 +20,9 @@ import javax.swing.SwingWorker;
 
 import datatypes.DrawFrame;
 import datatypes.DrawPoint;
+import datatypes.Enums;
 import datatypes.KeyFrames;
 import datatypes.Layer;
-import factories.EnumFactory;
 import ui.MainView;
 import ui.button.Button;
 import ui.button.ButtonFactory;
@@ -363,11 +363,11 @@ public class Controller {
 	}
 	
 	//DRAWABLE PAINT SETTING
-	public void setPaintSetting(EnumFactory.PaintSetting paintSetting) {
+	public void setPaintSetting(Enums.PaintSetting paintSetting) {
 		session.setPaintSetting(paintSetting);
 	}
 	
-	public EnumFactory.PaintSetting getPaintSetting() {
+	public Enums.PaintSetting getPaintSetting() {
 		return session.getPaintSetting();
 	}
 	

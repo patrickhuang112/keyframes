@@ -32,10 +32,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 import datatypes.DrawPoint;
+import datatypes.Enums;
 import datatypes.Interval;
 import datatypes.KeyFrames;
 import datatypes.Layer;
-import factories.EnumFactory;
 import keyframes.Controller;
 import keyframes.MagicValues;
 import keyframes.Session;
