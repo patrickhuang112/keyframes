@@ -136,6 +136,8 @@ public class Controller {
 	}
 	
 	private void buildTimeline() {
+		// This is just to set up the layers being displayed
+		timelineLayersPanel.buildLayersPanelLayers();
 		timeline.getSwingComponent().add(timelineSlider.getSwingComponent(), BorderLayout.NORTH);
 		timeline.getSwingComponent().add(timelineLayersPanel.getSwingComponent());
 	}
@@ -216,7 +218,8 @@ public class Controller {
 		timelineCanvasSplitPane = SplitPaneFactory.createHorizontalSplitPane();
 		mainViewTopContainer = PaneFactory.createMainViewTopContainer();
 		mainViewToolBarAndProgressBarContainer = PaneFactory.createMainViewToolBarAndProgressBarContainer();
-		progressBar = ProgressBarFactory.createRenderingProgressBar();
+		progressBar = ProgressBarFactory.createRenderingProgressBar(session.getShortestTimepoint(),
+																	session.getLongestTimepoint());
 		initializeToolBarUIComponents();
 		initializeMenuBarUIComponents();
 	}
@@ -269,12 +272,19 @@ public class Controller {
 		timelineLayersPanel = TimelineLayersPanelFactory.createStandardTimelineLayersPanel();
 	}
 	
+	public void newSessionLayers() {
+		session.initializeLayers();
+		refreshUI();
+	}
+	
 	public void newSessionFromSettings() {
 		session = Session.createSessionFromSettings(Utils.getSettings());
 	}
 	
 	public void newSessionFromSessionSave(SessionSave ss) {
 		session = Session.createSessionFromSessionSave(ss);
+		updateLayersFromDeserialization();
+		refreshUI();
 	}
 	
 	public SessionSave createCurrentSessionSave() {
@@ -454,7 +464,6 @@ public class Controller {
 	}
 	
 	public int getFramesPerSecond() {
-		
 		return session.getFramesPerSecond();
 	}
 	
@@ -516,7 +525,7 @@ public class Controller {
 	    timelineSlider.getSwingComponent().requestFocus();
 	}
 	
-	private void refreshUI() {
+	public void refreshUI() {
 		refreshCanvas();
 		refreshTimelineUI();
 	}
@@ -556,6 +565,10 @@ public class Controller {
 	
 	//-------------------------------------------------------------------------------------------------
 	// Layers management
+	
+	public Layer selectLayer(MouseEvent e) {
+		return session.selectLayer(e);
+	}
 	
 	public ArrayList<Layer> deepCopyLayers() {
 		ArrayList<Layer> newLayers = new ArrayList<Layer>();
@@ -613,14 +626,46 @@ public class Controller {
 		session.setCurrentLayerFrameAtCurrentTime(drawing);
 	}
 	
-	
 	public void addToCurrentLayerFrameAtCurrentTime(ArrayList<DrawPoint> newPoints) {
 		session.addToCurrentLayerFrameAtCurrentTime(newPoints);
 	}
 	
-	public void eraseAllLayersAtCurrentFrame() {
-		session.eraseAllLayersAtCurrentFrame();
+	public void eraseCurrentLayerAtCurrentFrame() {
+		int w  = canvas.getCanvasWidth();
+		int h  = canvas.getCanvasHeight();
+		if (w == 0) {
+			w = MagicValues.drawablePanelDefaultPreferredWidth;
+		} 
+		if (h == 0) {
+			h = MagicValues.drawablePanelDefaultPreferredHeight;
+		}
+		session.eraseCurrentLayerAtCurrentFrame(w,h);
 		refreshUI();
+	}
+	
+	public void eraseAllLayersAtCurrentFrame() {
+		int w  = canvas.getCanvasWidth();
+		int h  = canvas.getCanvasHeight();
+		if (w == 0) {
+			w = MagicValues.drawablePanelDefaultPreferredWidth;
+		} 
+		if (h == 0) {
+			h = MagicValues.drawablePanelDefaultPreferredHeight;
+		}
+		session.eraseAllLayersAtCurrentFrame(w,h);
+		refreshUI();
+	}
+	
+	private void prepareLayersForSerialization() {
+		for(Layer layer : getLayers()) {
+			layer.prepareForSerialization();
+		}
+	}
+	
+	public void updateLayersFromDeserialization() {
+		for(Layer layer : getLayers()) {
+			layer.updateFromDeserialization();
+		}
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -632,9 +677,11 @@ public class Controller {
 		Utils.openFile(frame);
 	}
 	public void saveProject() {
+		prepareLayersForSerialization();
 		Utils.saveFile(frame);
 	}
 	public void saveAsProject() {
+		prepareLayersForSerialization();
 		Utils.saveAsFile(frame);
 	}
 	public void renderMP4() {
@@ -665,7 +712,6 @@ public class Controller {
 				kf.put(t, newDf);
 			}
 		}
-
 	}
 	
 }

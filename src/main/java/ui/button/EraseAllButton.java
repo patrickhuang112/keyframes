@@ -34,13 +34,8 @@ public class EraseAllButton extends JButton implements Button {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					//OLD
-					/*
-					DrawablePanel drawPane = (DrawablePanel)drawableAndTimelinePane.getTopOrLeft().getMainComponent();
-					drawPane.clearAll();
-					*/
-					//NEW
-					//Change it to a controller/session function
+					Controller.getController().eraseCurrentLayerAtCurrentFrame();
+					
 				}
 				else if(SwingUtilities.isRightMouseButton(e)) {
 					JPopupMenu menu = new JPopupMenu();

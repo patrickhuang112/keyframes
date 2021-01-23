@@ -65,8 +65,6 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 		layersParentPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 		viewport.add(layersParentPane);
 		setupLayersParentPaneListeners();
-		//updateTimelineLayersPanelLayerNumbers();
-		
 	}
 	
 	public void setupLayersParentPaneListeners() {
@@ -84,10 +82,10 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 			@Override
 			public void mousePressed(MouseEvent e) {
 				
-				Layer layer = selectLayer(e);
+				Layer layer = Controller.getController().selectLayer(e);
 				if (SwingUtilities.isLeftMouseButton(e) && layer != null) {
 					layerBeingDragged = layer;
-					layersCopy = getSession().deepCopyLayers();
+					layersCopy = Controller.getController().deepCopyLayers();
 					// This is so that only when the mouse is really being held will the layer
 					// turn into a ghost visually
 					// Mainly because without this, it keeps flickering whenever there is any simple
@@ -98,10 +96,12 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 				                public void run() {
 				                	if (layerBeingDragged != null) {
 				                		layerBeingDragged.setGhost(true);
+				                		Controller.getController().refreshUI();
 				                	}
 				                }
 				            }, MagicValues.timelineLayersPanelDefaultWaitTimeBeforeGhostActivatesAfterClick);
 				}
+				
 			}
 			
 			@Override
@@ -109,6 +109,7 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 				if (layerBeingDragged != null) {
 					layerBeingDragged.setGhost(false);
 					layerBeingDragged = null;
+					Controller.getController().refreshUI();
 				}
 			}
 			
@@ -118,11 +119,11 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 			public void mouseDragged(MouseEvent e) {
 				
 				if (layerBeingDragged != null) {
-					ArrayList<Layer> layers = getSession().getLayers();
+					ArrayList<Layer> layers = Controller.getController().getLayers();
 					for (int i = 0; i < layers.size(); i++) {
 						Layer layer = layers.get(i);
 						if(layer.inBounds(e.getX(), e.getY())) {
-							int curLayNum = getSession().getCurrentLayerNum();
+							int curLayNum = Controller.getController().getCurrentLayerNum();
 							
 							//ASSERT statements are just for piece of mind so I know i'm doing the right
 							//logic thing here
@@ -132,29 +133,15 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 							if (curLayNum != boundLayNum) {
 								layers.remove(curLayNum);
 								layers.add(boundLayNum, layerBeingDragged);
-								getSession().setCurrentLayerNum(i);
+								Controller.getController().setCurrentLayerNum(i);
 							}
 							break;
 						}
 					}
+					Controller.getController().refreshUI();
 				}
 			}
 		});
-	}
-	
-	private Layer selectLayer(MouseEvent e) {
-		ArrayList<Layer> layers = getSession().getLayers();
-		for (int i = 0; i < layers.size(); i++) {
-			Layer layer = layers.get(i);
-			if(layer.inBounds(e.getX(), e.getY())) {
-				int curLayNum = getSession().getCurrentLayerNum();
-				layers.get(curLayNum).setSelected(false);
-				layer.setSelected(true);
-				getSession().setCurrentLayerNum(i);
-				return layer;
-			}
-		}
-		return null;
 	}
 	
 	private void displayRightClickMenu(MouseEvent e) {
@@ -162,12 +149,12 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 		JMenuItem newLayerMenuItem = new JMenuItem(new AbstractAction("New layer") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				getSession().addNewLayer();
+				Controller.getController().addNewLayer();
 			}
 		});
 		menu.add(newLayerMenuItem);
 		
-		Layer layer = selectLayer(e);
+		Layer layer = Controller.getController().selectLayer(e);
 		if (layer != null) {
 			// We do this first here, JUST so the selected black box shows around the layer
 			JMenuItem recolorLayerMenuItem = new JMenuItem(new AbstractAction("Change layer color") {
@@ -185,14 +172,14 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 			JMenuItem copyFramesFromCurrentLayerMenuItem = new JMenuItem(new AbstractAction("Copy frame from current time and layer") {
 				@Override
 				public void actionPerformed(ActionEvent ae) {
-					getSession().copyFramesFromCurrentLayerAndCurrentTime();
+					Controller.getController().copyFramesFromCurrentLayerAndCurrentTime();
 				}
 			});
 			
 			JMenuItem pasteFramesOntoCurrentLayerMenuItem = new JMenuItem(new AbstractAction("Paste frame") {
 				@Override
 				public void actionPerformed(ActionEvent ae) {
-					getSession().pasteFramesToCurrentLayerAndCurrentTime();
+					Controller.getController().pasteFramesToCurrentLayerAndCurrentTime();
 				}
 			});
 			
@@ -205,14 +192,13 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 	}
 	
 	public void updateTimelineFromMouseClick(MouseEvent e) {
-		selectLayer(e);
+		Controller.getController().selectLayer(e);
 		Controller.getController().updateTimelineFromMouseClick(e);
-		
 	}
 	
 	// This is where we also update the layer nums of all the layers.
 	public void updateTimelineLayersPanelLayerNumbers() {
-		ArrayList<Layer> layers = session.getLayers();
+		ArrayList<Layer> layers = Controller.getController().getLayers();
 		layersParentPane.removeAll();
 		for (int i = 0; i < layers.size(); i++) {
 			Layer layer = layers.get(i);
@@ -265,10 +251,6 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 			
 	}
 
-	public Session getSession() {
-		return session;
-	}
-
 	@Override
 	public JScrollPane getSwingComponent() {
 		return this;
@@ -283,6 +265,11 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 	    
 	    repaint();
 		revalidate();
+	}
+
+	@Override
+	public void buildLayersPanelLayers() {
+		updateTimelineLayersPanelLayerNumbers();
 	}
 	
 }

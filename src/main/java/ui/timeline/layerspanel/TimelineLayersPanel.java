@@ -10,5 +10,5 @@ public interface TimelineLayersPanel extends UIComponent {
 	public JScrollPane getSwingComponent();
 
 	public void updateLayersPanelUI(double newMarkerX);
-	
+	public void buildLayersPanelLayers();
 }

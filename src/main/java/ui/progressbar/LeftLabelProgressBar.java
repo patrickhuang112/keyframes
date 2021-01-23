@@ -28,17 +28,12 @@ public class LeftLabelProgressBar extends JPanel implements ProgressBar {
 	//0 = HORIZONTAL
 	//1 = VERTICAL
 	
-	LeftLabelProgressBar(String label) {
-		this( label, BoxLayout.X_AXIS);
-	}
-	
-	private LeftLabelProgressBar(String label, int orientation) {
+	LeftLabelProgressBar(String label, int start, int end) {
 		super();
-		this.bar = new JProgressBar(Controller.getController().getShortestTimepoint() , 
-									Controller.getController().getLongestTimepoint());
+		this.bar = new JProgressBar(start, end);
 		this.label = new JLabel(label);
 		
-		setLayout(new BoxLayout(this, orientation));
+		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		rightMargin = Box.createRigidArea(new Dimension(rightMarginSpacing,0));
 		
 		bar.setPreferredSize(new Dimension(300,20));

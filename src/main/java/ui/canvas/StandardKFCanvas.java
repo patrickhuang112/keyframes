@@ -108,6 +108,7 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
 					if (setting == EnumFactory.PaintSetting.FILLSINGLE) {
 						floodFillCurrentLayer(point);
 					} else if (setting == EnumFactory.PaintSetting.DRAW || setting == EnumFactory.PaintSetting.ERASE) {
+						
 						ArrayList<DrawPoint> singlePointCollection = new ArrayList<>();
 						drawSize = setting == EnumFactory.PaintSetting.DRAW 
 								? Controller.getController().getBrushSize()
@@ -208,35 +209,6 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
 		Controller.getController().setCurrentLayerFrameAtCurrentTime(new DrawFrame(getImageWidth(), getImageHeight()));
 		refresh();
 	}
-	public static void drawAndErasePoint(Graphics2D g2d, DrawPoint p) {
-		Point point = p.point;
-		float xPos = (float)point.getX();
-		float yPos = (float)point.getY();
-		float radius = p.size;
-		g2d.setPaint(p.color);
-		//Center the ellipse, ellipse created from top left coord
-		Ellipse2D.Float newPoint = new Ellipse2D.Float(xPos-(radius/2), yPos-(radius/2), radius, radius);
-		g2d.fill(newPoint);
-	}
-	
-	public static void drawAndErasePath(Graphics2D g2d, ArrayList<DrawPoint> points) {
-		GeneralPath gp =  new GeneralPath();
-		BasicStroke s = null;
-		
-		boolean firstPoint = true;
-		for(DrawPoint dp : points) {
-			if(firstPoint) {
-				gp.moveTo(dp.point.getX(), dp.point.getY());
-				firstPoint = false;
-			} else {
-				g2d.setPaint(dp.color);
-				s = new BasicStroke(dp.size, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-				g2d.setStroke(s);
-				gp.lineTo(dp.point.getX(), dp.point.getY());
-			}
-		}
-		g2d.draw(gp);
-	}
 	
 	private void floodFillCurrentLayer(Point p) {
 		floodFillSpecifiedLayer(p, Controller.getController().getCurrentLayerNum());
@@ -309,7 +281,7 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
  			
  			// The currently dragged stuff
  			if(Controller.getController().getCurrentLayerNum() == i && currentDraggedPoints != null) {
- 				StandardKFCanvas.drawAndErasePath(g2d, currentDraggedPoints);
+ 				KFCanvas.drawAndErasePath(g2d, currentDraggedPoints);
  			}
 		}
  			

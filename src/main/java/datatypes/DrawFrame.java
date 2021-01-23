@@ -32,7 +32,7 @@ public class DrawFrame extends BufferedImage {
 		this.height = height;
 		//findPixelArray();
 	}
-	
+
 	/*
 	public void refreshPixelArray() {
 		byte[] pixels = new byte[width * height * 4]; 
@@ -57,7 +57,41 @@ public class DrawFrame extends BufferedImage {
 	}
 	*/
 	
-	private void findPixelArray() {
+	public int[][] getPixelArray() {
+		int[][] p = new int[getHeight()][getWidth()];
+		for(int r = 0; r < getHeight(); r++) {
+			for(int c = 0; c < getWidth(); c++) {
+				p[r][c] = this.getRGB(c, r);
+			}
+		}
+		return p;		
+		
+		/*
+		byte[] pixels = ((DataBufferByte) getRaster().getDataBuffer()).getData();
+		int[] r = new int[pixels.length];
+		for (int i = 0; i < pixels.length; i++) {
+			r[i] = (int)(pixels[i] & 0xff);
+		}
+		return r;
+		*/
+		/*
+		int[] result = new int[getWidth() * getHeight()];
+		int j = 0;
+		for (int i = 0; i < pixels.length; i += numChannels) {
+			int argb = 0;
+			argb += (((int) pixels[i] & 0xff) << 24); // alpha
+            argb += ((int) pixels[i + 1] & 0xff); // blue
+            argb += (((int) pixels[i + 2] & 0xff) << 8); // green
+            argb += (((int) pixels[i + 3] & 0xff) << 16); // red
+            result[j] = argb;
+            j++;
+		}
+		return result;
+		*/
+	}
+	
+	/*
+	public int[] findPixelArray() {
 		pixelArray = new int[height][width];
 		byte[] pixels = ((DataBufferByte) getRaster().getDataBuffer()).getData();
 		int row = 0;
@@ -75,7 +109,9 @@ public class DrawFrame extends BufferedImage {
 				row++;
 			}
 		}
+		return pixelArray;
 	}
+	*/
 	
 	public void updateDrawFrameFromPixelArray() {
 		int [] newPixels = new int[width * height];

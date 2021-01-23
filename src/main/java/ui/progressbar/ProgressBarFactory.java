@@ -4,8 +4,8 @@ import keyframes.Session;
 
 public class ProgressBarFactory {
 
-	public static ProgressBar createRenderingProgressBar() {
-		return new LeftLabelProgressBar("Rendering Progress: ");
+	public static ProgressBar createRenderingProgressBar(int start, int end) {
+		return new LeftLabelProgressBar("Rendering Progress: ", start, end);
 	}
 	
 }

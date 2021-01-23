@@ -76,6 +76,17 @@ public class Session implements Serializable {
 	
 	private Session() {
 		super();
+		initializeLayers();
+		// Defaults
+		brushSize = 5;
+		eraserSize = 5;
+		longestTimeInSeconds = 5;
+		framesPerSecond = 10;
+		longestTimepoint = longestTimeInSeconds * framesPerSecond;
+	}
+	
+	void initializeLayers() {
+		drawLayers = new ArrayList<Layer>();
 		// Initialize new HashMap of times and frames for default layer
 		KeyFrames drawFrames = 
 			new KeyFrames();
@@ -88,16 +99,7 @@ public class Session implements Serializable {
 		Layer newLayer = new Layer(0, drawFrames);
 		newLayer.setSelected(true);
 		drawLayers.add(newLayer);
-		
-		// Defaults
-		brushSize = 5;
-		eraserSize = 5;
-		longestTimeInSeconds = 5;
-		framesPerSecond = 10;
-		longestTimepoint = longestTimeInSeconds * framesPerSecond;
 	}
-	
-	 
 	
 	private Integer currentLayerNum = 0;
 	private String savePath = null;
@@ -109,7 +111,7 @@ public class Session implements Serializable {
 	private int eraserSize;
 	private EnumFactory.PaintSetting paintSetting = EnumFactory.PaintSetting.DRAW;
 	// This contains layer info, and time info
-	private ArrayList<Layer> drawLayers = new ArrayList<Layer>();
+	private ArrayList<Layer> drawLayers;
 	
 	
 	//REPLACE BY SETTINGS
@@ -139,9 +141,6 @@ public class Session implements Serializable {
 	public void setSavePath(String path) {
 		savePath = path;
 	}
-	
-	
-	
 	
 	//-------------------------------------------------------------------------------------------------
 	//Draw settings
@@ -196,11 +195,11 @@ public class Session implements Serializable {
 	//-------------------------------------------------------------------------------------------------
 	//Composition settings (FPS, timepoints)
 	
-	public int getShortestTimepoint() {
+	int getShortestTimepoint() {
 		return this.minTimepoint;
 	}
 	
-	public int getLongestTimepoint() {
+	int getLongestTimepoint() {
 		return this.longestTimepoint;
 	}
 	
@@ -331,6 +330,20 @@ public class Session implements Serializable {
 	//-------------------------------------------------------------------------------------------------
 	// Layers management
 	
+	Layer selectLayer(MouseEvent e) {
+		for (int i = 0; i < drawLayers.size(); i++) {
+			Layer layer = drawLayers.get(i);
+			if(layer.inBounds(e.getX(), e.getY())) {
+				int curLayNum = getCurrentLayerNum();
+				drawLayers.get(curLayNum).setSelected(false);
+				layer.setSelected(true);
+				setCurrentLayerNum(i);
+				return layer;
+			}
+		}
+		return null;
+	}
+	
 	public ArrayList<Layer> deepCopyLayers() {
 		ArrayList<Layer> newLayers = new ArrayList<Layer>();
 		for (Layer layer : drawLayers) {
@@ -432,16 +445,24 @@ public class Session implements Serializable {
 	public void addToCurrentLayerFrameAtCurrentTime(ArrayList<DrawPoint> newPoints) {
 		DrawFrame dps = getCurrentLayerFrameAtCurrentTime();
 		Graphics2D g2d = dps.createGraphics();
-		//DrawablePanel.drawAndErasePath(g2d, newPoints);
-		//dps.refreshPixelArray();
+		if (newPoints.size() == 1) {
+			KFCanvas.drawAndErasePoint(g2d, newPoints.get(0));
+		} else {
+			KFCanvas.drawAndErasePath(g2d, newPoints);
+		}
+		
 	}
 	
-	public void eraseAllLayersAtCurrentFrame() {
-		int dw = MagicValues.drawablePanelDefaultPreferredWidth;
-		int dh = MagicValues.drawablePanelDefaultPreferredHeight;
+	void eraseCurrentLayerAtCurrentFrame(int w, int h) {
+		Layer curLayer = getCurrentLayer();
+		KeyFrames frames = curLayer.getFrames();
+		frames.put(getCurrentTimepoint(), new DrawFrame(w, h));
+	}
+	
+	void eraseAllLayersAtCurrentFrame(int w, int h) {
 		for (Layer layer : drawLayers) {
 			KeyFrames frames = layer.getFrames();
-			frames.put(getCurrentTimepoint(), new DrawFrame(dw, dh));
+			frames.put(getCurrentTimepoint(), new DrawFrame(w, h));
 		}
 	}
 	

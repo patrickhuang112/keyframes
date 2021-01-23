@@ -8,10 +8,16 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Stroke;
+import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import keyframes.MagicValues;
@@ -23,7 +29,13 @@ public class Layer extends JPanel implements Serializable {
 	// Layer num is the priority of the list being drawn
 	private int layerNum;
 	// All the timestamped points for a layer
-	private KeyFrames frames;
+	
+	private HashMap<Integer, int[][]> pixelsMap;
+	private boolean inSerializedState;
+	private int serializedWidth;
+	private int serializedHeight;
+	private transient KeyFrames frames;
+	//FOR SERIALIZATION OF A KEYFRAMES
 	private String layerName;
 	
 	private int UIwidth = MagicValues.layerUIDefaultWidth;
@@ -45,10 +57,6 @@ public class Layer extends JPanel implements Serializable {
 	
 	private final int layerInitialFrames = 0;
 	
-	public Layer() {
-		super();
-	}
-		
 	public Layer(int layerNum, KeyFrames frames) {
 		this.layerNum = layerNum;
 		this.frames = frames;
@@ -66,6 +74,44 @@ public class Layer extends JPanel implements Serializable {
 		setMinimumSize(new Dimension(Layer.MaxWidth,Layer.MaxHeight));
 		setPreferredSize(new Dimension(Layer.MaxWidth,Layer.MaxHeight));
 		setMaximumSize(new Dimension(Layer.MaxWidth,Layer.MaxHeight));
+	}
+	
+	public void prepareForSerialization() {
+		pixelsMap = new HashMap<Integer, int[][]>();
+		boolean setSerializedWidthHeight = false;
+		for(Integer key : frames.keySet()) {
+			DrawFrame img = frames.get(key);
+			int[][] pixels = img.getPixelArray();
+			pixelsMap.put(key, pixels);
+			if (!setSerializedWidthHeight) {
+				serializedWidth = img.getWidth();
+				serializedHeight = img.getHeight();
+				setSerializedWidthHeight = true;
+			}
+		}
+		inSerializedState = true;
+	}
+	
+	public void updateFromDeserialization() {
+		if (inSerializedState) {
+			frames = new KeyFrames();
+			for(Integer key : pixelsMap.keySet()) {
+				int[][] pixels = pixelsMap.get(key);
+				DrawFrame image = new DrawFrame(serializedWidth, serializedHeight);
+				for(int r = 0; r < serializedHeight; r++) {
+					for (int c = 0; c < serializedWidth; c++) {
+						image.setRGB(c, r, pixels[r][c]);
+					}
+				}
+				/*
+		        WritableRaster raster = (WritableRaster) image.getData();
+		        raster.setPixels(0,0, serializedWidth, serializedHeight, pixels);
+		        image.setData(raster);
+		        */
+				frames.put(key, image);
+			}
+			inSerializedState = false;	
+		}
 	}
 	
 	public Layer deepCopy() {

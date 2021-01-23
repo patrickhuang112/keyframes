@@ -32,7 +32,7 @@ import ui.MainView;
 public class Utils {
 	
 	//KeyFrame Project File
-	public static final String fileExtension = ".kfpf";
+	public static final String fileExtension = "kfpf";
 
 	public static Settings getSettings() {
 		Settings settings;
@@ -65,10 +65,7 @@ public class Utils {
 	
 	public static void newFile(JFrame frame) {
 		// DO STUFF WITH OLD Controller.getController() (NOT IMPLEMENTED YET)
-		
-		frame.getContentPane().removeAll();
-		MainView.createNewInstance();
-		
+		Controller.getController().newSessionLayers();
 		System.out.println("New project created");
 	}
 	
@@ -88,8 +85,6 @@ public class Utils {
 			        in.close();
 			        fileIn.close();
 			        Controller.getController().newSessionFromSessionSave(ss);
-			        frame.getContentPane().removeAll();
-					MainView.createNewInstance();
 				} else {
 					System.out.println("Incompatible file");
 				}
@@ -112,7 +107,7 @@ public class Utils {
 			
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
-				String savePath = file.getAbsolutePath() + Utils.fileExtension;
+				String savePath = file.getAbsolutePath() + "." + Utils.fileExtension;
 				Controller.getController().setSavePath(savePath);
 				SessionSave ss = Controller.getController().createCurrentSessionSave();
 				FileOutputStream fos = new FileOutputStream(savePath);
