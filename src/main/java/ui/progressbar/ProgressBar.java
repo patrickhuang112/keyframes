@@ -15,9 +15,17 @@ public interface ProgressBar extends UIComponent {
 	public JPanel getSwingComponent();
 	public JProgressBar getProgressBar() ;
 	public String getLabel() ;
+	public void setProgressLabelAndFinishedText(String label, String finished);
 	
-	
+	public void setIsIndeterminate(boolean isIndeterminate);
+	public boolean getIsIndeterminate();
 	public void toggleVisibility() ;
 	public void setVisibility(boolean isVisible) ;
 	public boolean getVisibility() ;
+	
+	// Only for determinate bars
+	public void displayCompletedDeterminateBar();
+	
+	/* Only for indeterminate bars */
+	public void displayCompletedIndeterminateBar();
 }

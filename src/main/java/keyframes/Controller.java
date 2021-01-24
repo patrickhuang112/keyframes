@@ -9,6 +9,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.Box;
 import javax.swing.JFrame;
@@ -218,7 +220,7 @@ public class Controller {
 		timelineCanvasSplitPane = SplitPaneFactory.createHorizontalSplitPane();
 		mainViewTopContainer = PaneFactory.createMainViewTopContainer();
 		mainViewToolBarAndProgressBarContainer = PaneFactory.createMainViewToolBarAndProgressBarContainer();
-		progressBar = ProgressBarFactory.createRenderingProgressBar(session.getShortestTimepoint(),
+		progressBar = ProgressBarFactory.createMainViewProgressBar(session.getShortestTimepoint(),
 																	session.getLongestTimepoint());
 		initializeToolBarUIComponents();
 		initializeMenuBarUIComponents();
@@ -399,9 +401,51 @@ public class Controller {
 		progressBar.setVisibility(visible);
 	}
 	
-	public void resetProgressBar() {
+	public void prepareRenderingProgressBar() {
+		progressBar.setIsIndeterminate(false);
+		progressBar.setProgressLabelAndFinishedText("Rendering progress:  ", "Rendering finished!  ");
 		progressBar.resetProgressBar();
+		progressBar.setVisibility(true);
 	}
+	
+	public void prepareSavingFileProgressBar() {
+		progressBar.setIsIndeterminate(true);
+		progressBar.setProgressLabelAndFinishedText("Saving project...:  ", "Saved successfully!  ");
+		progressBar.resetProgressBar();
+		progressBar.setVisibility(true);
+	}
+	
+	public void prepareOpeningFileProgressBar() {
+		progressBar.setIsIndeterminate(true);
+		progressBar.setProgressLabelAndFinishedText("Opening project...:  ", "Opened successfully!  ");
+		progressBar.resetProgressBar();
+		progressBar.setVisibility(true);
+	}
+	
+	public void displayCompletedIndeterminateProgressBar() {
+		progressBar.displayCompletedIndeterminateBar();
+		// After 3 seconds of finishing, toggle off the progress bar
+		new Timer().schedule( 
+	        new TimerTask() {
+	            @Override
+	            public void run() {
+	            	progressBar.setVisibility(false);
+	            }
+	        }, MagicValues.utilsRenderDefaultTimeBeforeProgressBarDisappearsAfterOpenAndSave);
+	}
+	
+	public void displayCompletedDeterminateProgressBar() {
+		progressBar.displayCompletedDeterminateBar();
+		// After 3 seconds of finishing, toggle off the progress bar
+		new Timer().schedule( 
+            new TimerTask() {
+                @Override
+                public void run() {
+                	progressBar.setVisibility(false);
+                }
+            }, MagicValues.utilsRenderDefaultTimeBeforeProgressBarDisappearsAfterRender);
+	}
+	
 	
 	//-------------------------------------------------------------------------------------------------
 	//Composition settings (FPS, timepoints)

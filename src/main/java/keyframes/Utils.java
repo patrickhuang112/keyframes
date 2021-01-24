@@ -17,10 +17,12 @@ import java.util.TimerTask;
 
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
+import javax.swing.filechooser.FileFilter;
 
 import org.jcodec.api.awt.AWTSequenceEncoder;
 
@@ -34,6 +36,33 @@ public class Utils {
 	//KeyFrame Project File
 	public static final String fileExtension = "kfpf";
 
+	private static void setFileChooserToViewDetailsAsDefault(JFileChooser fc) {
+		Action details = fc.getActionMap().get("viewTypeDetails");
+		details.actionPerformed(null);
+	}
+	
+	private static void setFileChooserToOnlyAllowValidFileExtension(JFileChooser fc, String ext, String desc) {
+		fc.setAcceptAllFileFilterUsed(false);
+		fc.setFileFilter(new FileFilter() {
+
+			@Override
+			public boolean accept(File f) {
+				if (f.isDirectory()) {
+			           return true;
+			       } else {
+			           String filename = f.getName().toLowerCase();
+			           return filename.endsWith(ext);
+			       }
+			}
+
+			@Override
+			public String getDescription() {
+				return desc;
+			}
+		
+		});
+	}
+	
 	public static Settings getSettings() {
 		Settings settings;
 		try {
@@ -64,19 +93,22 @@ public class Utils {
     }
 	
 	public static void newFile(JFrame frame) {
-		// DO STUFF WITH OLD Controller.getController() (NOT IMPLEMENTED YET)
 		Controller.getController().newSessionLayers();
 		System.out.println("New project created");
 	}
 	
 	public static void openFile( JFrame frame) {
-		// DO STUFF WITH OLD Controller.getController() (NOT IMPLEMENTED YET)
 		try {
-			System.out.println("Loading project...");
 			final JFileChooser fc = new JFileChooser();
+			
+			fc.setDialogTitle("Open project");
+			Utils.setFileChooserToOnlyAllowValidFileExtension(fc, ".kfpf", "Keyframes project file (*.kfpf)");
+			Utils.setFileChooserToViewDetailsAsDefault(fc);
+			
 			int returnVal = fc.showOpenDialog(frame);
 			
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				Controller.getController().prepareOpeningFileProgressBar();
 				File file = fc.getSelectedFile();
 				if(Utils.getExtension(file).equals(Utils.fileExtension)) {
 					FileInputStream fileIn = new FileInputStream(file);
@@ -85,6 +117,7 @@ public class Utils {
 			        in.close();
 			        fileIn.close();
 			        Controller.getController().newSessionFromSessionSave(ss);
+			        Controller.getController().displayCompletedIndeterminateProgressBar();
 				} else {
 					System.out.println("Incompatible file");
 				}
@@ -100,12 +133,14 @@ public class Utils {
 	
 	public static void saveAsFile( JFrame frame) {
 		try {
-			System.out.println("Loading project...");
 			final JFileChooser fc = new JFileChooser();
-			fc.setDialogTitle("Save Controller.getController()");
+			fc.setDialogTitle("Save project as...");
+			Utils.setFileChooserToOnlyAllowValidFileExtension(fc, ".kfpf", "Keyframes project file (*.kfpf)");
+			Utils.setFileChooserToViewDetailsAsDefault(fc);
 			int returnVal = fc.showSaveDialog(frame);
 			
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				Controller.getController().prepareSavingFileProgressBar();
 				File file = fc.getSelectedFile();
 				String savePath = file.getAbsolutePath() + "." + Utils.fileExtension;
 				Controller.getController().setSavePath(savePath);
@@ -114,10 +149,11 @@ public class Utils {
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 				// write object to file
 				oos.writeObject(ss);
-				System.out.println("Saving Successful!");
 				// closing resources
 				oos.close();
 				fos.close();
+				
+				Controller.getController().displayCompletedIndeterminateProgressBar();
 				
 			} else {
 				System.out.println("Saving aborted");
@@ -130,20 +166,20 @@ public class Utils {
 	}
 	
 	public static void saveFile(JFrame frame) {
-		
 		if(Controller.getController().getSavePath() == null) {
 			Utils.saveAsFile(frame);
 		} else {
 			try {
+				Controller.getController().prepareSavingFileProgressBar();
 				SessionSave ss = Controller.getController().createCurrentSessionSave();
 				FileOutputStream fos = new FileOutputStream(ss.savePath);
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 				// write object to file
 				oos.writeObject(ss);
-				System.out.println("Saving Successful!");
 				// closing resources
 				oos.close();
 				fos.close();
+				Controller.getController().displayCompletedIndeterminateProgressBar();
 			} catch (Exception e) {
 				System.out.println("SAVING FAILED");
 				System.out.println(e.getMessage());
@@ -158,7 +194,11 @@ public class Utils {
 				try {
 					System.out.println("Rendering video...");
 					final JFileChooser fc = new JFileChooser();
+					
 					fc.setDialogTitle("Render video");
+					Utils.setFileChooserToOnlyAllowValidFileExtension(fc, ".mp4", "MP4 Video");
+					Utils.setFileChooserToViewDetailsAsDefault(fc);
+					
 					int returnVal = fc.showSaveDialog(frame);
 					
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -166,7 +206,7 @@ public class Utils {
 						String filePath = file.getAbsolutePath() + ".mp4";
 						File newFile = new File(filePath);
 						
-						Controller.getController().setProgressBarVisible(true);
+						Controller.getController().prepareRenderingProgressBar();
 						
 						AWTSequenceEncoder enc = AWTSequenceEncoder.createSequenceEncoder(newFile, fps);
 						HashMap<Integer, BufferedImage> images = Controller.getController().getImages();
@@ -179,16 +219,8 @@ public class Utils {
 							Controller.getController().updateProgressBar(i);
 						}
 						enc.finish();
+						Controller.getController().displayCompletedDeterminateProgressBar();
 						
-						// After 3 seconds of finishing, toggle off the progress bar and reset it to 0
-					    new Timer().schedule( 
-					            new TimerTask() {
-					                @Override
-					                public void run() {
-					                	Controller.getController().setProgressBarVisible(false);
-					                	Controller.getController().resetProgressBar();
-					                }
-					            }, MagicValues.utilsRenderDefaultTimeBeforeProgressBarDisappearsAfterRender);
 						
 					} else {
 						System.out.println("Rendering video aborted");
@@ -217,14 +249,18 @@ public class Utils {
 				try {
 					System.out.println("Rendering gif...");
 					final JFileChooser fc = new JFileChooser();
+					
 					fc.setDialogTitle("Render gif");
+					Utils.setFileChooserToOnlyAllowValidFileExtension(fc, ".gif", "GIF Image");
+					Utils.setFileChooserToViewDetailsAsDefault(fc);
+					
 					int returnVal = fc.showSaveDialog(frame);
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
 						File file = fc.getSelectedFile();
 						String filePath = file.getAbsolutePath() + ".gif";
 						File newFile = new File(filePath);
 						
-						Controller.getController().setProgressBarVisible(true);
+						Controller.getController().prepareRenderingProgressBar();
 						
 						HashMap<Integer, BufferedImage> images = Controller.getController().getImages();
 						ImageOutputStream output = new FileImageOutputStream(newFile);
@@ -233,7 +269,7 @@ public class Utils {
 						int timeBetweenFrames = millisecondsInSecond / fps;
 						
 						//Don't change unless I change how buffered images are made.1
-						int imgType = BufferedImage.TYPE_INT_RGB;
+						int imgType = BufferedImage.TYPE_4BYTE_ABGR;
 						
 						// create a gif sequence with the type of the first image, 1 second
 					    // between frames, which loops continuously
@@ -254,15 +290,8 @@ public class Utils {
 					    writer.close();
 					    output.close();
 					    
-					    // After 3 seconds of finishing, toggle off the progress bar and reset it to 0
-					    new Timer().schedule( 
-					            new TimerTask() {
-					                @Override
-					                public void run() {
-					                	Controller.getController().setProgressBarVisible(false);
-					                	Controller.getController().resetProgressBar();
-					                }
-					            }, MagicValues.utilsRenderDefaultTimeBeforeProgressBarDisappearsAfterRender);
+					    Controller.getController().displayCompletedDeterminateProgressBar();
+					    
 					} else {
 						System.out.println("Rendering gif aborted");
 					}

@@ -20,7 +20,8 @@ public class LeftLabelProgressBar extends JPanel implements ProgressBar {
 	private JProgressBar bar;
 	private Component rightMargin;
 	private boolean isVisible = false;
-	private String defaultText = "Rendering progress: ";
+	private String labelText = "Rendering progress: ";
+	private String finishedText = "Rendering complete!  ";
 	
 	private final int rightMarginSpacing = 20;
 	
@@ -53,17 +54,13 @@ public class LeftLabelProgressBar extends JPanel implements ProgressBar {
 	
 	public void updateProgressBar(int progress) {
 		bar.setValue(progress);
-		// We have finished
-		if (progress == bar.getMaximum()) {
-			label.setText("Rendering complete!  ");
-		}
 		repaint();
 		revalidate();
 	}
 	
 	public void resetProgressBar() {
 		bar.setValue(0);
-		label.setText(defaultText);
+		label.setText(labelText);
 	}
 	
 	public String getLabel() {
@@ -106,4 +103,40 @@ public class LeftLabelProgressBar extends JPanel implements ProgressBar {
 	public JPanel getSwingComponent() {
 		return this;
 	}
+
+	@Override
+	public void setProgressLabelAndFinishedText(String label, String finished) {
+		this.labelText = label;
+		this.finishedText = finished;
+	}
+
+	@Override
+	public void setIsIndeterminate(boolean isIndeterminate) {
+		bar.setStringPainted(!isIndeterminate);
+		bar.setIndeterminate(isIndeterminate);
+	}
+
+	@Override
+	public boolean getIsIndeterminate() {
+		return bar.isIndeterminate();
+	}
+	
+	@Override
+	public void displayCompletedIndeterminateBar() {
+		if (bar.isIndeterminate()) {
+			bar.setIndeterminate(false);
+			bar.setStringPainted(false);
+			bar.setValue(bar.getMaximum());
+			label.setText(finishedText);
+		}
+	}
+
+	@Override
+	public void displayCompletedDeterminateBar() {
+		if(!bar.isIndeterminate()) {
+			bar.setValue(bar.getMaximum());
+			label.setText(finishedText);
+		}
+	}
+
 }
