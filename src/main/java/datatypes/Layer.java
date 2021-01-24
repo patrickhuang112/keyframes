@@ -18,11 +18,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import keyframes.MagicValues;
+import ui.layer.KFLayer;
+import ui.layer.KFLayerFactory;
+import ui.layer.rectangles.KFLayerRectangles;
+import ui.layer.rectangles.KFLayerRectanglesFactory;
 
-public class Layer extends JPanel implements Serializable {
+public class Layer implements Serializable {
 	
 	private static int MaxWidth = MagicValues.layerDefaultMaxWidth;
 	private static int MaxHeight = MagicValues.layerDefaultMaxHeight;
@@ -38,18 +43,14 @@ public class Layer extends JPanel implements Serializable {
 	//FOR SERIALIZATION OF A KEYFRAMES
 	private String layerName;
 	
-	private int UIwidth = MagicValues.layerUIDefaultWidth;
+	private KFLayerRectangles layerUI;
+	
 	private int UIheight = MagicValues.layerUIDefaultHeight;
-	private int bboxStartY = 0;
 	private Color color = Color.black;
 
 	ArrayList<LayerBoundingBox> boundingBoxes =  new ArrayList<>();
 	
-	private int selectLineThickness  = 2;
-	private float []selectDashesArray = {10.0f};
-	private float strokeThickness = 1.0f;
-	private float miterLength = 10.0f;
-	private float dashPhase = 0.0f;
+	
 	
 	private boolean isVisible = true;
 	private boolean isSelected = false;
@@ -68,12 +69,7 @@ public class Layer extends JPanel implements Serializable {
 		//this when I actually implement acutal boxes for each point
 		Rectangle box = new Rectangle(boundx, boundy, Layer.MaxWidth, Layer.MaxHeight);
 		boundingBoxes.add(new LayerBoundingBox(layerInitialFrames, box));
-		
-		// THIS IS PURELY TO MAKE SURE THERE IS NO SPACE BETWEEN LAYERS
-		setAlignmentX(Component.LEFT_ALIGNMENT);
-		setMinimumSize(new Dimension(Layer.MaxWidth,Layer.MaxHeight));
-		setPreferredSize(new Dimension(Layer.MaxWidth,Layer.MaxHeight));
-		setMaximumSize(new Dimension(Layer.MaxWidth,Layer.MaxHeight));
+		layerUI = KFLayerRectanglesFactory.createStandardKFLayerRectangles(this);
 	}
 	
 	public void prepareForSerialization() {
@@ -155,55 +151,17 @@ public class Layer extends JPanel implements Serializable {
 		return false;
 	}
 	
-	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
-		Graphics2D g2d = (Graphics2D) g;
-		
-		if (isGhost) {
-			g2d.setPaint(Color.LIGHT_GRAY);
-			for (LayerBoundingBox bbox : boundingBoxes) {
-				// These coordinates I think are relative to our layer coordinates, so 
-				// y coordinates should basically always start at 0
-				
-				//LIGHT GREY INSIDE
-				Rectangle box = bbox.getBox();
-				g2d.fillRect(box.x, bboxStartY, box.width, box.height);
-				
-				//YELLOW DASHES?
-				g2d.setPaint(Color.yellow);
-				BasicStroke dashed = new BasicStroke(strokeThickness, BasicStroke.CAP_BUTT, 
-								BasicStroke.JOIN_MITER, miterLength, selectDashesArray, dashPhase);
-				g2d.setStroke(dashed);
-				g2d.drawRoundRect(box.x, bboxStartY, box.width, box.height, selectLineThickness, selectLineThickness);
-				}
-			}
-		else {
-			g2d.setPaint(color);
-			for (LayerBoundingBox bbox : boundingBoxes) {
-				// These coordinates I think are relative to our layer coordinates, so 
-				// y coordinates should basically always start at 0
-				Rectangle box = bbox.getBox();
-				g2d.setPaint(color);
-				g2d.fillRect(box.x, bboxStartY, box.width, box.height);
-				if (isSelected) {
-					g2d.setPaint(Color.black);
-					Stroke s = new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-					g2d.setStroke(s);
-					g2d.drawRoundRect(box.x, bboxStartY, box.width, box.height, selectLineThickness, selectLineThickness);
-				}
-			}
-		}
-		
-	}
-	
 	public ArrayList<LayerBoundingBox> getLayerBoundingBoxes() {
 		return boundingBoxes;
 	}
 	
 	public void setLayerBoundingBoxes(ArrayList<LayerBoundingBox> boxes) {
 		this.boundingBoxes = boxes;
-		repaint();
+		this.layerUI.refresh();
+	}
+	
+	public JPanel getUIContainer() {
+		return layerUI.getSwingComponent();
 	}
 	
 	public int getLayerNum() {

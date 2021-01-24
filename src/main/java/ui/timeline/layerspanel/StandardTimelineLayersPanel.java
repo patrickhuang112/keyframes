@@ -206,7 +206,7 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 			if (layer.getColor() == Color.black) {
 				layer.setColor(defaultColors.get(i % defaultColors.size()));
 			}
-			layersParentPane.add(layer);
+			layersParentPane.add(layer.getUIContainer());
 		}
 	}
 	

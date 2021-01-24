@@ -34,7 +34,7 @@ public class MagicValues {
 	
 	public static final int layerDefaultMaxWidth = 1534;
 	public static final int layerDefaultMaxHeight = 40;
-	public static final int layerUIDefaultWidth = 0;
+	public static final int layerUIDefaultWidth = 1534;
 	public static final int layerUIDefaultHeight = 40;
 	public static final int layerBboxDefaultSelectedOutlineThickness = 2;
 	public static final int timelineLayersPanelDefaultTimeIndicatorLineOffset = 5;
