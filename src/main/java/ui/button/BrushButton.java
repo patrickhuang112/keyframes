@@ -15,6 +15,7 @@ import javax.swing.SwingUtilities;
 import datatypes.Enums;
 import keyframes.Controller;
 import keyframes.Session;
+import keyframes.command.CommandFactory;
 import ui.dialog.DialogFactory;
 
 public class BrushButton extends JButton implements Button {
@@ -30,7 +31,7 @@ public class BrushButton extends JButton implements Button {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					Controller.getController().setPaintSetting(Enums.PaintSetting.DRAW);
+					Controller.getController().addAndExecuteCommand(CommandFactory.createBrushToolSelectedCommand());
 				}
 				else if(SwingUtilities.isRightMouseButton(e)) {
 					DialogFactory.createBrushSizeDialog();

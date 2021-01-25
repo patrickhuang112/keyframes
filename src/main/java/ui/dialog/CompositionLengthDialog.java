@@ -7,6 +7,7 @@ import javax.swing.JSlider;
 
 import keyframes.Controller;
 import keyframes.Session;
+import keyframes.command.CommandFactory;
 import ui.slider.SliderFactory;
 
 public class CompositionLengthDialog implements Dialog {
@@ -32,7 +33,7 @@ public class CompositionLengthDialog implements Dialog {
 	    		if (val == 0) {
 	    			val++;
 	    		}
-	    		Controller.getController().setLongestTimeInSeconds(val);
+	    		Controller.getController().addAndExecuteCommand(CommandFactory.createCompLengthChangedCommand(val));
 	    	} 
 	    }
 	}

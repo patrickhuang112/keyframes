@@ -136,5 +136,22 @@ public class MainView extends JPanel implements Serializable{
 			}
 		});
 		
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Z"), "undo");
+		getActionMap().put("undo", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Controller.getController().undoCommand();
+			}
+		});
+		
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Y"), "redo");
+		getActionMap().put("redo", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Controller.getController().redoCommand();
+			}
+		});
+		
+		
 	}
 }

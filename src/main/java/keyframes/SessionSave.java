@@ -20,7 +20,6 @@ public class SessionSave implements Serializable {
 	public int longestTimeInSeconds;
 	public int framesPerSecond;
 	//Dependent on frames persecond and time in seconds, updated when we set the timeline slider
-	public Integer spaceBetweenTicks;
 	public int longestTimepoint;
 	
 	public SessionSave(Session session) {

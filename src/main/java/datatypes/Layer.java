@@ -35,15 +35,15 @@ public class Layer implements Serializable {
 	private int layerNum;
 	// All the timestamped points for a layer
 	
+	// These for are only set when we do serialization, otherwise you can ignore them
 	private HashMap<Integer, int[][]> pixelsMap;
 	private boolean inSerializedState;
 	private int serializedWidth;
 	private int serializedHeight;
+	
 	private transient KeyFrames frames;
 	//FOR SERIALIZATION OF A KEYFRAMES
 	private String layerName;
-	
-	private KFLayerRectangles layerUI;
 	
 	private int UIheight = MagicValues.layerUIDefaultHeight;
 	private Color color = Color.black;
@@ -69,7 +69,6 @@ public class Layer implements Serializable {
 		//this when I actually implement acutal boxes for each point
 		Rectangle box = new Rectangle(boundx, boundy, Layer.MaxWidth, Layer.MaxHeight);
 		boundingBoxes.add(new LayerBoundingBox(layerInitialFrames, box));
-		layerUI = KFLayerRectanglesFactory.createStandardKFLayerRectangles(this);
 	}
 	
 	public void prepareForSerialization() {
@@ -157,11 +156,6 @@ public class Layer implements Serializable {
 	
 	public void setLayerBoundingBoxes(ArrayList<LayerBoundingBox> boxes) {
 		this.boundingBoxes = boxes;
-		this.layerUI.refresh();
-	}
-	
-	public JPanel getUIContainer() {
-		return layerUI.getSwingComponent();
 	}
 	
 	public int getLayerNum() {

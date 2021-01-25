@@ -7,6 +7,7 @@ import javax.swing.JDialog;
 
 import keyframes.Controller;
 import keyframes.Session;
+import keyframes.command.CommandFactory;
 
 public class BackgroundColorDialog implements Dialog {
 
@@ -14,8 +15,8 @@ public class BackgroundColorDialog implements Dialog {
 		Color current = Controller.getController().getDrawablePanelBackgroundColor();
 		Color newColor = JColorChooser.showDialog(null, "Choose a new background color", current);
 		if (newColor != null) {
-			Controller.getController().setDrawablePanelBackgroundColor(newColor);
-			Controller.getController().setEraserColor(newColor);
+			Controller.getController().addAndExecuteCommand(
+					CommandFactory.createBackgroundColorSelectedCommand(newColor));
 		}
 	}
 	

@@ -7,6 +7,7 @@ import javax.swing.JSlider;
 
 import keyframes.Controller;
 import keyframes.Session;
+import keyframes.command.CommandFactory;
 import ui.slider.SliderFactory;
 
 public class FPSDialog implements Dialog {
@@ -30,7 +31,7 @@ public class FPSDialog implements Dialog {
 	    		if (val == 0) {
 	    			val++;
 	    		}
-	    		Controller.getController().setFramesPerSecond(val);
+	    		Controller.getController().addAndExecuteCommand(CommandFactory.createFPSChangedCommand(val));
 	    	} 
 	    }
 	}

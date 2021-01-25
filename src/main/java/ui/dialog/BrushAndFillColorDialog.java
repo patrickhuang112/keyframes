@@ -7,6 +7,7 @@ import javax.swing.JDialog;
 
 import keyframes.Controller;
 import keyframes.Session;
+import keyframes.command.CommandFactory;
 
 public class BrushAndFillColorDialog implements Dialog {
 
@@ -14,7 +15,8 @@ public class BrushAndFillColorDialog implements Dialog {
 		Color current = Controller.getController().getBrushColor();
 		Color newColor = JColorChooser.showDialog(null, "Choose a color", current);
 		if (newColor != null) {
-			Controller.getController().setBrushColor(newColor);
+			Controller.getController().addAndExecuteCommand(
+					CommandFactory.createBrushAndFillColorSelectedCommand(newColor));
 		}
 	}
 	

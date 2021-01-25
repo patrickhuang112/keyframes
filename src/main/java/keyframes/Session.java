@@ -44,7 +44,7 @@ public class Session implements Serializable {
 	public static final int lengthMin = 0;
 	public static final int lengthMax = 20;
 	public static final Color defaultDrawPanelBackgroundColor = Color.gray;
-	public int minTimepoint = 0;
+	
 
 	
 	static Session createSessionFromSettings(Settings settings) {
@@ -61,7 +61,6 @@ public class Session implements Serializable {
 		this.framesPerSecond = ss.framesPerSecond;
 		this.longestTimeInSeconds = ss.longestTimeInSeconds;
 		this.longestTimepoint = ss.longestTimepoint;
-		this.spaceBetweenTicks = ss.spaceBetweenTicks;
 		this.savePath = ss.savePath;
 	}
 	
@@ -116,11 +115,9 @@ public class Session implements Serializable {
 	
 	//REPLACE BY SETTINGS
 	private int currentTimepoint = 0;
-	
+	private int minTimepoint = 0;
 	private int longestTimeInSeconds;
 	private int framesPerSecond;
-	//Dependent on frames persecond and time in seconds, updated when we set the timeline slider
-	private Integer spaceBetweenTicks = null;
 	
 	
 	private int longestTimepoint = longestTimeInSeconds * framesPerSecond;
@@ -131,6 +128,23 @@ public class Session implements Serializable {
 	//
 	private DrawFrame clipboardFrames = null;
 	
+	
+	Session createDeepCopy() {
+		Session copy = new Session();
+		copy.setCurrentLayerNum(this.currentLayerNum);
+		copy.setBrushColor(this.brushColor);
+		copy.setEraserColor(this.eraserColor);
+		copy.setBrushSize(this.brushSize);
+		copy.setEraserSize(this.eraserSize);
+		copy.setPaintSetting(this.paintSetting);
+		copy.setCurrentTimepoint(this.currentTimepoint);
+		copy.setLongestTimeInSeconds(this.longestTimeInSeconds);
+		copy.setFramesPerSecond(this.framesPerSecond);
+		copy.setSavePath(this.savePath);
+		copy.setShortestTimepoint(this.minTimepoint);
+		copy.setLayers(deepCopyLayers());
+		return copy;
+	}
 	
 	//-------------------------------------------------------------------------------------------------
 	// File saving stuff
@@ -194,6 +208,10 @@ public class Session implements Serializable {
 	
 	//-------------------------------------------------------------------------------------------------
 	//Composition settings (FPS, timepoints)
+	
+	void setShortestTimepoint(int min) {
+		this.minTimepoint = min;
+	}
 	
 	int getShortestTimepoint() {
 		return this.minTimepoint;
@@ -309,21 +327,21 @@ public class Session implements Serializable {
 	
 	//-------------------------------------------------------------------------------------------------
 	
-	public void copyFramesFromSpecifiedLayerAndCurrentTime(int layerNum) {
+	void copyFramesFromSpecifiedLayerAndCurrentTime(int layerNum) {
 		clipboardFrames = getSpecifiedLayerFrameAtCurrentTime(layerNum);
 	}
 	
-	public void pasteFramesToSpecifiedLayerAndCurrentTime(int layerNum) {
+	void pasteFramesToSpecifiedLayerAndCurrentTime(int layerNum) {
 		if (clipboardFrames != null) {
 			setSpecifiedLayerFrameAtCurrentTime(clipboardFrames, layerNum);
 		}
 	}
 	
-	public void copyFramesFromCurrentLayerAndCurrentTime() {
+	void copyFramesFromCurrentLayerAndCurrentTime() {
 		copyFramesFromSpecifiedLayerAndCurrentTime(getCurrentLayerNum());
 	}
 	
-	public void pasteFramesToCurrentLayerAndCurrentTime() {
+	void pasteFramesToCurrentLayerAndCurrentTime() {
 		pasteFramesToSpecifiedLayerAndCurrentTime(getCurrentLayerNum());
 	}	
 	
@@ -352,15 +370,19 @@ public class Session implements Serializable {
 		return newLayers;
 	}
 	
+	void setLayers(ArrayList<Layer> layers) {
+		this.drawLayers = layers;
+	}
+	
 	// CURRENT LAYER
-	public ArrayList<Layer> getLayers() {
+	ArrayList<Layer> getLayers() {
 		return this.drawLayers;
 	}
 	
 	// Return what the session thinks is the currently selected layer (num)
 	// Was an Integer (object) but I think it should be an int because there should always be 
 	// a current layer (otherwise what do we draw to?)
-	public int getCurrentLayerNum () {
+	int getCurrentLayerNum () {
 		return this.currentLayerNum;
 	}
 	

@@ -25,6 +25,7 @@ import datatypes.DrawPoint;
 import datatypes.Enums;
 import datatypes.KeyFrames;
 import datatypes.Layer;
+import keyframes.command.Command;
 import ui.MainView;
 import ui.button.Button;
 import ui.button.ButtonFactory;
@@ -99,6 +100,22 @@ public class Controller {
 	private MenuItem editBackgroundColorMenuItem;
 	
 	
+	private ArrayList<Command> commandStack;
+	
+	//The command pointer will be on the command where we will undo, not the one to redo
+	private int currentCommand;
+	private int currentState;
+	
+	// Example relation between state and command:
+	// C1 -- C2 -- C3
+	//             ^
+	// S0 -- S1 -- S2 -- S3
+	//  				 ^
+	// This means that we are at the latest possible state
+	// If we are at Command C3, execute will bring us to state S3 and unexecute will bring us to state S2
+	
+	// the 
+	
 	private DrawFrame clipboardFrames = null;
 	
 	private Controller () {
@@ -108,6 +125,7 @@ public class Controller {
 	
 	//Initialize UI
 	public void initialize() {
+		initializeCommandStack();
 		initializeUI();
 		buildUI();
 	}
@@ -121,6 +139,60 @@ public class Controller {
 	public static Controller getController() {
 		return Controller.instance;
 	}
+	
+	//----------------------------------------------------------------------------------------------------
+	//Command Stack
+	
+	private void initializeCommandStack() {
+		commandStack = new ArrayList<>();
+		currentCommand = -1;
+		currentState = 0;
+	}
+	
+	public void addAndExecuteCommand(Command c) {
+		if (currentState != commandStack.size()) {
+			deleteCommandsFromEndToIndex(currentCommand);
+		}
+		
+		commandStack.add(c);
+		c.execute();
+		currentCommand++;
+		currentState++;
+		refreshUI();
+	}
+	
+	public void undoCommand() {
+		if (currentState > 0) {
+			commandStack.get(currentCommand).unExecute();			
+			currentCommand--;
+			currentState--;
+			refreshUI();
+		}
+	}
+	
+	public void redoCommand() {
+		if (currentState < commandStack.size()) {
+			currentCommand++;
+			currentState++;
+			commandStack.get(currentCommand).execute();
+			refreshUI();
+		}
+		
+		// WE have to update the pointer first
+		// This is because the only time a redo is possible is when we have undo at least once
+		// If we have undoed at least once, that means our pointer is pointing to the command for the next undo, 
+		// which means if we want to go back to the more future state, we have to move the pointer up and THEN
+		// execute that command, because just executing the command we are currently pointing at would just get us 
+		// to the same state we are currently at
+	}
+	
+	private void deleteCommandsFromEndToIndex(int ind) {
+		int initialStackSize = commandStack.size();
+		for (int i = initialStackSize - 1; i > ind; i--) {
+			commandStack.remove(i);
+		}
+	}
+	
 	
 	//----------------------------------------------------------------------------------------------------
 	//Build UI Elements put its children components together to make it complete
@@ -287,6 +359,15 @@ public class Controller {
 		session = Session.createSessionFromSessionSave(ss);
 		updateLayersFromDeserialization();
 		refreshUI();
+	}
+	
+	public void newSessionFromUndo(Session s) {
+		session = s;
+		refreshUI();
+	}
+	
+	public Session createSessionDeepCopy() {
+		return session.createDeepCopy();
 	}
 	
 	public SessionSave createCurrentSessionSave() {
@@ -660,6 +741,10 @@ public class Controller {
 	
 	public DrawFrame getSpecifiedLayerFrameAtCurrentTime(Integer layerNum) {
 		return session.getSpecifiedLayerFrameAtCurrentTime(layerNum);
+	}
+	
+	public DrawFrame getCurrentLayerFrameAtCurrentTime() {
+		return session.getCurrentLayerFrameAtCurrentTime();
 	}
 	
 	public void setSpecifiedLayerFrameAtCurrentTime(DrawFrame drawing, int layerNum) {

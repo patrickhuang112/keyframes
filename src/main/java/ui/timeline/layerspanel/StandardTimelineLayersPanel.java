@@ -38,6 +38,8 @@ import keyframes.Controller;
 import keyframes.MagicValues;
 import keyframes.Session;
 import ui.UIComponent;
+import ui.layer.rectangles.KFLayerRectangles;
+import ui.layer.rectangles.KFLayerRectanglesFactory;
 import ui.timeline.Timeline;
 
 public class StandardTimelineLayersPanel extends JScrollPane implements TimelineLayersPanel, Serializable{
@@ -206,7 +208,8 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 			if (layer.getColor() == Color.black) {
 				layer.setColor(defaultColors.get(i % defaultColors.size()));
 			}
-			layersParentPane.add(layer.getUIContainer());
+			KFLayerRectangles layerUI = KFLayerRectanglesFactory.createStandardKFLayerRectangles(layer);
+			layersParentPane.add(layerUI.getSwingComponent());
 		}
 	}
 	

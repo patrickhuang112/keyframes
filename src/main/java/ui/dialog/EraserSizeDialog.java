@@ -7,6 +7,7 @@ import javax.swing.JSlider;
 
 import keyframes.Controller;
 import keyframes.Session;
+import keyframes.command.CommandFactory;
 import ui.slider.SliderFactory;
 
 public class EraserSizeDialog implements Dialog{
@@ -31,7 +32,7 @@ public class EraserSizeDialog implements Dialog{
 	    		if (val == 0) {
 	    			val++;
 	    		}
-	    		Controller.getController().setEraserSize(val);
+	    		Controller.getController().addAndExecuteCommand(CommandFactory.createEraserSizeCommand(val));
 	    	} else {
 	    		System.out.println("Slider cancelled");
 	    	}	

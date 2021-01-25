@@ -36,6 +36,7 @@ import datatypes.SessionObject;
 import keyframes.Controller;
 import keyframes.MagicValues;
 import keyframes.Session;
+import keyframes.command.CommandFactory;
 import ui.UIComponent;
 
 public class StandardKFCanvas extends JPanel implements KFCanvas{
@@ -117,7 +118,8 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
 								? Controller.getController().getBrushColor()
 								: Controller.getController().getEraserColor();	
 						singlePointCollection.add(new DrawPoint(point, drawSize, setting, pointColor));
-						Controller.getController().addToCurrentLayerFrameAtCurrentTime(singlePointCollection);
+						Controller.getController().addAndExecuteCommand(
+								CommandFactory.createDrawOnCanvasCommand(singlePointCollection));
 					}
 					repaint();
 				}
@@ -131,7 +133,8 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(currentDraggedPoints != null) {
-					Controller.getController().addToCurrentLayerFrameAtCurrentTime(currentDraggedPoints);
+					Controller.getController().addAndExecuteCommand(
+							CommandFactory.createDrawOnCanvasCommand(currentDraggedPoints));
 					currentDraggedPoints = null;
 				}
 				repaint();
@@ -146,7 +149,8 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
 			public void mouseExited(MouseEvent e) {
 				cursorInScreen = false;
 				if(currentDraggedPoints != null) {
-					Controller.getController().addToCurrentLayerFrameAtCurrentTime(currentDraggedPoints);
+					Controller.getController().addAndExecuteCommand(
+							CommandFactory.createDrawOnCanvasCommand(currentDraggedPoints));
 					currentDraggedPoints = null;
 				}
 				repaint();
@@ -211,14 +215,11 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
 	}
 	
 	private void floodFillCurrentLayer(Point p) {
-		floodFillSpecifiedLayer(p, Controller.getController().getCurrentLayerNum());
-	}
-	
-	private void floodFillSpecifiedLayer(Point p, int layerNum) {
+		//floodFillSpecifiedLayer(p, Controller.getController().getCurrentLayerNum());
 		int[] dxs = new int[] {-1,0,1,0};
 		int[] dys = new int[] {0,-1,0,1};
   		Color newColor = Controller.getController().getBrushColor();
-		DrawFrame df = Controller.getController().getSpecifiedLayerFrameAtCurrentTime(layerNum);
+		DrawFrame df = Controller.getController().getCurrentLayerFrameAtCurrentTime().deepCopy();
 		Color oldColor = df.getColorAtPoint(p.x, p.y);
 		if (newColor.equals(oldColor)) {
 			return;
@@ -250,7 +251,50 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
 				}
 			}
 		}
+		Controller.getController().addAndExecuteCommand(CommandFactory.createFillOnCanvasCommand(df));
 	}
+	
+	//For later if i want it for specific layers, currently should only ever be on current layer
+	/*
+	private void floodFillSpecifiedLayer(Point p, int layerNum) {
+		int[] dxs = new int[] {-1,0,1,0};
+		int[] dys = new int[] {0,-1,0,1};
+  		Color newColor = Controller.getController().getBrushColor();
+		DrawFrame df = Controller.getController().getSpecifiedLayerFrameAtCurrentTime(layerNum).deepCopy();
+		Color oldColor = df.getColorAtPoint(p.x, p.y);
+		if (newColor.equals(oldColor)) {
+			return;
+		}
+		Queue<Point> q = new LinkedList<Point>();
+		int width = getImageWidth();
+		int height = getImageHeight();
+		boolean[][] visited = new boolean[height][width];
+		for(int r = 0; r < height; r++) {
+			for(int c = 0; c < width; c++) {
+				visited[r][c] = false;
+			}
+		}
+		q.add(p);
+		while (!q.isEmpty() ) {
+			Point np = q.remove();
+			visited[np.y][np.x] = true;
+			df.setColorAtPixelArrayPoint(newColor, np.x, np.y);
+			
+			
+			for (int i = 0; i < dxs.length; i++) {
+				int nx = np.x + dxs[i];
+				int ny = np.y + dys[i];
+				Point newp = new Point(nx, ny);
+				if(nx >= 0 && nx < width && ny >= 0 && ny < height && !visited[ny][nx] 
+						   && df.getColorAtPoint(nx, ny).equals(oldColor)) {
+					visited[ny][nx] = true;
+					q.add(newp);
+				}
+			}
+		}
+		Controller.getController().setSpecifiedLayerFrameAtCurrentTime(df, layerNum);
+	}
+	*/
 	
 	@Override
 	public void paintComponent(Graphics g){
@@ -286,6 +330,7 @@ public class StandardKFCanvas extends JPanel implements KFCanvas{
 		}
  			
 	}
+	
 
 	@Override
 	public JPanel getSwingComponent() {
