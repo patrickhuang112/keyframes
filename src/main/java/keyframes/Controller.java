@@ -20,12 +20,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
+import commands.Command;
 import datatypes.DrawFrame;
 import datatypes.DrawPoint;
 import datatypes.Enums;
 import datatypes.KeyFrames;
 import datatypes.Layer;
-import keyframes.command.Command;
 import ui.MainView;
 import ui.button.Button;
 import ui.button.ButtonFactory;

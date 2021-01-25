@@ -5,9 +5,9 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JSlider;
 
+import commands.CommandFactory;
 import keyframes.Controller;
 import keyframes.Session;
-import keyframes.command.CommandFactory;
 import ui.slider.SliderFactory;
 
 public class BrushSizeDialog implements Dialog {

@@ -28,6 +28,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import commands.CommandFactory;
 import datatypes.DrawFrame;
 import datatypes.DrawPoint;
 import datatypes.Enums;
@@ -36,7 +37,6 @@ import datatypes.SessionObject;
 import keyframes.Controller;
 import keyframes.MagicValues;
 import keyframes.Session;
-import keyframes.command.CommandFactory;
 import ui.UIComponent;
 
 public class StandardKFCanvas extends JPanel implements KFCanvas{

@@ -5,9 +5,9 @@ import java.awt.Color;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 
+import commands.CommandFactory;
 import keyframes.Controller;
 import keyframes.Session;
-import keyframes.command.CommandFactory;
 
 public class BackgroundColorDialog implements Dialog {
 

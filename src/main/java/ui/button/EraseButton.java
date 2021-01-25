@@ -12,10 +12,10 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
+import commands.CommandFactory;
 import datatypes.Enums;
 import keyframes.Controller;
 import keyframes.Session;
-import keyframes.command.CommandFactory;
 import ui.dialog.DialogFactory;
 
 public class EraseButton extends JButton implements Button {
