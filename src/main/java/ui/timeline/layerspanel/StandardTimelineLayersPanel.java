@@ -208,7 +208,7 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 			if (layer.getColor() == Color.black) {
 				layer.setColor(defaultColors.get(i % defaultColors.size()));
 			}
-			KFLayerRectangles layerUI = KFLayerRectanglesFactory.createStandardKFLayerRectangles(layer);
+			KFLayerRectangles layerUI = layer.getRectanglesUI();
 			layersParentPane.add(layerUI.getSwingComponent());
 		}
 	}
@@ -261,10 +261,12 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 
 	@Override
 	public void updateLayersPanelUI(double newMarkerX) {
-		setSliderBarx(newMarkerX);
+		
 		    
 	    //Updates the layers order on the layers panel
 	    updateTimelineLayersPanelLayerNumbers();
+	    
+	    setSliderBarx(newMarkerX);
 	    
 	    repaint();
 		revalidate();

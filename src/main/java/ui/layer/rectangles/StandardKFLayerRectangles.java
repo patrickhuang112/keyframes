@@ -38,6 +38,7 @@ public class StandardKFLayerRectangles extends JPanel implements KFLayerRectangl
 		setPreferredSize(new Dimension(KFLayerRectangles.DefaultWidth, KFLayerRectangles.DefaultHeight));
 		setMaximumSize(new Dimension(KFLayerRectangles.DefaultWidth, KFLayerRectangles.DefaultHeight));
 		this.layer = layer;
+		layer.setRectanglesUI(this);
 	}
 	
 	@Override

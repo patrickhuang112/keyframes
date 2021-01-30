@@ -41,6 +41,10 @@ public class Layer implements Serializable {
 	private int serializedWidth;
 	private int serializedHeight;
 	
+	//UI component of a layer that is displayed as a layer, the right side
+	//Transient also because this stuff isn't needed to know for serialization
+	private transient KFLayerRectangles rect;
+	
 	private transient KeyFrames frames;
 	//FOR SERIALIZATION OF A KEYFRAMES
 	private String layerName;
@@ -69,6 +73,14 @@ public class Layer implements Serializable {
 		//this when I actually implement acutal boxes for each point
 		Rectangle box = new Rectangle(boundx, boundy, Layer.MaxWidth, Layer.MaxHeight);
 		boundingBoxes.add(new LayerBoundingBox(layerInitialFrames, box));
+		
+		
+		//Doing this here fixed two issues
+		//First, now we don't have to create a new UI componenet each time, we can just use one for each layer
+		//Second, it fixed the issue where the timepoint slider would sometimes draw under the rectangle
+		//This mightve been caused because we were creating the rectangle each time.
+		setRectanglesUI(KFLayerRectanglesFactory.createStandardKFLayerRectangles(this));
+		
 	}
 	
 	public void prepareForSerialization() {
@@ -236,6 +248,14 @@ public class Layer implements Serializable {
 	
 	public static int getMaxHeight() {
 		return Layer.MaxHeight;
+	}
+	
+	public void setRectanglesUI(KFLayerRectangles rect) {
+		this.rect = rect;
+	}
+	
+	public KFLayerRectangles getRectanglesUI() {
+		return this.rect;
 	}
 	
 }

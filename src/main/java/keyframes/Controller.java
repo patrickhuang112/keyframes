@@ -608,6 +608,7 @@ public class Controller {
 	
 	//Play button
 	public void playMovie() {
+		boolean firstTimeClicked = !session.isPlaying();
 		session.setPlaying(true);
 		SwingWorker sw = new SwingWorker() {
 			@Override
@@ -617,7 +618,7 @@ public class Controller {
 					// Sleep the thread by a frame
 					long increment = 1000 / getFramesPerSecond();
 					Thread.sleep(increment);
-					System.out.println("Playing movie...");
+					
 				}
 				return null;
 			}
@@ -627,7 +628,12 @@ public class Controller {
 				System.out.println("Finished playing movie");
 			}
 		};
-		sw.execute();
+		// This prevents the bug where clicking the play button multiple times would suddenly speed it up by a
+		// ton.
+		if (firstTimeClicked) {
+			sw.execute();
+			System.out.println("Playing movie...");
+		}
 	}
 	
 	//Pause button
@@ -636,8 +642,16 @@ public class Controller {
 	}
 	
 	private void playOneFrame() {
-		session.incrementTimepoint();
+		incrementTimepoint();
 		refreshUI();
+	}
+	
+	private void incrementTimepoint() {
+		//Model 
+		session.incrementTimepoint();
+		//View 
+		timelineSlider.updateSlider(session.getCurrentTimepoint());
+		timelineSlider.getSwingComponent().requestFocus();
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -661,10 +675,20 @@ public class Controller {
 	}
 	
 	private void refreshTimelineUI() {
+		//refreshLayersUI();
 		// UPDATES the line on the layers panel
 		double sliderBarx = timelineSlider.getThumbMidX();
 		timelineLayersPanel.updateLayersPanelUI(sliderBarx);
 	}
+	
+	private void refreshLayersUI() {
+		ArrayList<Layer> layers = session.getLayers();
+		for (Layer layer : layers) {
+			layer.getRectanglesUI().refresh();
+		}
+				
+	}
+	
 	
 	
 	//-------------------------------------------------------------------------------------------------
