@@ -2,6 +2,8 @@ package keyframes;
 
 public class MagicValues {
 	
+	// If a value is 0, that means we basically ignore/its a placeholder/ its children dictate the actual value
+	
 	public static final int windowMinimumWidth = 1600;
 	public static final int windowMinimumHeight = 900;
 	// These are 0 just cause they span the whole screen currently
@@ -32,10 +34,29 @@ public class MagicValues {
 	public static final int timelineDefaultMinWidth = 0;
 	public static final int timelineDefaultMinHeight = 200;
 	
-	public static final int layerDefaultMaxWidth = 1534;
-	public static final int layerDefaultMaxHeight = 40;
+	//Layer UI
 	public static final int layerUIDefaultWidth = 1534;
 	public static final int layerUIDefaultHeight = 40;
+	public static final int layerUIRectanglesDefaultWidth = 1380;
+	public static final int layerUINameDefaultWidth = 140;
+	
+	public static final int timelineSliderPreferredWidth = 1400;
+	public static final int timelineSliderPreferredHeight = 50;
+	
+	public static final int timelineAdditionalInfoPaneDefaultWidth = 150;
+	public static final int timelineAdditionalInfoPaneDefaultHeight = 50;
+	
+	public static final int timelineNamesAndAdditionalInfoContainerPanelMinimumWidth = 140;
+	public static final int timelineNamesAndAdditionalInfoContainerPanelMinimumHeight = 0;
+	public static final int timelineNamesAndAdditionalInfoContainerPanelPreferredWidth = 140;
+	public static final int timelineNamesAndAdditionalInfoContainerPanelPreferredHeight = 0;
+	
+	public static final int timelineSliderAndRectanglesContainerPanelMinimumWidth = 600;
+	public static final int timelineSliderAndRectanglesContainerPanelMinimumHeight = 0;
+	public static final int timelineSliderAndRectanglesContainerPanelPreferredWidth = 600;
+	public static final int timelineSliderAndRectanglesContainerPanelPreferredHeight = 0;
+	
+	
 	public static final int layerBboxDefaultSelectedOutlineThickness = 2;
 	public static final int timelineLayersPanelDefaultTimeIndicatorLineOffset = 5;
 	public static final int timelineLayersPanelDefaultTimeIndicatorLineX = 5;

@@ -78,10 +78,8 @@ import ui.timeline.Timeline;
 import ui.timeline.TimelineFactory;
 
 
-public class MainView extends JPanel implements Serializable{
+public class MainView extends JPanel {
 	
-	private static final long serialVersionUID = -4390147842958702501L;
-
 	private static MainView instance;
 	
 	public static MainView getInstance() {

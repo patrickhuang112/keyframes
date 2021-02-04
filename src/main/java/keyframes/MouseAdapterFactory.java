@@ -7,7 +7,7 @@ import javax.swing.JSlider;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 public class MouseAdapterFactory {
-	public static MouseAdapter clickToMouseAdapter = new MouseAdapter() {
+	public static MouseAdapter sliderClickToMouseAdapter = new MouseAdapter() {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			JSlider sourceSlider=(JSlider)e.getSource();

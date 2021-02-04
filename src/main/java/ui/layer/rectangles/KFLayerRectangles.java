@@ -7,10 +7,9 @@ import ui.UIComponent;
 
 public interface KFLayerRectangles extends UIComponent {
 	
-	public static int DefaultWidth = MagicValues.layerUIDefaultWidth;
-	public static int DefaultHeight = MagicValues.layerUIDefaultHeight;
+	public static int DefaultWidth = MagicValues.layerUIRectanglesDefaultWidth;
+	
 	@Override
 	public JPanel getSwingComponent();
-	
 	public void refresh();
 }

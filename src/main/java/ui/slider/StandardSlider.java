@@ -14,7 +14,7 @@ public class StandardSlider extends JSlider implements Slider{
 		setMinorTickSpacing(1);
 		setPaintTicks(true);
 		setPaintLabels(true);
-		addMouseListener(MouseAdapterFactory.clickToMouseAdapter);
+		addMouseListener(MouseAdapterFactory.sliderClickToMouseAdapter);
 	}
 	
 	@Override

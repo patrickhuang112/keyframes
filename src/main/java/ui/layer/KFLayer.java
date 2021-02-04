@@ -16,5 +16,6 @@ public interface KFLayer extends UIComponent {
 	
 	public Layer getModel();
 	public void refresh();
+	public void setName(String name);
 	
 }

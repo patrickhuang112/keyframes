@@ -57,7 +57,7 @@ public class Session implements Serializable {
 	
 	private Session(SessionSave ss) {
 		this();
-		this.drawLayers = ss.drawLayers;
+		this.layers = ss.drawLayers;
 		this.framesPerSecond = ss.framesPerSecond;
 		this.longestTimeInSeconds = ss.longestTimeInSeconds;
 		this.longestTimepoint = ss.longestTimepoint;
@@ -85,7 +85,7 @@ public class Session implements Serializable {
 	}
 	
 	void initializeLayers() {
-		drawLayers = new ArrayList<Layer>();
+		layers = new ArrayList<Layer>();
 		// Initialize new HashMap of times and frames for default layer
 		KeyFrames drawFrames = 
 			new KeyFrames();
@@ -97,7 +97,7 @@ public class Session implements Serializable {
 		
 		Layer newLayer = new Layer(0, drawFrames);
 		newLayer.setSelected(true);
-		drawLayers.add(newLayer);
+		layers.add(newLayer);
 	}
 	
 	private Integer currentLayerNum = 0;
@@ -110,8 +110,8 @@ public class Session implements Serializable {
 	private int eraserSize;
 	private Enums.PaintSetting paintSetting = Enums.PaintSetting.DRAW;
 	// This contains layer info, and time info
-	private ArrayList<Layer> drawLayers;
-	
+	private ArrayList<Layer> layers;
+	private Layer layerBeingDragged = null;
 	
 	//REPLACE BY SETTINGS
 	private int currentTimepoint = 0;
@@ -252,7 +252,7 @@ public class Session implements Serializable {
 			this.currentTimepoint = Session.calculateNewTimelinePointerPositionFromOldFPS(framesPerSecond, 
 					   				framesPerSecond, currentTimepoint);
 			Session.updateAllLayerFramesFromChangeInFPSOrLength(framesPerSecond, framesPerSecond, longestTimepoint,
-																	drawLayers);
+																	layers);
 			return true;
 		}
 		return false;
@@ -271,7 +271,7 @@ public class Session implements Serializable {
 			this.currentTimepoint = Session.calculateNewTimelinePointerPositionFromOldFPS(oldFPS, newFPS, 
 																							currentTimepoint);
 			Session.updateAllLayerFramesFromChangeInFPSOrLength(oldFPS, newFPS, longestTimepoint,
-					drawLayers);
+					layers);
 			return true;
 		}
 		return false;
@@ -348,12 +348,30 @@ public class Session implements Serializable {
 	//-------------------------------------------------------------------------------------------------
 	// Layers management
 	
+	boolean isLayerBeingDragged() {
+		return layerBeingDragged != null;
+	}
+	
+	// Needs to trhow an exception if its null, will update this later
+	Layer getCurrentDraggedLayer() {
+		return layerBeingDragged;
+	}
+	
+	void setCurrentDraggedLayer(Layer layer) {
+		layerBeingDragged = layer;
+	}
+	
+	// Means reset layerBeingDragged to null
+	void resetCurrentDraggedLayer() {
+		layerBeingDragged = null;
+	}
+	
 	Layer selectLayer(MouseEvent e) {
-		for (int i = 0; i < drawLayers.size(); i++) {
-			Layer layer = drawLayers.get(i);
+		for (int i = 0; i < layers.size(); i++) {
+			Layer layer = layers.get(i);
 			if(layer.inBounds(e.getX(), e.getY())) {
 				int curLayNum = getCurrentLayerNum();
-				drawLayers.get(curLayNum).setSelected(false);
+				layers.get(curLayNum).setSelected(false);
 				layer.setSelected(true);
 				setCurrentLayerNum(i);
 				return layer;
@@ -362,21 +380,42 @@ public class Session implements Serializable {
 		return null;
 	}
 	
+	//Layers can only be deleted if at least one layer remains
+	boolean layersCanBeDeleted(ArrayList<Integer> layerNums) {
+		return layerNums.size() < layers.size();
+	}
+	
+	void deleteLayers(ArrayList<Integer> layerNums) {
+		for (int i = layerNums.size() - 1; i >= 0; i--) {
+			this.layers.remove((int)layerNums.get(i));
+		}
+		//This is a bandaid fix right now, preferably, we would allow no selected layer.
+		setCurrentLayerNum(0);
+		recalibrateLayerNums();
+	}
+	
+	private void recalibrateLayerNums() {
+		for (int i = 0; i < layers.size(); i++) {
+			Layer layer = layers.get(i);
+			layer.setLayerNum(i);
+		}
+	}
+	
 	public ArrayList<Layer> deepCopyLayers() {
 		ArrayList<Layer> newLayers = new ArrayList<Layer>();
-		for (Layer layer : drawLayers) {
+		for (Layer layer : layers) {
 			newLayers.add(layer.deepCopy());
 		}
 		return newLayers;
 	}
 	
 	void setLayers(ArrayList<Layer> layers) {
-		this.drawLayers = layers;
+		this.layers = layers;
 	}
 	
 	// CURRENT LAYER
 	ArrayList<Layer> getLayers() {
-		return this.drawLayers;
+		return this.layers;
 	}
 	
 	// Return what the session thinks is the currently selected layer (num)
@@ -391,29 +430,29 @@ public class Session implements Serializable {
 		this.currentLayerNum = num;
 	}
 	
-	private Layer getCurrentLayer() {
-		return this.drawLayers.get(this.currentLayerNum);
+	Layer getCurrentLayer() {
+		return this.layers.get(this.currentLayerNum);
 	}
 	
 	private Layer getSpecifiedLayer(int layerNum) {
-		return this.drawLayers.get(layerNum);
+		return this.layers.get(layerNum);
 	}
 	
 	// ADD LAYERS
 	public void addNewLayer() {
 		KeyFrames newDrawFrames = new KeyFrames();
-		int numLayers = drawLayers.size();
+		int numLayers = layers.size();
 		Layer newLayer = new Layer(numLayers, newDrawFrames);
 		
 		// The new layer should be selected when created
-		for (Layer layer : drawLayers) {
+		for (Layer layer : layers) {
 			if(layer.isSelected()) {
 				layer.setSelected(false);
 			}
 		}
 		newLayer.setSelected(true);
 		this.setCurrentLayerNum(numLayers);
-		drawLayers.add(newLayer);
+		layers.add(newLayer);
 	}
 	
 	
@@ -482,7 +521,7 @@ public class Session implements Serializable {
 	}
 	
 	void eraseAllLayersAtCurrentFrame(int w, int h) {
-		for (Layer layer : drawLayers) {
+		for (Layer layer : layers) {
 			KeyFrames frames = layer.getFrames();
 			frames.put(getCurrentTimepoint(), new DrawFrame(w, h));
 		}

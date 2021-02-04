@@ -2,6 +2,7 @@ package ui.slider;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
@@ -20,6 +21,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 import keyframes.Controller;
+import keyframes.MagicValues;
 import keyframes.Session;
 
 
@@ -39,6 +41,11 @@ public class StandardTimelineSlider extends JSlider implements TimelineSlider{
 		setPaintTicks(true);
 		setPaintLabels(true);
 		setSnapToTicks(true);
+		
+		int pw = MagicValues.timelineSliderPreferredWidth;
+		int ph = MagicValues.timelineSliderPreferredHeight;
+		
+		this.setPreferredSize(new Dimension(pw, ph));
 		
 		Hashtable<Integer, JLabel> labelDict = new Hashtable<Integer, JLabel>();
 		for(Integer i = 0; i < endSec; i++) {

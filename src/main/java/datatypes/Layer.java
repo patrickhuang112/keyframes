@@ -24,13 +24,13 @@ import javax.swing.JPanel;
 import keyframes.MagicValues;
 import ui.layer.KFLayer;
 import ui.layer.KFLayerFactory;
+import ui.layer.names.KFLayerName;
+import ui.layer.names.KFLayerNameFactory;
 import ui.layer.rectangles.KFLayerRectangles;
 import ui.layer.rectangles.KFLayerRectanglesFactory;
 
 public class Layer implements Serializable {
 	
-	private static int MaxWidth = MagicValues.layerDefaultMaxWidth;
-	private static int MaxHeight = MagicValues.layerDefaultMaxHeight;
 	// Layer num is the priority of the list being drawn
 	private int layerNum;
 	// All the timestamped points for a layer
@@ -43,7 +43,8 @@ public class Layer implements Serializable {
 	
 	//UI component of a layer that is displayed as a layer, the right side
 	//Transient also because this stuff isn't needed to know for serialization
-	private transient KFLayerRectangles rect;
+	private transient KFLayerRectangles uiRect;
+	private transient KFLayerName uiNames;
 	
 	private transient KeyFrames frames;
 	//FOR SERIALIZATION OF A KEYFRAMES
@@ -69,18 +70,25 @@ public class Layer implements Serializable {
 		int boundx = 0;
 		int boundy = layerNum * UIheight;
 		
+		// Default layer name
+		// + 1 because we use 0 indexing, but for a user, they should see 1 indexing
+		layerName = "Layer " + String.valueOf(layerNum + 1);
+		
 		//Default rectangle just to fill the whole screen right now, I'll figure out how to change
 		//this when I actually implement acutal boxes for each point
-		Rectangle box = new Rectangle(boundx, boundy, Layer.MaxWidth, Layer.MaxHeight);
+		Rectangle box = new Rectangle(boundx, boundy, KFLayer.DefaultWidth, KFLayer.DefaultHeight);
 		boundingBoxes.add(new LayerBoundingBox(layerInitialFrames, box));
-		
 		
 		//Doing this here fixed two issues
 		//First, now we don't have to create a new UI componenet each time, we can just use one for each layer
 		//Second, it fixed the issue where the timepoint slider would sometimes draw under the rectangle
 		//This mightve been caused because we were creating the rectangle each time.
-		setRectanglesUI(KFLayerRectanglesFactory.createStandardKFLayerRectangles(this));
-		
+		initializeTransientUIComponents();
+	}
+	
+	private void initializeTransientUIComponents() {
+		this.uiRect = KFLayerRectanglesFactory.createStandardKFLayerRectangles(this);
+		this.uiNames = KFLayerNameFactory.createStandardKFLayerNames(this);
 	}
 	
 	public void prepareForSerialization() {
@@ -99,6 +107,7 @@ public class Layer implements Serializable {
 		inSerializedState = true;
 	}
 	
+	// Need to recreate the UI elements here as well
 	public void updateFromDeserialization() {
 		if (inSerializedState) {
 			frames = new KeyFrames();
@@ -117,6 +126,7 @@ public class Layer implements Serializable {
 		        */
 				frames.put(key, image);
 			}
+			initializeTransientUIComponents();
 			inSerializedState = false;	
 		}
 	}
@@ -196,6 +206,7 @@ public class Layer implements Serializable {
 	
 	public void setName(String name) {
 		this.layerName = name;
+		this.uiNames.setName(name);
 	} 
 	
 	public String getName() {
@@ -234,28 +245,16 @@ public class Layer implements Serializable {
 		return isVisible;
 	}
 	
-	public static void setMaxWidth(int newWidth) {
-		Layer.MaxWidth = newWidth;
+	public KFLayerRectangles getUIRectangles() {
+		return this.uiRect;
 	}
 	
-	public static int getMaxWidth() {
-		return Layer.MaxWidth;
+	public KFLayerName getUINames() {
+		return this.uiNames;
 	}
 	
-	public static void setMaxHeight(int newHeight) {
-		Layer.MaxHeight = newHeight;
+	public void refreshUI() {
+		this.uiRect.refresh();
+		this.uiNames.refresh();
 	}
-	
-	public static int getMaxHeight() {
-		return Layer.MaxHeight;
-	}
-	
-	public void setRectanglesUI(KFLayerRectangles rect) {
-		this.rect = rect;
-	}
-	
-	public KFLayerRectangles getRectanglesUI() {
-		return this.rect;
-	}
-	
 }

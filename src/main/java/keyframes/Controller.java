@@ -41,6 +41,8 @@ import ui.pane.Pane;
 import ui.pane.PaneFactory;
 import ui.progressbar.ProgressBar;
 import ui.progressbar.ProgressBarFactory;
+import ui.scroll.KFScrollPane;
+import ui.scroll.KFScrollPaneFactory;
 import ui.slider.SliderFactory;
 import ui.slider.StandardTimelineSlider;
 import ui.slider.TimelineSlider;
@@ -50,6 +52,8 @@ import ui.timeline.Timeline;
 import ui.timeline.TimelineFactory;
 import ui.timeline.layerspanel.TimelineLayersPanel;
 import ui.timeline.layerspanel.TimelineLayersPanelFactory;
+import ui.timeline.namespanel.TimelineNamesPanel;
+import ui.timeline.namespanel.TimelineNamesPanelFactory;
 import ui.toolbar.ToolBar;
 import ui.toolbar.ToolBarFactory;
 
@@ -62,11 +66,19 @@ public class Controller {
 	private MainView mainView = null;
 	
 	private SplitPane timelineCanvasSplitPane;
-	private TimelineSlider timelineSlider;
-	private TimelineLayersPanel timelineLayersPanel;
-	
 	private KFCanvas canvas;
+	
+	//Timeline
 	private Timeline timeline;
+	private KFScrollPane rectanglesScrollPane;
+	private KFScrollPane namesScrollPane;
+	private SplitPane rectanglesNamesSplitPane;
+	private TimelineSlider timelineSlider;
+	private Pane timelineSliderAndRectanglesContainerPanel;
+	private Pane namesAndAdditionalInfoContainerPanel;
+	private Pane additionalInfoPanel;
+	private TimelineLayersPanel timelineLayersPanel;
+	private TimelineNamesPanel timelineNamesPanel;
 	
 	//Top MainView
 	private Pane mainViewToolBarAndProgressBarContainer;
@@ -210,10 +222,36 @@ public class Controller {
 	}
 	
 	private void buildTimeline() {
-		// This is just to set up the layers being displayed
+		buildNamesAndAdditionalInfo();
+		buildTimelineSliderAndRectangles();
+		rectanglesNamesSplitPane.addTopLeftComponent(namesAndAdditionalInfoContainerPanel);
+		rectanglesNamesSplitPane.addBottomRightComponent(timelineSliderAndRectanglesContainerPanel);
+		connectNamesScrollPaneAndRectanglesScrollPane();
+		timeline.getSwingComponent().add(rectanglesNamesSplitPane.getSwingComponent());
+	}
+	
+	private void buildNamesAndAdditionalInfo() {
+		buildNamesScrollPane();
+		timelineNamesPanel.buildLayersPanelLayers();
+		namesAndAdditionalInfoContainerPanel.getSwingComponent().add(
+				additionalInfoPanel.getSwingComponent());
+		namesAndAdditionalInfoContainerPanel.getSwingComponent().add(namesScrollPane.getSwingComponent());
+	}
+	
+	private void buildNamesScrollPane() {
+		namesScrollPane.addScrollComponent(timelineNamesPanel);
+	}
+	
+	private void buildTimelineSliderAndRectangles() {
+		buildRectanglesScrollPane();
 		timelineLayersPanel.buildLayersPanelLayers();
-		timeline.getSwingComponent().add(timelineSlider.getSwingComponent(), BorderLayout.NORTH);
-		timeline.getSwingComponent().add(timelineLayersPanel.getSwingComponent());
+		timelineSliderAndRectanglesContainerPanel.getSwingComponent().add(
+				timelineSlider.getSwingComponent());
+		timelineSliderAndRectanglesContainerPanel.getSwingComponent().add(rectanglesScrollPane.getSwingComponent());
+	}
+	
+	private void buildRectanglesScrollPane() {
+		rectanglesScrollPane.addScrollComponent(timelineLayersPanel);
 	}
 	
 	private void buildTopContainer() {
@@ -289,7 +327,7 @@ public class Controller {
 	}
 	
 	private void initializeOtherMainViewUIComponents() {
-		timelineCanvasSplitPane = SplitPaneFactory.createHorizontalSplitPane();
+		timelineCanvasSplitPane = SplitPaneFactory.createVerticalSplitPane();
 		mainViewTopContainer = PaneFactory.createMainViewTopContainer();
 		mainViewToolBarAndProgressBarContainer = PaneFactory.createMainViewToolBarAndProgressBarContainer();
 		progressBar = ProgressBarFactory.createMainViewProgressBar(session.getShortestTimepoint(),
@@ -344,6 +382,17 @@ public class Controller {
 																	session.getLongestTimeInSeconds(),
 																	session.getFramesPerSecond());
 		timelineLayersPanel = TimelineLayersPanelFactory.createStandardTimelineLayersPanel();
+		
+		rectanglesScrollPane = KFScrollPaneFactory.createStandardTimelineKFScrollPane();
+		namesScrollPane = KFScrollPaneFactory.createStandardTimelineKFScrollPane();
+		rectanglesNamesSplitPane = SplitPaneFactory.createHorizontalSplitPane();
+		
+		additionalInfoPanel = PaneFactory.createTimelineAdditionalInfoPane();
+		timelineNamesPanel = TimelineNamesPanelFactory	.createStandardTimelineNamesPanel();
+		
+		timelineSliderAndRectanglesContainerPanel = PaneFactory.createTimelineSliderAndRectanglesContainerPane();
+		namesAndAdditionalInfoContainerPanel = PaneFactory.createNamesAndAdditionalInfoContainerPane();
+		
 	}
 	
 	public void newSessionLayers() {
@@ -416,6 +465,13 @@ public class Controller {
 		}
 		
 		return drawImages;
+	}
+	
+	//-------------------------------------------------------------------------------------------------
+	//Timeline scroll panel configuration stuff
+	public void connectNamesScrollPaneAndRectanglesScrollPane() {
+		this.namesScrollPane.getSwingComponent().getVerticalScrollBar().setModel(
+				this.rectanglesScrollPane.getSwingComponent().getVerticalScrollBar().getModel());
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -664,6 +720,12 @@ public class Controller {
 	    timelineSlider.getSwingComponent().requestFocus();
 	}
 	
+	//Another bandaid fix as long as I can't find how to actually resize stuff in scrollpanes
+	public void updateTimelineFromSplitPaneResize() {
+		setCurrentTimepoint(getCurrentTimepoint());
+		refreshUI();
+	}
+	
 	public void refreshUI() {
 		refreshCanvas();
 		refreshTimelineUI();
@@ -675,21 +737,26 @@ public class Controller {
 	}
 	
 	private void refreshTimelineUI() {
-		//refreshLayersUI();
+		
 		// UPDATES the line on the layers panel
 		double sliderBarx = timelineSlider.getThumbMidX();
 		timelineLayersPanel.updateLayersPanelUI(sliderBarx);
+		timelineNamesPanel.buildLayersPanelLayers();
+		refreshLayersContainersUI();
+		refreshLayersUI();
+	}
+	
+	private void refreshLayersContainersUI() {
+		this.timelineNamesPanel.refresh();
 	}
 	
 	private void refreshLayersUI() {
 		ArrayList<Layer> layers = session.getLayers();
 		for (Layer layer : layers) {
-			layer.getRectanglesUI().refresh();
+			layer.refreshUI();
 		}
 				
 	}
-	
-	
 	
 	//-------------------------------------------------------------------------------------------------
 	
@@ -715,8 +782,33 @@ public class Controller {
 	//-------------------------------------------------------------------------------------------------
 	// Layers management
 	
+	public boolean isLayerBeingDragged() {
+		return session.isLayerBeingDragged();
+	}
+	
+	public Layer getCurrentDraggedLayer() {
+		return session.getCurrentDraggedLayer();
+	}
+	
+	public void setCurrentDraggedLayer(Layer layer) {
+		session.setCurrentDraggedLayer(layer);
+	}
+
+	public void resetCurrentDraggedLayer() {
+		session.resetCurrentDraggedLayer();
+	}
+	
 	public Layer selectLayer(MouseEvent e) {
 		return session.selectLayer(e);
+	}
+	
+	//Should only be able to delete a layer if its not the only layer remaining
+	public boolean layersCanBeDeleted(ArrayList<Integer> layerNums) {
+		return session.layersCanBeDeleted(layerNums);
+	}
+	
+	public void deleteLayers(ArrayList<Integer> layerNums) {
+		session.deleteLayers(layerNums);
 	}
 	
 	public ArrayList<Layer> deepCopyLayers() {
@@ -731,6 +823,18 @@ public class Controller {
 	// CURRENT LAYER
 	public ArrayList<Layer> getLayers() {
 		return session.getLayers();
+	}
+	
+	public Layer getCurrentLayer() {
+		return session.getCurrentLayer();
+	}
+	
+	public void setCurrentLayerColor(Color color) {
+		session.getCurrentLayer().setColor(color);
+	}
+	
+	public void setCurrentLayerName(String name) {
+		session.getCurrentLayer().setName(name);
 	}
 	
 	// Return what the session thinks is the currently selected layer (num)

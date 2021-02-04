@@ -14,8 +14,13 @@ import commands.session.eraser.EraserSizeCommand;
 import commands.session.eraser.EraserToolSelectedCommand;
 import commands.session.fill.FillToolSelectedCommand;
 import commands.session.fps.FPSChangedCommand;
+import commands.session.layer.AddLayerCommand;
+import commands.session.layer.DeleteLayersCommand;
+import commands.session.layer.LayerColorSelectedCommand;
+import commands.session.layer.RenameCurrentLayerCommand;
 import datatypes.DrawFrame;
 import datatypes.DrawPoint;
+import datatypes.Layer;
 
 public class CommandFactory {
 	
@@ -61,6 +66,22 @@ public class CommandFactory {
 	
 	public static Command createFPSChangedCommand(int val) {
 		return new FPSChangedCommand(val);
+	}
+	
+	public static Command createLayerColorSelectedCommand(Color color) {
+		return new LayerColorSelectedCommand(color);
+	}
+	
+	public static Command createRenameCurrentLayerCommand(String newName) {
+		return new RenameCurrentLayerCommand(newName);
+	}
+	
+	public static Command createAddLayerCommand() {
+		return new AddLayerCommand();
+	}
+	
+	public static Command createDeleteLayersCommand(ArrayList<Integer> layerNums) { 
+		return new DeleteLayersCommand(layerNums);
 	}
 	
 }

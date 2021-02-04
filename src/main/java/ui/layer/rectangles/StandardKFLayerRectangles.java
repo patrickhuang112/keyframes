@@ -8,6 +8,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Stroke;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
@@ -15,14 +17,13 @@ import javax.swing.JPanel;
 
 import datatypes.Layer;
 import datatypes.LayerBoundingBox;
+import keyframes.Controller;
 import keyframes.MagicValues;
 import ui.layer.KFLayer;
 
 public class StandardKFLayerRectangles extends JPanel implements KFLayerRectangles {
 
 	private Layer layer;
-	private int UIwidth = MagicValues.layerUIDefaultWidth;
-	private int UIheight = MagicValues.layerUIDefaultHeight;
 	private int bboxStartY = 0;
 	
 	private int selectLineThickness  = 2;
@@ -33,12 +34,11 @@ public class StandardKFLayerRectangles extends JPanel implements KFLayerRectangl
 	
 	StandardKFLayerRectangles(Layer layer) {
 		super();
-		setAlignmentX(Component.LEFT_ALIGNMENT);
-		setMinimumSize(new Dimension(KFLayerRectangles.DefaultWidth, KFLayerRectangles.DefaultHeight));
-		setPreferredSize(new Dimension(KFLayerRectangles.DefaultWidth, KFLayerRectangles.DefaultHeight));
-		setMaximumSize(new Dimension(KFLayerRectangles.DefaultWidth, KFLayerRectangles.DefaultHeight));
+		setMinimumSize(new Dimension(KFLayerRectangles.DefaultWidth, KFLayer.DefaultHeight));
+		setPreferredSize(new Dimension(KFLayerRectangles.DefaultWidth, KFLayer.DefaultHeight));
+		setMaximumSize(new Dimension(KFLayerRectangles.DefaultWidth, KFLayer.DefaultHeight));
 		this.layer = layer;
-		layer.setRectanglesUI(this);
+		
 	}
 	
 	@Override

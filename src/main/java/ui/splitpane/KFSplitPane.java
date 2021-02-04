@@ -1,33 +1,23 @@
 package ui.splitpane;
 
-import java.awt.Dimension;
-import java.io.Serializable;
-
-import javax.swing.JComponent;
 import javax.swing.JSplitPane;
 
-import datatypes.SessionObject;
-import keyframes.Session;
 import ui.UIComponent;
 
-public class VerticalSplitPane extends JSplitPane implements Serializable, SplitPane {
+public class KFSplitPane extends JSplitPane implements SplitPane{
 
-	private static final long serialVersionUID = -4937128517824428147L;
-
-	private JSplitPane splitPane;
-	
 	private UIComponent topOrLeft;
 	private UIComponent bottomOrRight;
 	
-	VerticalSplitPane() {
-		super(JSplitPane.VERTICAL_SPLIT);
+	KFSplitPane(int orientation) {
+		super(orientation);
 	}
 	
 	@Override
 	public JSplitPane getSwingComponent() {
 		return this;
 	}
-
+	
 	@Override
 	public void addTopLeftComponent(UIComponent c) {
 		topOrLeft = c;
@@ -39,5 +29,4 @@ public class VerticalSplitPane extends JSplitPane implements Serializable, Split
 		bottomOrRight = c;
 		this.setBottomComponent(c.getSwingComponent());
 	}
-	
 }

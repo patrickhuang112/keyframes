@@ -1,5 +1,6 @@
 package ui.timeline.layerspanel;
 
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import ui.UIComponent;
@@ -7,7 +8,7 @@ import ui.UIComponent;
 public interface TimelineLayersPanel extends UIComponent {
 	
 	@Override
-	public JScrollPane getSwingComponent();
+	public JPanel getSwingComponent();
 
 	public void updateLayersPanelUI(double newMarkerX);
 	public void buildLayersPanelLayers();

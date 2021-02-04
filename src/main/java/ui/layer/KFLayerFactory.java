@@ -5,8 +5,8 @@ import keyframes.MagicValues;
 
 public class KFLayerFactory {
 
-	public static KFLayer createStandardKFLayer(Layer parent) {
-		return new StandardKFLayer(parent);
+	public static KFLayer createNamesLeftRectanglesRightKFLayer(Layer parent) {
+		return new NamesLeftRectanglesRightKFLayer(parent);
 	}
 	
 }

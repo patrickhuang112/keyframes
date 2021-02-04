@@ -42,4 +42,12 @@ public class DialogFactory {
 	public static Dialog createBrushAndFillColorDialog () {
 		return new BrushAndFillColorDialog();
 	}
+	
+	public static Dialog createLayerColorDialog() {
+		return new LayerColorDialog();
+	}
+	
+	public static Dialog createRenameCurrentLayerDialog() {
+		return new RenameCurrentLayerDialog();
+	}
 }

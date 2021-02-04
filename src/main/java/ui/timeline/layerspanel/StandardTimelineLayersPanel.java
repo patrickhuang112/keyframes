@@ -8,6 +8,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
@@ -38,161 +40,33 @@ import keyframes.Controller;
 import keyframes.MagicValues;
 import keyframes.Session;
 import ui.UIComponent;
+import ui.dialog.DialogFactory;
+import ui.layer.KFLayer;
 import ui.layer.rectangles.KFLayerRectangles;
 import ui.layer.rectangles.KFLayerRectanglesFactory;
+import ui.timeline.KFLayerPanel;
 import ui.timeline.Timeline;
 
-public class StandardTimelineLayersPanel extends JScrollPane implements TimelineLayersPanel, Serializable{
+public class StandardTimelineLayersPanel extends KFLayerPanel implements TimelineLayersPanel, Serializable{
 	
 	// Set this manually cause I couldn't get other things to work
 	private double sliderBarx = MagicValues.timelineLayersPanelDefaultTimeIndicatorLineX;
 	private final int offset = MagicValues.timelineLayersPanelDefaultTimeIndicatorLineOffset;
-	private JViewport viewport;
-	private JPanel layersParentPane;
-	private Session session;
 	private ArrayList<Color> defaultColors = new ArrayList<>();
 	
 	private Layer layerBeingDragged = null;
-	private ArrayList<Layer> layersCopy = null;
 	
 	
 	
 	StandardTimelineLayersPanel() {
 		super();
-		this.viewport = this.getViewport();
-		this.layersParentPane = new JPanel();
 		initializeDefaultColors();
 		
-		layersParentPane.setLayout(new BoxLayout(layersParentPane, BoxLayout.Y_AXIS));
-		layersParentPane.setAlignmentX(Component.LEFT_ALIGNMENT);
-		viewport.add(layersParentPane);
-		setupLayersParentPaneListeners();
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		this.setAlignmentX(Component.LEFT_ALIGNMENT);
 	}
 	
-	public void setupLayersParentPaneListeners() {
-		layersParentPane.addMouseListener(new MouseAdapter() {
-			@Override 
-			public void mouseClicked(MouseEvent e) {
-				if(SwingUtilities.isLeftMouseButton(e)) {
-					updateTimelineFromMouseClick(e);
-				}
-				else if(SwingUtilities.isRightMouseButton(e)) {
-					displayRightClickMenu(e);
-				}
-			}
-			
-			@Override
-			public void mousePressed(MouseEvent e) {
-				
-				Layer layer = Controller.getController().selectLayer(e);
-				if (SwingUtilities.isLeftMouseButton(e) && layer != null) {
-					layerBeingDragged = layer;
-					layersCopy = Controller.getController().deepCopyLayers();
-					// This is so that only when the mouse is really being held will the layer
-					// turn into a ghost visually
-					// Mainly because without this, it keeps flickering whenever there is any simple
-					// mouse click which is pretty annoying
-					new Timer().schedule( 
-				            new TimerTask() {
-				                @Override
-				                public void run() {
-				                	if (layerBeingDragged != null) {
-				                		layerBeingDragged.setGhost(true);
-				                		Controller.getController().refreshUI();
-				                	}
-				                }
-				            }, MagicValues.timelineLayersPanelDefaultWaitTimeBeforeGhostActivatesAfterClick);
-				}
-				
-			}
-			
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				if (layerBeingDragged != null) {
-					layerBeingDragged.setGhost(false);
-					layerBeingDragged = null;
-					Controller.getController().refreshUI();
-				}
-			}
-			
-		});
-		layersParentPane.addMouseMotionListener(new MouseAdapter() {
-			@Override 
-			public void mouseDragged(MouseEvent e) {
-				
-				if (layerBeingDragged != null) {
-					ArrayList<Layer> layers = Controller.getController().getLayers();
-					for (int i = 0; i < layers.size(); i++) {
-						Layer layer = layers.get(i);
-						if(layer.inBounds(e.getX(), e.getY())) {
-							int curLayNum = Controller.getController().getCurrentLayerNum();
-							
-							//ASSERT statements are just for piece of mind so I know i'm doing the right
-							//logic thing here
-							assert(curLayNum == layerBeingDragged.getLayerNum());
-							int boundLayNum = layer.getLayerNum();
-							assert(boundLayNum == i);
-							if (curLayNum != boundLayNum) {
-								layers.remove(curLayNum);
-								layers.add(boundLayNum, layerBeingDragged);
-								Controller.getController().setCurrentLayerNum(i);
-							}
-							break;
-						}
-					}
-					Controller.getController().refreshUI();
-				}
-			}
-		});
-	}
-	
-	private void displayRightClickMenu(MouseEvent e) {
-		JPopupMenu menu = new JPopupMenu();
-		JMenuItem newLayerMenuItem = new JMenuItem(new AbstractAction("New layer") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Controller.getController().addNewLayer();
-			}
-		});
-		menu.add(newLayerMenuItem);
-		
-		Layer layer = Controller.getController().selectLayer(e);
-		if (layer != null) {
-			// We do this first here, JUST so the selected black box shows around the layer
-			JMenuItem recolorLayerMenuItem = new JMenuItem(new AbstractAction("Change layer color") {
-				@Override
-				public void actionPerformed(ActionEvent ae) {
-					Color newColor = JColorChooser.showDialog(null, "Choose a color", layer.getColor());
-					if (newColor != null) {
-						layer.setColor(newColor);
-					}
-					// We do this here to update the color of the layer straightaway
-					// Kind of messy butwhatever
-				}
-			});
-			
-			JMenuItem copyFramesFromCurrentLayerMenuItem = new JMenuItem(new AbstractAction("Copy frame from current time and layer") {
-				@Override
-				public void actionPerformed(ActionEvent ae) {
-					Controller.getController().copyFramesFromCurrentLayerAndCurrentTime();
-				}
-			});
-			
-			JMenuItem pasteFramesOntoCurrentLayerMenuItem = new JMenuItem(new AbstractAction("Paste frame") {
-				@Override
-				public void actionPerformed(ActionEvent ae) {
-					Controller.getController().pasteFramesToCurrentLayerAndCurrentTime();
-				}
-			});
-			
-			menu.add(recolorLayerMenuItem);
-			menu.add(copyFramesFromCurrentLayerMenuItem);
-			menu.add(pasteFramesOntoCurrentLayerMenuItem);
-		}
-		
-		menu.show(e.getComponent(), e.getX(), e.getY());
-	}
-	
+	@Override
 	public void updateTimelineFromMouseClick(MouseEvent e) {
 		Controller.getController().selectLayer(e);
 		Controller.getController().updateTimelineFromMouseClick(e);
@@ -201,15 +75,15 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 	// This is where we also update the layer nums of all the layers.
 	public void updateTimelineLayersPanelLayerNumbers() {
 		ArrayList<Layer> layers = Controller.getController().getLayers();
-		layersParentPane.removeAll();
+		this.removeAll();
 		for (int i = 0; i < layers.size(); i++) {
 			Layer layer = layers.get(i);
 			layer.setLayerNum(i);
 			if (layer.getColor() == Color.black) {
 				layer.setColor(defaultColors.get(i % defaultColors.size()));
 			}
-			KFLayerRectangles layerUI = layer.getRectanglesUI();
-			layersParentPane.add(layerUI.getSwingComponent());
+			KFLayerRectangles layerRectUI = layer.getUIRectangles();
+			this.add(layerRectUI.getSwingComponent());
 		}
 	}
 	
@@ -255,14 +129,12 @@ public class StandardTimelineLayersPanel extends JScrollPane implements Timeline
 	}
 
 	@Override
-	public JScrollPane getSwingComponent() {
+	public JPanel getSwingComponent() {
 		return this;
 	}
 
 	@Override
 	public void updateLayersPanelUI(double newMarkerX) {
-		
-		    
 	    //Updates the layers order on the layers panel
 	    updateTimelineLayersPanelLayerNumbers();
 	    
