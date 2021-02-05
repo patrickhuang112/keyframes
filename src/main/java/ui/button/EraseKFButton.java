@@ -18,31 +18,20 @@ import keyframes.Controller;
 import keyframes.Session;
 import ui.dialog.DialogFactory;
 
-public class BrushButton extends JButton implements Button {
+public class EraseKFButton extends AbstractKFButton {
 
-	BrushButton() throws IOException {
-		super();
-		Image drawImage = ImageIO.read(this.getClass().getResource("/drawIcon.png"));
-		setIcon(new ImageIcon(drawImage));
-		
-		setVisible(true);
-		setPreferredSize(new Dimension(Button.mvw, Button.mvh));
-		addMouseListener(new MouseAdapter( ) {
+	EraseKFButton() throws IOException {
+		super("/eraseIcon.png", new MouseAdapter( ) {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					Controller.getController().addAndExecuteCommand(CommandFactory.createBrushToolSelectedCommand());
+					Controller.getController().addAndExecuteCommand(CommandFactory.createEraserToolSelectedCommand());
 				}
 				else if(SwingUtilities.isRightMouseButton(e)) {
-					DialogFactory.createBrushSizeDialog();
+					DialogFactory.createEraserSizeDialog();
 				}
 			}
 		});
 	}
 	
-	@Override
-	public JButton getSwingComponent() {
-		return this;
-	}
-
 }

@@ -4,7 +4,7 @@ import javax.swing.JToolBar;
 
 import ui.UIComponent;
 
-public interface ToolBar extends UIComponent {
+public interface KFToolBar extends UIComponent {
 	
 	@Override
 	public JToolBar getSwingComponent ();

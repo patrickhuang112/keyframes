@@ -27,12 +27,12 @@ import datatypes.Enums;
 import datatypes.KeyFrames;
 import datatypes.Layer;
 import ui.MainView;
-import ui.button.Button;
-import ui.button.ButtonFactory;
+import ui.button.KFButton;
+import ui.button.KFButtonFactory;
 import ui.canvas.KFCanvas;
 import ui.canvas.KFCanvasFactory;
-import ui.menubar.MenuBar;
-import ui.menubar.MenuBarFactory;
+import ui.menubar.KFMenuBar;
+import ui.menubar.KFMenuBarFactory;
 import ui.menubar.menu.Menu;
 import ui.menubar.menu.MenuFactory;
 import ui.menubar.menu.menuitem.MenuItem;
@@ -54,8 +54,8 @@ import ui.timeline.layerspanel.TimelineLayersPanel;
 import ui.timeline.layerspanel.TimelineLayersPanelFactory;
 import ui.timeline.namespanel.TimelineNamesPanel;
 import ui.timeline.namespanel.TimelineNamesPanelFactory;
-import ui.toolbar.ToolBar;
-import ui.toolbar.ToolBarFactory;
+import ui.toolbar.KFToolBar;
+import ui.toolbar.KFToolBarFactory;
 
 public class Controller {
 
@@ -86,17 +86,17 @@ public class Controller {
 	private ProgressBar progressBar;
 	
 	//ToolBar
-	private ToolBar toolBar;
-	private Button brushButton;
-	private Button eraseButton;
-	private Button eraseAllButton;
-	private Button playButton;
-	private Button pauseButton;
-	private Button colorPickerButton;
-	private Button fillButton;
+	private KFToolBar toolBar;
+	private KFButton brushButton;
+	private KFButton eraseButton;
+	private KFButton eraseAllButton;
+	private KFButton playButton;
+	private KFButton pauseButton;
+	private KFButton colorPickerButton;
+	private KFButton fillButton;
 	
 	//Menubar
-	private MenuBar menuBar;
+	private KFMenuBar menuBar;
 	private Menu fileMenu;
 	private Menu editMenu;
 	private MenuItem newProjectMenuItem;
@@ -314,11 +314,13 @@ public class Controller {
 	}
 	
 	private void initializeFrame() {
+		int framemw = 1600;
+		int framemh = 900;
 		frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("Keyframes");
 		frame.setVisible(true);
-		frame.setMinimumSize(new Dimension(MagicValues.windowMinimumWidth, MagicValues.windowMinimumHeight));
+		frame.setMinimumSize(new Dimension(framemw, framemh));
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	}
 	
@@ -337,22 +339,22 @@ public class Controller {
 	}
 	
 	private void initializeToolBarUIComponents() {
-		toolBar = ToolBarFactory.createMainViewTopToolBar();
+		toolBar = KFToolBarFactory.createMainViewTopToolBar();
 		try {
-			brushButton = ButtonFactory.createBrushButton();
-			eraseButton = ButtonFactory.createEraseButton();
-			eraseAllButton = ButtonFactory.createEraseAllButton();
-			playButton = ButtonFactory.createPlayButton();
-			pauseButton = ButtonFactory.createPauseButton();
-			colorPickerButton = ButtonFactory.createColorPickerButton();
-			fillButton = ButtonFactory.createFillButton();
+			brushButton = KFButtonFactory.createBrushButton();
+			eraseButton = KFButtonFactory.createEraseButton();
+			eraseAllButton = KFButtonFactory.createEraseAllButton();
+			playButton = KFButtonFactory.createPlayButton();
+			pauseButton = KFButtonFactory.createPauseButton();
+			colorPickerButton = KFButtonFactory.createColorPickerButton();
+			fillButton = KFButtonFactory.createFillButton();
 		} catch(Exception e) {
 			System.out.println("Button icon creation failed");
 		}
 	}
 	
 	private void initializeMenuBarUIComponents() {
-		menuBar = MenuBarFactory.createMainViewTopMenuBar();
+		menuBar = KFMenuBarFactory.createMainViewTopMenuBar();
 		
 		fileMenu = MenuFactory.createFileMenu();
 		editMenu = MenuFactory.createEditMenu();
@@ -891,10 +893,10 @@ public class Controller {
 		int w  = canvas.getCanvasWidth();
 		int h  = canvas.getCanvasHeight();
 		if (w == 0) {
-			w = MagicValues.drawablePanelDefaultPreferredWidth;
+			w = KFCanvas.defaultPreferredWidth;
 		} 
 		if (h == 0) {
-			h = MagicValues.drawablePanelDefaultPreferredHeight;
+			h = KFCanvas.defaultPreferredHeight; 
 		}
 		session.eraseCurrentLayerAtCurrentFrame(w,h);
 		refreshUI();
@@ -904,10 +906,10 @@ public class Controller {
 		int w  = canvas.getCanvasWidth();
 		int h  = canvas.getCanvasHeight();
 		if (w == 0) {
-			w = MagicValues.drawablePanelDefaultPreferredWidth;
+			w = KFCanvas.defaultPreferredWidth;
 		} 
 		if (h == 0) {
-			h = MagicValues.drawablePanelDefaultPreferredHeight;
+			h = KFCanvas.defaultPreferredHeight;
 		}
 		session.eraseAllLayersAtCurrentFrame(w,h);
 		refreshUI();

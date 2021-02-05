@@ -63,7 +63,7 @@ import keyframes.MagicValues;
 import keyframes.Session;
 import keyframes.Utils;
 import settings.Settings;
-import ui.button.ButtonFactory;
+import ui.button.KFButtonFactory;
 import ui.canvas.KFCanvas;
 import ui.canvas.KFCanvasFactory;
 import ui.dialog.CompositionLengthDialog;

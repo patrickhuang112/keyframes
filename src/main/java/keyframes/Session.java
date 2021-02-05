@@ -90,8 +90,8 @@ public class Session implements Serializable {
 		KeyFrames drawFrames = 
 			new KeyFrames();
 		
-		int dw = MagicValues.drawablePanelDefaultPreferredWidth;
-		int dh = MagicValues.drawablePanelDefaultPreferredHeight;
+		int dw = KFCanvas.defaultPreferredWidth;
+		int dh = KFCanvas.defaultPreferredHeight;
 		
 		drawFrames.put(0, new DrawFrame(dw, dh));
 		
@@ -475,8 +475,8 @@ public class Session implements Serializable {
 		if(drawFrames.containsKey(timePoint)) {
 			return drawFrames.get(timePoint);
 		} else {
-			int dw = MagicValues.drawablePanelDefaultPreferredWidth;
-			int dh = MagicValues.drawablePanelDefaultPreferredHeight;
+			int dw = KFCanvas.defaultPreferredWidth;
+			int dh = KFCanvas.defaultPreferredHeight;
 			
 			setCurrentLayerFrameAtTime(timePoint, new DrawFrame(dw, dh));
 			return drawFrames.get(timePoint);

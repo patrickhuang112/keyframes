@@ -18,25 +18,14 @@ import datatypes.Enums;
 import keyframes.Session;
 import ui.dialog.DialogFactory;
 
-public class ColorPickerButton extends JButton implements Button {
+public class ColorPickerKFButton extends AbstractKFButton {
 
-	ColorPickerButton() throws IOException {
-		Image icon = ImageIO.read(this.getClass().getResource("/colorPickerIcon.png"));
-		setIcon(new ImageIcon(icon));
-		
-		setVisible(true);
-		setPreferredSize(new Dimension(Button.mvw, Button.mvh));
-		addMouseListener(new MouseAdapter( ) {
+	ColorPickerKFButton() throws IOException {
+		super("/colorPickerIcon.png", new MouseAdapter( ) {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				DialogFactory.createBrushAndFillColorDialog();
 			}
 		});
 	}
-	
-	@Override
-	public JButton getSwingComponent() {
-		return this;
-	}
-	
 }

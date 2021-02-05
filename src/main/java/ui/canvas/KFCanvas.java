@@ -16,6 +16,11 @@ import ui.UIComponent;
 //KF stands for key frames, because there is already a java.awt canvas type
 public interface KFCanvas extends UIComponent {
 	
+	public static final int defaultMinWidth = 0;
+	public static final int defaultPreferredWidth = 1800;
+	public static final int defaultMinHeight = 200;
+	public static final int defaultPreferredHeight = 500;
+	
 	@Override
 	public JPanel getSwingComponent();
 	

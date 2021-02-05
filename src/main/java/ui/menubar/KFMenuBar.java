@@ -5,7 +5,7 @@ import javax.swing.JMenuBar;
 import ui.UIComponent;
 import ui.menubar.menu.Menu;
 
-public interface MenuBar extends UIComponent {
+public interface KFMenuBar extends UIComponent {
 
 	@Override
 	public JMenuBar getSwingComponent();

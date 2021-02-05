@@ -16,15 +16,10 @@ import keyframes.Controller;
 import keyframes.Session;
 import ui.dialog.DialogFactory;
 
-public class PlayButton extends JButton implements Button {
+public class PlayKFButton extends AbstractKFButton {
 
-	PlayButton() throws IOException {
-		Image playImage = ImageIO.read(this.getClass().getResource("/playIcon.png"));
-		setIcon(new ImageIcon(playImage));
-		
-		setVisible(true);
-		setPreferredSize(new Dimension(Button.mvw, Button.mvh));
-		addMouseListener(new MouseAdapter( ) {
+	PlayKFButton() throws IOException {
+		super("/playIcon.png", new MouseAdapter( ) {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
@@ -33,10 +28,5 @@ public class PlayButton extends JButton implements Button {
 			}
 		});
 	}
-	
-	@Override
-	public JButton getSwingComponent() {
-		return this;
-	}
-	
+
 }

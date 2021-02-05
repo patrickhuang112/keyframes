@@ -20,17 +20,12 @@ import keyframes.Controller;
 import keyframes.Session;
 import ui.dialog.DialogFactory;
 
-public class EraseAllButton extends JButton implements Button {
+public class EraseAllKFButton extends AbstractKFButton {
 
 	private static int menuPopupOffset = 5;
 	
-	EraseAllButton() throws IOException {
-		Image eraserImage = ImageIO.read(this.getClass().getResource("/eraseAllIcon.png"));
-		setIcon(new ImageIcon(eraserImage));
-		
-		setVisible(true);
-		setPreferredSize(new Dimension(Button.mvw, Button.mvh));
-		addMouseListener(new MouseAdapter( ) {
+	EraseAllKFButton() throws IOException {
+		super("/eraseAllIcon.png", new MouseAdapter( ) {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
@@ -49,16 +44,10 @@ public class EraseAllButton extends JButton implements Button {
 					menu.add(eraseAllLayersAtCurrentTimeMenuItem);
 					
 					//Very arbitrary right now just to make it look good
-					int offset = EraseAllButton.menuPopupOffset;
+					int offset = EraseAllKFButton.menuPopupOffset;
 					menu.show(e.getComponent(), e.getX() + offset, e.getY() + offset);
 				}
 			}
 		});
 	}
-	
-	@Override
-	public JButton getSwingComponent() {
-		return this;
-	}
-	
 }

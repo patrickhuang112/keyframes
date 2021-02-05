@@ -9,35 +9,29 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
+import commands.CommandFactory;
 import datatypes.Enums;
 import keyframes.Controller;
 import keyframes.Session;
 import ui.dialog.DialogFactory;
 
-public class FillButton extends JButton implements Button {
+public class BrushKFButton extends AbstractKFButton {
 
-	FillButton() throws IOException {
-		super();
-		Image icon = ImageIO.read(this.getClass().getResource("/fillIcon.png"));
-		setIcon(new ImageIcon(icon));
-		
-		setVisible(true);
-		setPreferredSize(new Dimension(Button.mvw, Button.mvh));
-		addMouseListener(new MouseAdapter( ) {
+	BrushKFButton() throws IOException {
+		super("/drawIcon.png", new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					Controller.getController().setPaintSetting(Enums.PaintSetting.FILLSINGLE);
+					Controller.getController().addAndExecuteCommand(CommandFactory.createBrushToolSelectedCommand());
+				}
+				else if(SwingUtilities.isRightMouseButton(e)) {
+					DialogFactory.createBrushSizeDialog();
 				}
 			}
 		});
 	}
 	
-	@Override
-	public JButton getSwingComponent() {
-		return this;
-	}
-
 }

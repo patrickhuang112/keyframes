@@ -7,13 +7,10 @@ import javax.swing.JMenuBar;
 import keyframes.MagicValues;
 import ui.menubar.menu.Menu;
 
-public class StandardMenuBar extends JMenuBar implements MenuBar {
+public class StandardKFMenuBar extends AbstractKFMenuBar {
 
-	public static final int dw = MagicValues.mainViewTopMenuBarDefaultWidth;
-	public static final int dh = MagicValues.mainViewTopMenuBarDefaultHeight;
-	
-	StandardMenuBar() {
-		this.setPreferredSize(new Dimension(dw, dh));
+	StandardKFMenuBar() {
+		this.setPreferredSize(new Dimension(AbstractKFMenuBar.defaultWidth, AbstractKFMenuBar.defaultHeight));
 	}
 	@Override
 	public JMenuBar getSwingComponent() {

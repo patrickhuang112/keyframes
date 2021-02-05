@@ -16,27 +16,17 @@ import keyframes.Controller;
 import keyframes.Session;
 import ui.dialog.DialogFactory;
 
-public class PauseButton extends JButton implements Button {
+public class FillKFButton extends AbstractKFButton {
 
-	PauseButton() throws IOException {
-		Image pauseImage = ImageIO.read(this.getClass().getResource("/pauseIcon.png"));
-		setIcon(new ImageIcon(pauseImage));
-		
-		setVisible(true);
-		setPreferredSize(new Dimension(Button.mvw, Button.mvh));
-		addMouseListener(new MouseAdapter( ) {
+	FillKFButton() throws IOException {
+		super("/fillIcon.png", new MouseAdapter( ) {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					Controller.getController().pauseMovie();
+					Controller.getController().setPaintSetting(Enums.PaintSetting.FILLSINGLE);
 				}
 			}
 		});
-	}
-	
-	@Override
-	public JButton getSwingComponent() {
-		return this;
 	}
 	
 }
