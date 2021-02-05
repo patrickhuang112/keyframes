@@ -37,7 +37,6 @@ import datatypes.Interval;
 import datatypes.KeyFrames;
 import datatypes.Layer;
 import keyframes.Controller;
-import keyframes.MagicValues;
 import keyframes.Session;
 import ui.UIComponent;
 import ui.slider.SliderFactory;
@@ -47,16 +46,15 @@ import ui.slider.TimelineSlider;
 import ui.timeline.layerspanel.StandardTimelineLayersPanel;
 import ui.timeline.layerspanel.TimelineLayersPanel;
 
-public class StandardTimeline extends JPanel implements Serializable, Timeline{
-	
+public class StandardKFTimeline extends AbstractKFTimeline{
 	private static final long serialVersionUID = -4549310200115960539L;
 	
-	public StandardTimeline () {
+	public StandardKFTimeline () {
 		super();
-		int dpw = MagicValues.timelineDefaultPreferredWidth;
-		int dph = MagicValues.timelineDefaultPreferredHeight;
-		int dmw = MagicValues.timelineDefaultMinWidth;
-		int dmh = MagicValues.timelineDefaultMinHeight;
+		int dpw = 0;
+		int dph = 200;
+		int dmw = 0;
+		int dmh = 200;
 		// Default heights of the timeline on the bottom
 		
 		setBackground(Color.gray);
@@ -64,14 +62,6 @@ public class StandardTimeline extends JPanel implements Serializable, Timeline{
 		setPreferredSize(new Dimension(dpw,dph));
 		setMinimumSize(new Dimension(dmw, dmh));
 	}
-	
-	@Override
-	public JPanel getSwingComponent() {
-		return this;
-	}
 
-	@Override
-	public void updateTimelineFromMouse(MouseEvent e) {
-	    Controller.getController().updateTimelineFromMouseClick(e);
-	}
+
 }

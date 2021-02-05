@@ -15,7 +15,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 
-import keyframes.MagicValues;
 import settings.Settings;
 import ui.slider.SliderFactory;
 
@@ -24,6 +23,9 @@ public class SettingsDialog extends JDialog implements Dialog {
 	private static final long serialVersionUID = 1L;
 	private Settings settings;
 	private static JFrame nullFrame;
+	
+	public static final int defaultWidth = 500;
+	public static final int defaultHeight = 400;
 	
 	SettingsDialog(String title, Settings settings) {
 		super(SettingsDialog.nullFrame, title, true);
@@ -159,7 +161,7 @@ public class SettingsDialog extends JDialog implements Dialog {
         gbc.weightx = .5;
         add(applyButton, gbc);
         
-        setSize(MagicValues.settingsDialogDefaultWidth, MagicValues.settingsDialogDefaultHeight);    
+        setSize(defaultWidth, defaultHeight);    
         setVisible(true);  
 	}
 

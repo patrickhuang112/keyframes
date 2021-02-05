@@ -37,8 +37,8 @@ import ui.menubar.menu.Menu;
 import ui.menubar.menu.MenuFactory;
 import ui.menubar.menu.menuitem.MenuItem;
 import ui.menubar.menu.menuitem.MenuItemFactory;
-import ui.pane.Pane;
-import ui.pane.PaneFactory;
+import ui.pane.KFPane;
+import ui.pane.KFPaneFactory;
 import ui.progressbar.ProgressBar;
 import ui.progressbar.ProgressBarFactory;
 import ui.scroll.KFScrollPane;
@@ -48,8 +48,8 @@ import ui.slider.StandardTimelineSlider;
 import ui.slider.TimelineSlider;
 import ui.splitpane.SplitPane;
 import ui.splitpane.SplitPaneFactory;
-import ui.timeline.Timeline;
-import ui.timeline.TimelineFactory;
+import ui.timeline.KFTimeline;
+import ui.timeline.KFTimelineFactory;
 import ui.timeline.layerspanel.TimelineLayersPanel;
 import ui.timeline.layerspanel.TimelineLayersPanelFactory;
 import ui.timeline.namespanel.TimelineNamesPanel;
@@ -69,20 +69,20 @@ public class Controller {
 	private KFCanvas canvas;
 	
 	//Timeline
-	private Timeline timeline;
+	private KFTimeline timeline;
 	private KFScrollPane rectanglesScrollPane;
 	private KFScrollPane namesScrollPane;
 	private SplitPane rectanglesNamesSplitPane;
 	private TimelineSlider timelineSlider;
-	private Pane timelineSliderAndRectanglesContainerPanel;
-	private Pane namesAndAdditionalInfoContainerPanel;
-	private Pane additionalInfoPanel;
+	private KFPane timelineSliderAndRectanglesContainerPanel;
+	private KFPane namesAndAdditionalInfoContainerPanel;
+	private KFPane additionalInfoPanel;
 	private TimelineLayersPanel timelineLayersPanel;
 	private TimelineNamesPanel timelineNamesPanel;
 	
 	//Top MainView
-	private Pane mainViewToolBarAndProgressBarContainer;
-	private Pane mainViewTopContainer;
+	private KFPane mainViewToolBarAndProgressBarContainer;
+	private KFPane mainViewTopContainer;
 	private ProgressBar progressBar;
 	
 	//ToolBar
@@ -110,6 +110,11 @@ public class Controller {
 	private MenuItem editFPSMenuItem;
 	private MenuItem editCompLengthMenuItem;
 	private MenuItem editBackgroundColorMenuItem;
+	
+	
+	private int defaultTimeBeforeProgressBarDisappearsAfterRender = 3000;
+	private int defaultTimeBeforeProgressBarDisappearsAfterOpenAndSave = 3000;
+		
 	
 	
 	private ArrayList<Command> commandStack;
@@ -330,8 +335,8 @@ public class Controller {
 	
 	private void initializeOtherMainViewUIComponents() {
 		timelineCanvasSplitPane = SplitPaneFactory.createVerticalSplitPane();
-		mainViewTopContainer = PaneFactory.createMainViewTopContainer();
-		mainViewToolBarAndProgressBarContainer = PaneFactory.createMainViewToolBarAndProgressBarContainer();
+		mainViewTopContainer = KFPaneFactory.createMainViewTopContainer();
+		mainViewToolBarAndProgressBarContainer = KFPaneFactory.createMainViewToolBarAndProgressBarContainer();
 		progressBar = ProgressBarFactory.createMainViewProgressBar(session.getShortestTimepoint(),
 																	session.getLongestTimepoint());
 		initializeToolBarUIComponents();
@@ -377,7 +382,7 @@ public class Controller {
 	}
 	
 	private void initializeTimelineUIComponents() {
-		timeline = TimelineFactory.createStandardTimeline();
+		timeline = KFTimelineFactory.createStandardTimeline();
 		timelineSlider = SliderFactory.createStandardTimelineSlider(session.getShortestTimepoint(), 
 																	session.getLongestTimepoint(), 
 																	session.getCurrentTimepoint(),
@@ -389,11 +394,11 @@ public class Controller {
 		namesScrollPane = KFScrollPaneFactory.createStandardTimelineKFScrollPane();
 		rectanglesNamesSplitPane = SplitPaneFactory.createHorizontalSplitPane();
 		
-		additionalInfoPanel = PaneFactory.createTimelineAdditionalInfoPane();
+		additionalInfoPanel = KFPaneFactory.createTimelineAdditionalInfoPane();
 		timelineNamesPanel = TimelineNamesPanelFactory	.createStandardTimelineNamesPanel();
 		
-		timelineSliderAndRectanglesContainerPanel = PaneFactory.createTimelineSliderAndRectanglesContainerPane();
-		namesAndAdditionalInfoContainerPanel = PaneFactory.createNamesAndAdditionalInfoContainerPane();
+		timelineSliderAndRectanglesContainerPanel = KFPaneFactory.createTimelineSliderAndRectanglesContainerPane();
+		namesAndAdditionalInfoContainerPanel = KFPaneFactory.createNamesAndAdditionalInfoContainerPane();
 		
 	}
 	
@@ -570,7 +575,7 @@ public class Controller {
 	            public void run() {
 	            	progressBar.setVisibility(false);
 	            }
-	        }, MagicValues.utilsRenderDefaultTimeBeforeProgressBarDisappearsAfterOpenAndSave);
+	        }, this.defaultTimeBeforeProgressBarDisappearsAfterOpenAndSave);
 	}
 	
 	public void displayCompletedDeterminateProgressBar() {
@@ -582,7 +587,7 @@ public class Controller {
                 public void run() {
                 	progressBar.setVisibility(false);
                 }
-            }, MagicValues.utilsRenderDefaultTimeBeforeProgressBarDisappearsAfterRender);
+            }, this.defaultTimeBeforeProgressBarDisappearsAfterRender);
 	}
 	
 	

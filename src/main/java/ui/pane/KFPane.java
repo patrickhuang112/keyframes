@@ -4,7 +4,7 @@ import javax.swing.JPanel;
 
 import ui.UIComponent;
 
-public interface Pane extends UIComponent {
+public interface KFPane extends UIComponent {
 	@Override
 	public JPanel getSwingComponent();
 }

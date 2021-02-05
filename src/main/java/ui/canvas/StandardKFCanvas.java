@@ -35,7 +35,6 @@ import datatypes.Enums;
 import datatypes.Layer;
 import datatypes.SessionObject;
 import keyframes.Controller;
-import keyframes.MagicValues;
 import keyframes.Session;
 import ui.UIComponent;
 

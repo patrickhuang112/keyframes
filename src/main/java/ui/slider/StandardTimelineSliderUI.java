@@ -17,7 +17,7 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-import keyframes.MagicValues;
+import ui.timeline.layerspanel.StandardTimelineLayersPanel;
 
 public class StandardTimelineSliderUI extends BasicSliderUI {
 	
@@ -55,13 +55,12 @@ public class StandardTimelineSliderUI extends BasicSliderUI {
 		BasicStroke s = null;
 		
 		gp.moveTo(midx, bottomy);
-		
 		g2d.setPaint(Color.black);
-		s = new BasicStroke(MagicValues.timelineSliderUIDefaultTimeIndicatorLineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+		s = new BasicStroke(StandardTimelineLayersPanel.defaultLineXRadius, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2d.setStroke(s);
 		
 		// 50 is an arbitrary number just to make sure it draws on the screen properly
-		gp.lineTo(midx, bottomy + MagicValues.timelineSliderUIDefaultTimeIndicatorLineYLength);
+		gp.lineTo(midx, bottomy + StandardTimelineLayersPanel.defaultLineYRadius);
 		
 		g2d.draw(gp);
 	}

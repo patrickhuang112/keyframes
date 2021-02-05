@@ -21,7 +21,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 import keyframes.Controller;
-import keyframes.MagicValues;
 import keyframes.Session;
 
 
@@ -29,6 +28,9 @@ import keyframes.Session;
 public class StandardTimelineSlider extends JSlider implements TimelineSlider{
 
 	private static final int defaultOrientation = JSlider.HORIZONTAL;
+	public static final int preferredWidth = 1400;
+	public static final int preferredHeight = 50;
+	
 	
 	public StandardTimelineSlider(int min, int max, int value, int endSec, int fps) {
 		super(StandardTimelineSlider.defaultOrientation, min, max, value);
@@ -42,8 +44,8 @@ public class StandardTimelineSlider extends JSlider implements TimelineSlider{
 		setPaintLabels(true);
 		setSnapToTicks(true);
 		
-		int pw = MagicValues.timelineSliderPreferredWidth;
-		int ph = MagicValues.timelineSliderPreferredHeight;
+		int pw = preferredWidth;
+		int ph = preferredHeight;
 		
 		this.setPreferredSize(new Dimension(pw, ph));
 		

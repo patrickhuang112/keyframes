@@ -28,9 +28,9 @@ public class StandardKFLayerName extends JPanel implements KFLayerName {
 	
 	StandardKFLayerName(Layer layer) {
 		super();
-		setMinimumSize(new Dimension(KFLayerName.DefaultWidth, KFLayer.DefaultHeight));
-		setPreferredSize(new Dimension(KFLayerName.DefaultWidth, KFLayer.DefaultHeight));
-		setMaximumSize(new Dimension(KFLayerName.DefaultWidth, KFLayer.DefaultHeight));
+		setMinimumSize(new Dimension(KFLayerName.defaultWidth, KFLayer.defaultHeight));
+		setPreferredSize(new Dimension(KFLayerName.defaultWidth, KFLayer.defaultHeight));
+		setMaximumSize(new Dimension(KFLayerName.defaultWidth, KFLayer.defaultHeight));
 		this.layer = layer;
 		label = new JLabel(layer.getName());
 		label.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -67,7 +67,7 @@ public class StandardKFLayerName extends JPanel implements KFLayerName {
 			}
 			Stroke s = new BasicStroke(5, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 			g2d.setStroke(s);
-			g2d.drawRoundRect(10, 0, KFLayerName.DefaultWidth - 10, KFLayer.DefaultHeight, roundness, roundness);
+			g2d.drawRoundRect(10, 0, KFLayerName.defaultWidth - 10, KFLayer.defaultHeight, roundness, roundness);
 		} 
 	}
 	

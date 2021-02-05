@@ -59,7 +59,6 @@ import ui.progressbar.ProgressBar;
 import datatypes.Enums;
 import datatypes.SessionObject;
 import keyframes.Controller;
-import keyframes.MagicValues;
 import keyframes.Session;
 import keyframes.Utils;
 import settings.Settings;
@@ -74,8 +73,8 @@ import ui.progressbar.ProgressBarFactory;
 import ui.slider.SliderFactory;
 import ui.splitpane.SplitPane;
 import ui.splitpane.SplitPaneFactory;
-import ui.timeline.Timeline;
-import ui.timeline.TimelineFactory;
+import ui.timeline.KFTimeline;
+import ui.timeline.KFTimelineFactory;
 
 
 public class MainView extends JPanel {

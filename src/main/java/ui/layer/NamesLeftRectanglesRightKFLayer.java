@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 
 import datatypes.Layer;
 import datatypes.LayerBoundingBox;
-import keyframes.MagicValues;
 import ui.layer.names.KFLayerName;
 import ui.layer.names.KFLayerNameFactory;
 import ui.layer.rectangles.KFLayerRectangles;
@@ -35,9 +34,9 @@ public class NamesLeftRectanglesRightKFLayer extends JPanel implements KFLayer {
 		this.name = KFLayerNameFactory.createStandardKFLayerNames(layer);
 		this.rectangles = KFLayerRectanglesFactory.createStandardKFLayerRectangles(layer);
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		setMinimumSize(new Dimension(KFLayer.DefaultWidth, KFLayer.DefaultHeight));
-		setPreferredSize(new Dimension(KFLayer.DefaultWidth, KFLayer.DefaultHeight));
-		setMaximumSize(new Dimension(KFLayer.DefaultWidth, KFLayer.DefaultHeight));
+		setMinimumSize(new Dimension(KFLayer.defaultWidth, KFLayer.defaultHeight));
+		setPreferredSize(new Dimension(KFLayer.defaultWidth, KFLayer.defaultHeight));
+		setMaximumSize(new Dimension(KFLayer.defaultWidth, KFLayer.defaultHeight));
 		
 		// How it should be arranged, swing name left, glue middle, rectangles right;
 		add(this.name.getSwingComponent());

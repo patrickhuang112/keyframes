@@ -21,7 +21,6 @@ import javax.imageio.ImageIO;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import keyframes.MagicValues;
 import ui.layer.KFLayer;
 import ui.layer.KFLayerFactory;
 import ui.layer.names.KFLayerName;
@@ -50,7 +49,7 @@ public class Layer implements Serializable {
 	//FOR SERIALIZATION OF A KEYFRAMES
 	private String layerName;
 	
-	private int UIheight = MagicValues.layerUIDefaultHeight;
+	private int UIheight = KFLayer.defaultHeight;
 	private Color color = Color.black;
 
 	ArrayList<LayerBoundingBox> boundingBoxes =  new ArrayList<>();
@@ -76,7 +75,7 @@ public class Layer implements Serializable {
 		
 		//Default rectangle just to fill the whole screen right now, I'll figure out how to change
 		//this when I actually implement acutal boxes for each point
-		Rectangle box = new Rectangle(boundx, boundy, KFLayer.DefaultWidth, KFLayer.DefaultHeight);
+		Rectangle box = new Rectangle(boundx, boundy, KFLayer.defaultWidth, KFLayer.defaultHeight);
 		boundingBoxes.add(new LayerBoundingBox(layerInitialFrames, box));
 		
 		//Doing this here fixed two issues

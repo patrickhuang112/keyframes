@@ -16,10 +16,11 @@ import javax.swing.SwingUtilities;
 import commands.CommandFactory;
 import datatypes.Layer;
 import keyframes.Controller;
-import keyframes.MagicValues;
 import ui.dialog.DialogFactory;
 
 public abstract class KFLayerPanel extends JPanel {
+	
+	public static final int defaultPauseBeforeGhost = 100;
 	
 	protected KFLayerPanel() {
 		super();
@@ -53,7 +54,7 @@ public abstract class KFLayerPanel extends JPanel {
 				                		Controller.getController().refreshUI();
 				                	}
 				                }
-				            }, MagicValues.timelineLayersPanelDefaultWaitTimeBeforeGhostActivatesAfterClick);
+				            }, defaultPauseBeforeGhost);
 				}
 				
 			}

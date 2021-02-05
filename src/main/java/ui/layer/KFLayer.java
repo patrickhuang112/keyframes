@@ -3,13 +3,14 @@ package ui.layer;
 import javax.swing.JPanel;
 
 import datatypes.Layer;
-import keyframes.MagicValues;
 import ui.UIComponent;
 
 public interface KFLayer extends UIComponent {
 	
-	public static int DefaultWidth = MagicValues.layerUIDefaultWidth;
-	public static int DefaultHeight = MagicValues.layerUIDefaultHeight;
+	//Layer UI
+	
+	public static int defaultWidth = 1534;
+	public static int defaultHeight = 40;
 	
 	@Override
 	public JPanel getSwingComponent();

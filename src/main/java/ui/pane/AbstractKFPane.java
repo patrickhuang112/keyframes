@@ -2,11 +2,7 @@ package ui.pane;
 
 import javax.swing.JPanel;
 
-public class StandardPane extends JPanel implements Pane {
-
-	StandardPane() {
-		super();
-	}
+public abstract class AbstractKFPane extends JPanel implements KFPane {
 	
 	@Override
 	public JPanel getSwingComponent() {

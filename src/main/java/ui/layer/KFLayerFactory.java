@@ -1,7 +1,6 @@
 package ui.layer;
 
 import datatypes.Layer;
-import keyframes.MagicValues;
 
 public class KFLayerFactory {
 

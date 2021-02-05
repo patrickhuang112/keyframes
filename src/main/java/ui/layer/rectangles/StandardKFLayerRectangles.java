@@ -18,7 +18,6 @@ import javax.swing.JPanel;
 import datatypes.Layer;
 import datatypes.LayerBoundingBox;
 import keyframes.Controller;
-import keyframes.MagicValues;
 import ui.layer.KFLayer;
 
 public class StandardKFLayerRectangles extends JPanel implements KFLayerRectangles {
@@ -34,9 +33,9 @@ public class StandardKFLayerRectangles extends JPanel implements KFLayerRectangl
 	
 	StandardKFLayerRectangles(Layer layer) {
 		super();
-		setMinimumSize(new Dimension(KFLayerRectangles.DefaultWidth, KFLayer.DefaultHeight));
-		setPreferredSize(new Dimension(KFLayerRectangles.DefaultWidth, KFLayer.DefaultHeight));
-		setMaximumSize(new Dimension(KFLayerRectangles.DefaultWidth, KFLayer.DefaultHeight));
+		setMinimumSize(new Dimension(KFLayerRectangles.defaultWidth, KFLayer.defaultHeight));
+		setPreferredSize(new Dimension(KFLayerRectangles.defaultWidth, KFLayer.defaultHeight));
+		setMaximumSize(new Dimension(KFLayerRectangles.defaultWidth, KFLayer.defaultHeight));
 		this.layer = layer;
 		
 	}

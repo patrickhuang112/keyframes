@@ -37,7 +37,6 @@ import javax.swing.SwingUtilities;
 import datatypes.Layer;
 import datatypes.SessionObject;
 import keyframes.Controller;
-import keyframes.MagicValues;
 import keyframes.Session;
 import ui.UIComponent;
 import ui.dialog.DialogFactory;
@@ -45,13 +44,19 @@ import ui.layer.KFLayer;
 import ui.layer.rectangles.KFLayerRectangles;
 import ui.layer.rectangles.KFLayerRectanglesFactory;
 import ui.timeline.KFLayerPanel;
-import ui.timeline.Timeline;
+import ui.timeline.KFTimeline;
 
 public class StandardTimelineLayersPanel extends KFLayerPanel implements TimelineLayersPanel, Serializable{
 	
+	
+	public static final int defaultOffset = 5;
+	public static final int defaultSliderBarX = 5;
+	public static final int defaultLineYRadius = 500;
+	public static final int defaultLineXRadius = 5;
+	
 	// Set this manually cause I couldn't get other things to work
-	private double sliderBarx = MagicValues.timelineLayersPanelDefaultTimeIndicatorLineX;
-	private final int offset = MagicValues.timelineLayersPanelDefaultTimeIndicatorLineOffset;
+	private double sliderBarx = defaultSliderBarX;
+	private final int offset = defaultOffset;
 	private ArrayList<Color> defaultColors = new ArrayList<>();
 	
 	private Layer layerBeingDragged = null;
@@ -115,14 +120,14 @@ public class StandardTimelineLayersPanel extends KFLayerPanel implements Timelin
 		BasicStroke s = null;
 		
 		// Big values just to make sure it draws over the whole panel, look for a cleaner solution some other time
-		gp.moveTo(sliderBarx, this.getY() - MagicValues.timelineLayersPanelDefaultTimeIndicatorLineYRadius);
+		gp.moveTo(sliderBarx, this.getY() - defaultLineYRadius);
 		
 		g2d.setPaint(Color.black);
 		s = new BasicStroke(5, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2d.setStroke(s);
 		
 		// Big values just to make sure it draws over the whole panel, look for a cleaner solution some other time
-		gp.lineTo(sliderBarx, this.getY() + MagicValues.timelineLayersPanelDefaultTimeIndicatorLineYRadius);
+		gp.lineTo(sliderBarx, this.getY() + defaultLineYRadius);
 		
 		g2d.draw(gp);
 			

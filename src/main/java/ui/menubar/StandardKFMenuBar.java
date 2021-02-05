@@ -4,7 +4,6 @@ import java.awt.Dimension;
 
 import javax.swing.JMenuBar;
 
-import keyframes.MagicValues;
 import ui.menubar.menu.Menu;
 
 public class StandardKFMenuBar extends AbstractKFMenuBar {

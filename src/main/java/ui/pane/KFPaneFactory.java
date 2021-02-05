@@ -10,67 +10,66 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 import keyframes.Controller;
-import keyframes.MagicValues;
 
-public class PaneFactory {
+public class KFPaneFactory {
 	
-	public static Pane createEmptyPane() {
-		return new StandardPane();
+	public static KFPane createEmptyPane() {
+		return new StandardKFPane();
 	}
 	
-	public static Pane createMainViewTopContainer() {
-		int tw = MagicValues.mainViewTopBarDefaultWidth;
-		int th = MagicValues.mainViewTopBarDefaultHeight;
+	public static KFPane createMainViewTopContainer() {
+		int w = 0;
+		int h = 60;
 		
-		Pane topBar = new StandardPane();
+		KFPane topBar = new StandardKFPane();
 		topBar.getSwingComponent().setLayout(new BorderLayout());
-		topBar.getSwingComponent().setPreferredSize(new Dimension(tw,th));
+		topBar.getSwingComponent().setPreferredSize(new Dimension(w,h));
 		topBar.getSwingComponent().setAlignmentX(Component.LEFT_ALIGNMENT);
 		
 		return topBar;
 		
 	}
 	
-	public static Pane createMainViewToolBarAndProgressBarContainer() {
-		Pane container = new StandardPane();
+	public static KFPane createMainViewToolBarAndProgressBarContainer() {
+		KFPane container = new StandardKFPane();
 		container.getSwingComponent().setLayout(new BoxLayout(container.getSwingComponent(), BoxLayout.X_AXIS));
 		return container;
 	}
 	
-	public static Pane createTimelineAdditionalInfoPane() {
-		int tw = MagicValues.timelineAdditionalInfoPaneDefaultWidth;
-		int th = MagicValues.timelineAdditionalInfoPaneDefaultHeight;
-		
-		Pane sp = new StandardPane();
+	public static KFPane createTimelineAdditionalInfoPane() {
+		int tw = 150; 
+		int th = 50; 
+				
+		KFPane sp = new StandardKFPane();
 		sp.getSwingComponent().setPreferredSize(new Dimension(tw, th));
 		sp.getSwingComponent().setMaximumSize(new Dimension(tw, th));
 		sp.getSwingComponent().setMinimumSize(new Dimension(tw, th));
 		return sp;
 	}
 	
-	public static Pane createNamesAndAdditionalInfoContainerPane() {
-		int mw = MagicValues.timelineNamesAndAdditionalInfoContainerPanelMinimumWidth;
-		int mh = MagicValues.timelineNamesAndAdditionalInfoContainerPanelMinimumHeight;
+	public static KFPane createNamesAndAdditionalInfoContainerPane() {
+		int mw = 140;
+		int mh = 0;
 		
-		int pw = MagicValues.timelineNamesAndAdditionalInfoContainerPanelPreferredWidth;
-		int ph = MagicValues.timelineNamesAndAdditionalInfoContainerPanelPreferredHeight;
+		int pw = 140;
+		int ph = 0;
 		
-		Pane sp = new StandardPane();
+		KFPane sp = new StandardKFPane();
 		sp.getSwingComponent().setLayout(new BoxLayout(sp.getSwingComponent(), BoxLayout.Y_AXIS));
 		sp.getSwingComponent().setMinimumSize(new Dimension(mw, mh));
 		sp.getSwingComponent().setPreferredSize(new Dimension(pw, ph));
 		return sp;
 	}
 	
-	public static Pane createTimelineSliderAndRectanglesContainerPane() {
-		int mw = MagicValues.timelineSliderAndRectanglesContainerPanelMinimumWidth;
-		int mh = MagicValues.timelineSliderAndRectanglesContainerPanelMinimumHeight;
+	public static KFPane createTimelineSliderAndRectanglesContainerPane() {
+
+		int mw = 600;
+		int mh = 0;
 		
-		int pw = MagicValues.timelineSliderAndRectanglesContainerPanelPreferredWidth;
-		int ph = MagicValues.timelineSliderAndRectanglesContainerPanelPreferredHeight;
+		int pw = 600;
+		int ph = 0;
 		
-		
-		Pane sp = new StandardPane();
+		KFPane sp = new StandardKFPane();
 		sp.getSwingComponent().setLayout(new BoxLayout(sp.getSwingComponent(), BoxLayout.Y_AXIS));
 		sp.getSwingComponent().setMinimumSize(new Dimension(mw, mh));
 		sp.getSwingComponent().setPreferredSize(new Dimension(pw, ph));

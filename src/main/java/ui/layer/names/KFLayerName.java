@@ -2,12 +2,11 @@ package ui.layer.names;
 
 import javax.swing.JPanel;
 
-import keyframes.MagicValues;
 import ui.UIComponent;
 
 public interface KFLayerName extends UIComponent {
 
-	public static int DefaultWidth = MagicValues.layerUINameDefaultWidth;
+	public static int defaultWidth = 140;
 	
 	@Override
 	public JPanel getSwingComponent();

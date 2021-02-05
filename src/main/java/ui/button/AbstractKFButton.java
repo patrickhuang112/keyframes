@@ -9,7 +9,6 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
-import keyframes.MagicValues;
 
 public abstract class AbstractKFButton extends JButton implements KFButton{
 

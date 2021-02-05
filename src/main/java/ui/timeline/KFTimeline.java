@@ -8,7 +8,7 @@ import ui.UIComponent;
 import ui.slider.TimelineSlider;
 import ui.timeline.layerspanel.TimelineLayersPanel;
 
-public interface Timeline extends UIComponent {
+public interface KFTimeline extends UIComponent {
 	
 	@Override
 	public JPanel getSwingComponent();
