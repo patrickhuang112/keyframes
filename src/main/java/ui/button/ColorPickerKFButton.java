@@ -16,7 +16,7 @@ import javax.swing.SwingUtilities;
 
 import datatypes.Enums;
 import keyframes.Session;
-import ui.dialog.DialogFactory;
+import ui.dialog.KFDialogFactory;
 
 public class ColorPickerKFButton extends AbstractKFButton {
 
@@ -24,7 +24,7 @@ public class ColorPickerKFButton extends AbstractKFButton {
 		super("/colorPickerIcon.png", new MouseAdapter( ) {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				DialogFactory.createBrushAndFillColorDialog();
+				KFDialogFactory.createBrushAndFillColorDialog();
 			}
 		});
 	}

@@ -5,8 +5,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 
 import ui.UIComponent;
-import ui.slider.TimelineSlider;
-import ui.timeline.layerspanel.TimelineLayersPanel;
+import ui.pane.timeline.layerspanel.RectanglesKFLayerPane;
+import ui.slider.KFTimelineSlider;
 
 public interface KFTimeline extends UIComponent {
 	

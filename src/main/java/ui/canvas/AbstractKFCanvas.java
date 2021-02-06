@@ -25,7 +25,7 @@ import datatypes.Layer;
 import keyframes.Controller;
 import keyframes.Session;
 
-public class AbstractKFCanvas extends JPanel implements KFCanvas {
+class AbstractKFCanvas extends JPanel implements KFCanvas {
 
 	boolean cursorInScreen = true;
 	ArrayList<DrawPoint> currentDraggedPoints = null;

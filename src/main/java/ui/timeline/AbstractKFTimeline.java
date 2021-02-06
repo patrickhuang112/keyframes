@@ -6,7 +6,7 @@ import javax.swing.JPanel;
 
 import keyframes.Controller;
 
-public abstract class AbstractKFTimeline extends JPanel implements KFTimeline {
+abstract class AbstractKFTimeline extends JPanel implements KFTimeline {
 	
 	
 	@Override

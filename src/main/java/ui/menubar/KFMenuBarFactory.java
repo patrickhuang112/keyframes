@@ -1,6 +1,6 @@
 package ui.menubar;
 
-import ui.menubar.menu.MenuFactory;
+import ui.menubar.menu.KFMenuFactory;
 
 public class KFMenuBarFactory {
 	

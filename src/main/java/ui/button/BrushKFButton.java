@@ -16,7 +16,7 @@ import commands.CommandFactory;
 import datatypes.Enums;
 import keyframes.Controller;
 import keyframes.Session;
-import ui.dialog.DialogFactory;
+import ui.dialog.KFDialogFactory;
 
 public class BrushKFButton extends AbstractKFButton {
 
@@ -28,7 +28,7 @@ public class BrushKFButton extends AbstractKFButton {
 					Controller.getController().addAndExecuteCommand(CommandFactory.createBrushToolSelectedCommand());
 				}
 				else if(SwingUtilities.isRightMouseButton(e)) {
-					DialogFactory.createBrushSizeDialog();
+					KFDialogFactory.createBrushSizeDialog();
 				}
 			}
 		});

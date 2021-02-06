@@ -16,7 +16,7 @@ import commands.CommandFactory;
 import datatypes.Enums;
 import keyframes.Controller;
 import keyframes.Session;
-import ui.dialog.DialogFactory;
+import ui.dialog.KFDialogFactory;
 
 public class EraseKFButton extends AbstractKFButton {
 
@@ -28,7 +28,7 @@ public class EraseKFButton extends AbstractKFButton {
 					Controller.getController().addAndExecuteCommand(CommandFactory.createEraserToolSelectedCommand());
 				}
 				else if(SwingUtilities.isRightMouseButton(e)) {
-					DialogFactory.createEraserSizeDialog();
+					KFDialogFactory.createEraserSizeDialog();
 				}
 			}
 		});

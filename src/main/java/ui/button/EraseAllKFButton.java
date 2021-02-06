@@ -18,7 +18,7 @@ import javax.swing.SwingUtilities;
 import datatypes.Enums;
 import keyframes.Controller;
 import keyframes.Session;
-import ui.dialog.DialogFactory;
+import ui.dialog.KFDialogFactory;
 
 public class EraseAllKFButton extends AbstractKFButton {
 

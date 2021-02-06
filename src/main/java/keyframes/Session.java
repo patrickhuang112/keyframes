@@ -23,10 +23,10 @@ import datatypes.Enums;
 import datatypes.KeyFrames;
 import datatypes.Layer;
 import datatypes.LayerBoundingBox;
-import ui.progressbar.ProgressBar;
-import ui.slider.StandardTimelineSlider;
-import ui.slider.StandardTimelineSliderUI;
-import ui.slider.TimelineSlider;
+import ui.progressbar.KFProgressBar;
+import ui.slider.StandardKFTimelineSlider;
+import ui.slider.StandardTimelineKFSliderUI;
+import ui.slider.KFTimelineSlider;
 import settings.Settings;
 import ui.canvas.KFCanvas;
 

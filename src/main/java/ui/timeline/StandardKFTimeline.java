@@ -39,12 +39,12 @@ import datatypes.Layer;
 import keyframes.Controller;
 import keyframes.Session;
 import ui.UIComponent;
-import ui.slider.SliderFactory;
-import ui.slider.StandardTimelineSlider;
-import ui.slider.StandardTimelineSliderUI;
-import ui.slider.TimelineSlider;
-import ui.timeline.layerspanel.StandardTimelineLayersPanel;
-import ui.timeline.layerspanel.TimelineLayersPanel;
+import ui.pane.timeline.layerspanel.StandardRectanglesKFLayerPane;
+import ui.pane.timeline.layerspanel.RectanglesKFLayerPane;
+import ui.slider.KFSliderFactory;
+import ui.slider.StandardKFTimelineSlider;
+import ui.slider.StandardTimelineKFSliderUI;
+import ui.slider.KFTimelineSlider;
 
 public class StandardKFTimeline extends AbstractKFTimeline{
 	private static final long serialVersionUID = -4549310200115960539L;

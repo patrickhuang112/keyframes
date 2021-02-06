@@ -4,12 +4,14 @@ import java.awt.Dimension;
 
 import javax.swing.JScrollPane;
 
-public class StandardTimelineKFScrollPane extends StandardKFScrollPane {
+public class StandardTimelineKFScrollPane extends AbstractKFScrollPane {
+	
+	public static final int viewportw = 1200;
+	public static final int viewporth = 400;
 	
 	StandardTimelineKFScrollPane() {
 		super();
 		setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		setPreferredSize(new Dimension(1200, 400));
+		setPreferredSize(new Dimension(viewportw, viewporth));
 	}
-	
 }

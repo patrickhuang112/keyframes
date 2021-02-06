@@ -6,15 +6,12 @@ import javax.swing.JToolBar;
 
 import ui.UIComponent;
 
-public abstract class AbstractKFToolBar extends JToolBar implements KFToolBar {
-	
-	public static final int defaultWidth = 300;
-	public static final int defaultHeight = 30;
+abstract class AbstractKFToolBar extends JToolBar implements KFToolBar {
 	
 	AbstractKFToolBar(int orientation) {
 		super(orientation);
-		int tbw = AbstractKFToolBar.defaultWidth;
-		int tbh = AbstractKFToolBar.defaultHeight;
+		int tbw = KFToolBar.defaultWidth;
+		int tbh = KFToolBar.defaultHeight;
 		setPreferredSize(new Dimension(tbw,tbh));
 		setFloatable(false);
 	}

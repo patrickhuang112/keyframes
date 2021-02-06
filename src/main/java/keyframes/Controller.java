@@ -33,27 +33,27 @@ import ui.canvas.KFCanvas;
 import ui.canvas.KFCanvasFactory;
 import ui.menubar.KFMenuBar;
 import ui.menubar.KFMenuBarFactory;
-import ui.menubar.menu.Menu;
-import ui.menubar.menu.MenuFactory;
-import ui.menubar.menu.menuitem.MenuItem;
-import ui.menubar.menu.menuitem.MenuItemFactory;
+import ui.menubar.menu.KFMenu;
+import ui.menubar.menu.KFMenuFactory;
+import ui.menubar.menu.menuitem.KFMenuItem;
+import ui.menubar.menu.menuitem.KFMenuItemFactory;
 import ui.pane.KFPane;
 import ui.pane.KFPaneFactory;
-import ui.progressbar.ProgressBar;
-import ui.progressbar.ProgressBarFactory;
+import ui.pane.timeline.layerspanel.RectanglesKFLayerPane;
+import ui.pane.timeline.layerspanel.RectanglesKFLayerPaneFactory;
+import ui.pane.timeline.namespanel.NamesKFLayerPane;
+import ui.pane.timeline.namespanel.NamesKFLayerPaneFactory;
+import ui.progressbar.KFProgressBar;
+import ui.progressbar.KFProgressBarFactory;
 import ui.scroll.KFScrollPane;
 import ui.scroll.KFScrollPaneFactory;
-import ui.slider.SliderFactory;
-import ui.slider.StandardTimelineSlider;
-import ui.slider.TimelineSlider;
-import ui.splitpane.SplitPane;
-import ui.splitpane.SplitPaneFactory;
+import ui.slider.KFSliderFactory;
+import ui.slider.StandardKFTimelineSlider;
+import ui.slider.KFTimelineSlider;
+import ui.splitpane.KFSplitPane;
+import ui.splitpane.KFSplitPaneFactory;
 import ui.timeline.KFTimeline;
 import ui.timeline.KFTimelineFactory;
-import ui.timeline.layerspanel.TimelineLayersPanel;
-import ui.timeline.layerspanel.TimelineLayersPanelFactory;
-import ui.timeline.namespanel.TimelineNamesPanel;
-import ui.timeline.namespanel.TimelineNamesPanelFactory;
 import ui.toolbar.KFToolBar;
 import ui.toolbar.KFToolBarFactory;
 
@@ -65,25 +65,25 @@ public class Controller {
 	private JFrame frame;
 	private MainView mainView = null;
 	
-	private SplitPane timelineCanvasSplitPane;
+	private KFSplitPane timelineCanvasSplitPane;
 	private KFCanvas canvas;
 	
 	//Timeline
 	private KFTimeline timeline;
 	private KFScrollPane rectanglesScrollPane;
 	private KFScrollPane namesScrollPane;
-	private SplitPane rectanglesNamesSplitPane;
-	private TimelineSlider timelineSlider;
+	private KFSplitPane rectanglesNamesSplitPane;
+	private KFTimelineSlider timelineSlider;
 	private KFPane timelineSliderAndRectanglesContainerPanel;
 	private KFPane namesAndAdditionalInfoContainerPanel;
 	private KFPane additionalInfoPanel;
-	private TimelineLayersPanel timelineLayersPanel;
-	private TimelineNamesPanel timelineNamesPanel;
+	private RectanglesKFLayerPane timelineLayersPanel;
+	private NamesKFLayerPane timelineNamesPanel;
 	
 	//Top MainView
 	private KFPane mainViewToolBarAndProgressBarContainer;
 	private KFPane mainViewTopContainer;
-	private ProgressBar progressBar;
+	private KFProgressBar progressBar;
 	
 	//ToolBar
 	private KFToolBar toolBar;
@@ -97,19 +97,19 @@ public class Controller {
 	
 	//Menubar
 	private KFMenuBar menuBar;
-	private Menu fileMenu;
-	private Menu editMenu;
-	private MenuItem newProjectMenuItem;
-	private MenuItem openProjectMenuItem;
-	private MenuItem saveProjectMenuItem;
-	private MenuItem saveProjectAsMenuItem;
-	private MenuItem renderMP4MenuItem;
-	private MenuItem renderGIFMenuItem;
-	private MenuItem settingsMenuItem;
+	private KFMenu fileMenu;
+	private KFMenu editMenu;
+	private KFMenuItem newProjectMenuItem;
+	private KFMenuItem openProjectMenuItem;
+	private KFMenuItem saveProjectMenuItem;
+	private KFMenuItem saveProjectAsMenuItem;
+	private KFMenuItem renderMP4MenuItem;
+	private KFMenuItem renderGIFMenuItem;
+	private KFMenuItem settingsMenuItem;
 	
-	private MenuItem editFPSMenuItem;
-	private MenuItem editCompLengthMenuItem;
-	private MenuItem editBackgroundColorMenuItem;
+	private KFMenuItem editFPSMenuItem;
+	private KFMenuItem editCompLengthMenuItem;
+	private KFMenuItem editBackgroundColorMenuItem;
 	
 	
 	private int defaultTimeBeforeProgressBarDisappearsAfterRender = 3000;
@@ -237,7 +237,7 @@ public class Controller {
 	
 	private void buildNamesAndAdditionalInfo() {
 		buildNamesScrollPane();
-		timelineNamesPanel.buildLayersPanelLayers();
+		timelineNamesPanel.refresh();
 		namesAndAdditionalInfoContainerPanel.getSwingComponent().add(
 				additionalInfoPanel.getSwingComponent());
 		namesAndAdditionalInfoContainerPanel.getSwingComponent().add(namesScrollPane.getSwingComponent());
@@ -249,7 +249,7 @@ public class Controller {
 	
 	private void buildTimelineSliderAndRectangles() {
 		buildRectanglesScrollPane();
-		timelineLayersPanel.buildLayersPanelLayers();
+		timelineLayersPanel.refresh();
 		timelineSliderAndRectanglesContainerPanel.getSwingComponent().add(
 				timelineSlider.getSwingComponent());
 		timelineSliderAndRectanglesContainerPanel.getSwingComponent().add(rectanglesScrollPane.getSwingComponent());
@@ -334,10 +334,10 @@ public class Controller {
 	}
 	
 	private void initializeOtherMainViewUIComponents() {
-		timelineCanvasSplitPane = SplitPaneFactory.createVerticalSplitPane();
+		timelineCanvasSplitPane = KFSplitPaneFactory.createVerticalSplitPane();
 		mainViewTopContainer = KFPaneFactory.createMainViewTopContainer();
 		mainViewToolBarAndProgressBarContainer = KFPaneFactory.createMainViewToolBarAndProgressBarContainer();
-		progressBar = ProgressBarFactory.createMainViewProgressBar(session.getShortestTimepoint(),
+		progressBar = KFProgressBarFactory.createMainViewProgressBar(session.getShortestTimepoint(),
 																	session.getLongestTimepoint());
 		initializeToolBarUIComponents();
 		initializeMenuBarUIComponents();
@@ -361,20 +361,20 @@ public class Controller {
 	private void initializeMenuBarUIComponents() {
 		menuBar = KFMenuBarFactory.createMainViewTopMenuBar();
 		
-		fileMenu = MenuFactory.createFileMenu();
-		editMenu = MenuFactory.createEditMenu();
+		fileMenu = KFMenuFactory.createFileMenu();
+		editMenu = KFMenuFactory.createEditMenu();
 		
-		newProjectMenuItem = MenuItemFactory.createNewProjectMenuItem();
-		openProjectMenuItem = MenuItemFactory.createOpenProjectMenuItem();
-		saveProjectMenuItem = MenuItemFactory.createSaveMenuItem();
-		saveProjectAsMenuItem = MenuItemFactory.createSaveAsMenuItem();
-		renderMP4MenuItem = MenuItemFactory.createRenderMP4MenuItem();
-		renderGIFMenuItem = MenuItemFactory.createRenderGIFMenuItem();
-		settingsMenuItem = MenuItemFactory.createSettingsMenuItem();
+		newProjectMenuItem = KFMenuItemFactory.createNewProjectMenuItem();
+		openProjectMenuItem = KFMenuItemFactory.createOpenProjectMenuItem();
+		saveProjectMenuItem = KFMenuItemFactory.createSaveMenuItem();
+		saveProjectAsMenuItem = KFMenuItemFactory.createSaveAsMenuItem();
+		renderMP4MenuItem = KFMenuItemFactory.createRenderMP4MenuItem();
+		renderGIFMenuItem = KFMenuItemFactory.createRenderGIFMenuItem();
+		settingsMenuItem = KFMenuItemFactory.createSettingsMenuItem();
 		
-		editFPSMenuItem = MenuItemFactory.createEditFPSMenuItem();
-		editCompLengthMenuItem = MenuItemFactory.createEditCompositionLengthMenuItem();
-		editBackgroundColorMenuItem = MenuItemFactory.createEditBackgroundColorMenuItem();
+		editFPSMenuItem = KFMenuItemFactory.createEditFPSMenuItem();
+		editCompLengthMenuItem = KFMenuItemFactory.createEditCompositionLengthMenuItem();
+		editBackgroundColorMenuItem = KFMenuItemFactory.createEditBackgroundColorMenuItem();
 	}
 	
 	private void initializeCanvasUIComponents() {
@@ -383,19 +383,19 @@ public class Controller {
 	
 	private void initializeTimelineUIComponents() {
 		timeline = KFTimelineFactory.createStandardTimeline();
-		timelineSlider = SliderFactory.createStandardTimelineSlider(session.getShortestTimepoint(), 
+		timelineSlider = KFSliderFactory.createStandardTimelineSlider(session.getShortestTimepoint(), 
 																	session.getLongestTimepoint(), 
 																	session.getCurrentTimepoint(),
 																	session.getLongestTimeInSeconds(),
 																	session.getFramesPerSecond());
-		timelineLayersPanel = TimelineLayersPanelFactory.createStandardTimelineLayersPanel();
+		timelineLayersPanel = RectanglesKFLayerPaneFactory.createStandardTimelineLayersPanel();
 		
 		rectanglesScrollPane = KFScrollPaneFactory.createStandardTimelineKFScrollPane();
 		namesScrollPane = KFScrollPaneFactory.createStandardTimelineKFScrollPane();
-		rectanglesNamesSplitPane = SplitPaneFactory.createHorizontalSplitPane();
+		rectanglesNamesSplitPane = KFSplitPaneFactory.createHorizontalSplitPane();
 		
 		additionalInfoPanel = KFPaneFactory.createTimelineAdditionalInfoPane();
-		timelineNamesPanel = TimelineNamesPanelFactory	.createStandardTimelineNamesPanel();
+		timelineNamesPanel = NamesKFLayerPaneFactory	.createStandardTimelineNamesPanel();
 		
 		timelineSliderAndRectanglesContainerPanel = KFPaneFactory.createTimelineSliderAndRectanglesContainerPane();
 		namesAndAdditionalInfoContainerPanel = KFPaneFactory.createNamesAndAdditionalInfoContainerPane();
@@ -747,8 +747,8 @@ public class Controller {
 		
 		// UPDATES the line on the layers panel
 		double sliderBarx = timelineSlider.getThumbMidX();
-		timelineLayersPanel.updateLayersPanelUI(sliderBarx);
-		timelineNamesPanel.buildLayersPanelLayers();
+		timelineLayersPanel.updateMarkerAndRefresh(sliderBarx);
+		timelineNamesPanel.refresh();
 		refreshLayersContainersUI();
 		refreshLayersUI();
 	}

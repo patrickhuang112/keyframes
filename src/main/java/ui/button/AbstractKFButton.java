@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 
-public abstract class AbstractKFButton extends JButton implements KFButton{
+abstract class AbstractKFButton extends JButton implements KFButton{
 
 	protected static final int mvw = 30;
 	protected static final int mvh = 30;

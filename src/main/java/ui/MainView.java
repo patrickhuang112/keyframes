@@ -55,7 +55,7 @@ import javax.swing.plaf.basic.BasicSliderUI;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
-import ui.progressbar.ProgressBar;
+import ui.progressbar.KFProgressBar;
 import datatypes.Enums;
 import datatypes.SessionObject;
 import keyframes.Controller;
@@ -65,14 +65,14 @@ import settings.Settings;
 import ui.button.KFButtonFactory;
 import ui.canvas.KFCanvas;
 import ui.canvas.KFCanvasFactory;
-import ui.dialog.CompositionLengthDialog;
-import ui.dialog.DialogFactory;
-import ui.dialog.FPSDialog;
-import ui.dialog.SettingsDialog;
-import ui.progressbar.ProgressBarFactory;
-import ui.slider.SliderFactory;
-import ui.splitpane.SplitPane;
-import ui.splitpane.SplitPaneFactory;
+import ui.dialog.CompositionLengthKFDialog;
+import ui.dialog.KFDialogFactory;
+import ui.dialog.KFFPSDialog;
+import ui.dialog.SettingsKFDialog;
+import ui.progressbar.KFProgressBarFactory;
+import ui.slider.KFSliderFactory;
+import ui.splitpane.KFSplitPane;
+import ui.splitpane.KFSplitPaneFactory;
 import ui.timeline.KFTimeline;
 import ui.timeline.KFTimelineFactory;
 
