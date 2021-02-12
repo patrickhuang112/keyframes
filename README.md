@@ -62,7 +62,7 @@ You can once again run these scripts by double clicking them in your operating s
     Right click to add a new layer or to change a layer color.
     <br/>
     <br/>
-    <img src = "docs/readmeimages/layer1.gif" style="margin:auto;" width = "75%" height = "75%"/>
+    <img src = "docs/readmeimages/layer.gif" style="margin:auto;" width = "75%" height = "75%"/>
     <br/>
     <br/>
 </li>
