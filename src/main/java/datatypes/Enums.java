@@ -17,8 +17,6 @@ public class Enums implements Serializable{
 		DRAW,
 		ERASE,
 		//Floodfill with respect to a single layer
-		FILLSINGLE,
-		//FOodfill with respect to pixels from all layers
-		FILLALL
+		FILL
 	}
 }

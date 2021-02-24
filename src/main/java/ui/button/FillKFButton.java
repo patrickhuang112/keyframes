@@ -23,7 +23,7 @@ public class FillKFButton extends AbstractKFButton {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					Controller.getController().setPaintSetting(Enums.PaintSetting.FILLSINGLE);
+					Controller.getController().setPaintSetting(Enums.PaintSetting.FILL);
 				}
 			}
 		});

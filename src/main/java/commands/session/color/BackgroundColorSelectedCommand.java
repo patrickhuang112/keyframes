@@ -16,7 +16,7 @@ public class BackgroundColorSelectedCommand extends SessionCommand {
 	@Override
 	public void execute() {
 		super.execute();
-		Controller.getController().setDrawablePanelBackgroundColor(newColor);
+		Controller.getController().setBackgroundColor(newColor);
 		Controller.getController().setEraserColor(newColor);
 	}
 }

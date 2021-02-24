@@ -30,9 +30,6 @@ public class CompositionLengthKFDialog implements KFDialog {
 	    	int res = (int)(timeSelector.getValue());
 	    	if(res == JOptionPane.YES_OPTION) {
 	    		int val = timeSlider.getValue();
-	    		if (val == 0) {
-	    			val++;
-	    		}
 	    		Controller.getController().addAndExecuteCommand(CommandFactory.createCompLengthChangedCommand(val));
 	    	} 
 	    }

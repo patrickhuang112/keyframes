@@ -29,9 +29,6 @@ public class EraserSizeKFDialog implements KFDialog{
 	    	int res = (int)(eraserSizeSelector.getValue());
 	    	if(res == JOptionPane.YES_OPTION) {
 	    		int val = eraserSizeSlider.getValue();
-	    		if (val == 0) {
-	    			val++;
-	    		}
 	    		Controller.getController().addAndExecuteCommand(CommandFactory.createEraserSizeCommand(val));
 	    	} else {
 	    		System.out.println("Slider cancelled");

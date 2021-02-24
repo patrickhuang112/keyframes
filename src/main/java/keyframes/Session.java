@@ -43,9 +43,6 @@ public class Session implements Serializable {
 	public static final int fpsMax = 30;
 	public static final int lengthMin = 0;
 	public static final int lengthMax = 20;
-	public static final Color defaultDrawPanelBackgroundColor = Color.gray;
-	
-
 	
 	static Session createSessionFromSettings(Settings settings) {
 		return new Session(settings);
@@ -104,6 +101,7 @@ public class Session implements Serializable {
 	private String savePath = null;
 	private boolean isPlaying = false;
 	
+	private Color backgroundColor;
 	private Color brushColor = Color.red;
 	private Color eraserColor;
 	private int brushSize;
@@ -159,49 +157,62 @@ public class Session implements Serializable {
 	//-------------------------------------------------------------------------------------------------
 	//Draw settings
 	
-	public Color getBrushColor() {
+	Color getBackgroundColor() {
+		return this.backgroundColor;
+	}
+	
+	void setBackgroundColor(Color color) {
+		this.backgroundColor = color;
+	}
+	
+	Color getBrushColor() {
 		return this.brushColor;
 	}
 	
-	public void setBrushColor(Color color) {
+	void setBrushColor(Color color) {
 		this.brushColor = color;
 	}
 	
-	public Color getEraserColor() {
+	Color getEraserColor() {
 		return this.eraserColor;
 	}
 	
-	public void setEraserColor(Color color) {
+	void setEraserColor(Color color) {
 		this.eraserColor = color;
 	}
 	
 	//DRAWABLE PAINT SETTING
-	public void setPaintSetting(Enums.PaintSetting paintSetting) {
+	void setPaintSetting(Enums.PaintSetting paintSetting) {
 		this.paintSetting = paintSetting;
 	}
 	
-	public Enums.PaintSetting getPaintSetting() {
+	Enums.PaintSetting getPaintSetting() {
 		return this.paintSetting;
 	}
 	
 	
 	//DRAWABLE BRUSH/ERASER SETTINGS
-	public int getBrushSize() {
+	int getBrushSize() {
 		return brushSize;
 	}
 	
-	public void setBrushSize(int brushSize) {
-		if(brushSize >= brushMin && brushSize <= brushMax) {
+	void setBrushSize(int brushSize) {
+		// 0 should be set to 1
+		if(brushSize == brushMin) {
+			this.brushSize = 1;
+		} else if(brushSize > brushMin && brushSize <= brushMax) {
 			this.brushSize = brushSize;
 		}
 	}
 	
-	public int getEraserSize() {
+	int getEraserSize() {
 		return eraserSize;
 	}
 	
-	public void setEraserSize(int eraserSize) {
-		if(eraserSize >= eraserMin && eraserSize <= eraserMax) {
+	void setEraserSize(int eraserSize) {
+		if (eraserSize == eraserMin) {
+			this.eraserSize = 1;
+		} else if(eraserSize > eraserMin && eraserSize <= eraserMax) {
 			this.eraserSize = eraserSize;
 		}
 	}
@@ -247,6 +258,10 @@ public class Session implements Serializable {
 	// Set the longest timepoint for the composition (from the slider)
 	boolean setLongestTimeInSeconds(int time) {
 		if(time >= lengthMin && time <= lengthMax) {
+			// Don't allow 0 seconds
+			if (time == lengthMin) {
+				time++;
+			}
 			this.longestTimeInSeconds = time;
 			this.longestTimepoint = framesPerSecond * longestTimeInSeconds;
 			this.currentTimepoint = Session.calculateNewTimelinePointerPositionFromOldFPS(framesPerSecond, 
@@ -263,7 +278,11 @@ public class Session implements Serializable {
 	}
 		
 	boolean setFramesPerSecond(int fps) {
-		if(fps >= Session.fpsMin && fps <= Session.fpsMax) {
+		if(fps >= fpsMin && fps <= fpsMax) {
+			// Don't allow a 0 fps selection
+			if (fps == fpsMin) {
+				fps++;
+			}
 			int oldFPS = framesPerSecond;
 			int newFPS = fps;
 			this.framesPerSecond = fps;

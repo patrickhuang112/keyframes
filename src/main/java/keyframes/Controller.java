@@ -65,6 +65,8 @@ public class Controller {
 	private JFrame frame;
 	private MainView mainView = null;
 	
+	private boolean UIEnabled = false;
+	
 	private KFSplitPane timelineCanvasSplitPane;
 	private KFCanvas canvas;
 	
@@ -138,13 +140,14 @@ public class Controller {
 	private Controller () {
 		//Creates mode first
 		newSessionFromSettings();
+		initializeCommandStack();
 	}
 	
 	//Initialize UI
 	public void initialize() {
-		initializeCommandStack();
 		initializeUI();
 		buildUI();
+		UIEnabled = true;
 	}
 	
 	public static void createController() {
@@ -454,7 +457,7 @@ public class Controller {
 		
 		int drawWidth = canvas.getCanvasWidth();
 		int drawHeight = canvas.getCanvasHeight();
-		Color backgroundColor = getDrawablePanelBackgroundColor();
+		Color backgroundColor = getBackgroundColor();
 		
 		for(int t = 0; t <= getLongestTimepoint(); t++) {
 			BufferedImage img = new BufferedImage(drawWidth, drawHeight, 
@@ -484,12 +487,15 @@ public class Controller {
 	//-------------------------------------------------------------------------------------------------
 	//Draw settings
 	
-	public void setDrawablePanelBackgroundColor (Color color) {
-		canvas.setBackgroundColor(color);
+	public void setBackgroundColor (Color color) {
+		session.setBackgroundColor(color);
+		if(UIEnabled) {
+			canvas.setBackgroundColor(color);
+		}
 	}
 	
-	public Color getDrawablePanelBackgroundColor () {
-		return canvas.getBackgroundColor();
+	public Color getBackgroundColor () {
+		return session.getBackgroundColor();
 	}
 	
 	public Color getBrushColor() {
@@ -620,7 +626,7 @@ public class Controller {
 	public void setLongestTimeInSeconds(int time) {
 		//Model
 		boolean successful = session.setLongestTimeInSeconds(time);
-		if (successful) {
+		if (UIEnabled && successful) {
 			//View
 			updateTimelineUIFromChangeInFPSOrTime(session.getFramesPerSecond());
 			refreshUI();
@@ -644,7 +650,7 @@ public class Controller {
 	public void setFramesPerSecond(int fps) {
 		//Model
 		boolean successful = session.setFramesPerSecond(fps);
-		if (successful) {
+		if (UIEnabled && successful) {
 			//View
 			updateTimelineUIFromChangeInFPSOrTime(session.getFramesPerSecond());
 			refreshUI();
@@ -860,8 +866,11 @@ public class Controller {
 	public void addNewLayer() {
 		//Model
 		session.addNewLayer();
-		//View
-		refreshTimelineUI();
+		if(UIEnabled) {
+			//View
+			refreshTimelineUI();
+		}
+		
 	}
 	
 	// Returns an empty arraylist of draw instructions if there isn't anything currently at this time on

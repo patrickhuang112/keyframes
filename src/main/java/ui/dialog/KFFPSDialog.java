@@ -28,9 +28,6 @@ public class KFFPSDialog implements KFDialog {
 	    	int res = (int)(fpsSelector.getValue());
 	    	if(res == JOptionPane.YES_OPTION) {
 	    		int val = fpsSlider.getValue();
-	    		if (val == 0) {
-	    			val++;
-	    		}
 	    		Controller.getController().addAndExecuteCommand(CommandFactory.createFPSChangedCommand(val));
 	    	} 
 	    }

@@ -26,7 +26,7 @@ import keyframes.Controller;
 import keyframes.Session;
 
 class AbstractKFCanvas extends JPanel implements KFCanvas {
-
+	public static final Color defaultDrawPanelBackgroundColor = Color.gray;
 	boolean cursorInScreen = true;
 	ArrayList<DrawPoint> currentDraggedPoints = null;
 	
@@ -81,7 +81,7 @@ class AbstractKFCanvas extends JPanel implements KFCanvas {
 					Color pointColor;
 					setting = Controller.getController().getPaintSetting();
 					
-					if (setting == Enums.PaintSetting.FILLSINGLE) {
+					if (setting == Enums.PaintSetting.FILL) {
 						floodFillCurrentLayer(point);
 					} else if (setting == Enums.PaintSetting.DRAW || setting == Enums.PaintSetting.ERASE) {
 						
@@ -163,8 +163,8 @@ class AbstractKFCanvas extends JPanel implements KFCanvas {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				Color backgroundColor = Session.defaultDrawPanelBackgroundColor;
-				Controller.getController().setDrawablePanelBackgroundColor(backgroundColor);
+				Color backgroundColor = defaultDrawPanelBackgroundColor;
+				Controller.getController().setBackgroundColor(backgroundColor);
 				Controller.getController().setEraserColor(backgroundColor);
 				// Once we now have access to the draw panel, we should also update all the draw frames in
 				// the layers with the new dimensions

@@ -29,9 +29,6 @@ public class BrushSizeKFDialog implements KFDialog {
 	    	int res = (int)(brushSizeSelector.getValue());
 	    	if(res == JOptionPane.YES_OPTION) {
 	    		int val = brushSizeSlider.getValue();
-	    		if (val == 0) {
-	    			val++;
-	    		}
 	    		Controller.getController().addAndExecuteCommand(CommandFactory.createBrushSizeCommand(val));
 	    	} 
 	    }
