@@ -151,9 +151,7 @@ public class Controller {
 	}
 	
 	public static void createController() {
-		if (Controller.instance == null) {
-			Controller.instance = new Controller();
-		}
+		Controller.instance = new Controller();
 	}
 	
 	public static Controller getController() {
@@ -178,7 +176,9 @@ public class Controller {
 		c.execute();
 		currentCommand++;
 		currentState++;
-		refreshUI();
+		if (UIEnabled) {
+			refreshUI();
+		}
 	}
 	
 	public void undoCommand() {
@@ -186,7 +186,9 @@ public class Controller {
 			commandStack.get(currentCommand).unExecute();			
 			currentCommand--;
 			currentState--;
-			refreshUI();
+			if (UIEnabled) {
+				refreshUI();
+			}
 		}
 	}
 	
@@ -195,7 +197,9 @@ public class Controller {
 			currentCommand++;
 			currentState++;
 			commandStack.get(currentCommand).execute();
-			refreshUI();
+			if (UIEnabled) {
+				refreshUI();
+			}
 		}
 		
 		// WE have to update the pointer first
@@ -407,7 +411,9 @@ public class Controller {
 	
 	public void newSessionLayers() {
 		session.initializeLayers();
-		refreshUI();
+		if (UIEnabled) {
+			refreshUI();
+		}
 	}
 	
 	public void newSessionFromSettings() {
@@ -417,12 +423,16 @@ public class Controller {
 	public void newSessionFromSessionSave(SessionSave ss) {
 		session = Session.createSessionFromSessionSave(ss);
 		updateLayersFromDeserialization();
-		refreshUI();
+		if (UIEnabled) {
+			refreshUI();
+		}
 	}
 	
 	public void newSessionFromUndo(Session s) {
 		session = s;
-		refreshUI();
+		if (UIEnabled) {
+			refreshUI();
+		}
 	}
 	
 	public Session createSessionDeepCopy() {
